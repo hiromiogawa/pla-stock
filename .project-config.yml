@@ -1,0 +1,25 @@
+# Project-specific configuration values
+# Referenced by skills (code-quality, conventional-commits, etc.) for project-specific settings.
+
+project:
+  name: pla-stock
+  type: single-package
+
+coverage:
+  minimum: 60
+  target: 75
+
+architecture:
+  # Phase 2 でスキャフォールド時に確定。FSD 類似構造を採用予定。
+  type: tbd
+
+scopes:
+  # Domain features (MVP)
+  - kit              # プラモデル（キット）管理
+  - paint            # 塗料管理
+  # Cross-cutting
+  - ui               # shared/ui コンポーネント
+  - infra            # Cloudflare Workers / Neon / Drizzle / env
+  - deps             # dependency add/upgrade
+  - ci               # GitHub Actions
+  - docs             # documentation

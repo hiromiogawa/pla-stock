@@ -1,0 +1,70 @@
+---
+name: code-quality
+description: OXLint/Biome/knip/dependency-cruiser を pre-commit / pre-push / CI の 3 層で運用する設定と判断基準を示す。Use when 品質ツールの設定・実行タイミングを決めるとき、または lint・未使用コード・依存違反エラーに遭遇したとき
+---
+
+# コード品質ツール
+
+品質を pre-commit / pre-push / CI の 3 層で担保し、フォーマットとリントは別ツールに役割分担する。
+
+## ツールスタック
+
+| ツール | 用途 |
+|--------|------|
+| **Biome** | フォーマッター（Prettier の代替） |
+| **OXLint** | リンター（全ルール有効ベース） |
+| **knip** | 未使用コード・exports・依存の検出 |
+| **dependency-cruiser** | 依存方向の強制 + 循環依存検出 |
+| **Vitest** | テストフレームワーク |
+| **husky + lint-staged** | Git hooks 管理（pnpm self-contained で完結させるため lefthook ではなくこちらを採用） |
+| **commitlint** | コミットメッセージ検証 |
+
+## 実行タイミング
+
+| ツール | pre-commit | pre-push | CI |
+|--------|-----------|----------|-----|
+| Biome (format) | o | | o |
+| OXLint (lint) | o | | o |
+| knip (変更分) | o | | |
+| knip (全体) | | o | o |
+| dependency-cruiser | o | | o (+ SVG) |
+| TypeScript | | | o |
+| commitlint | commit-msg | | |
+| Vitest (unit) | | | o |
+| Vitest (integration + E2E) | | | o |
+
+## カバレッジ閾値
+
+プロジェクト固有の値は `.project-config.yml` を参照。デフォルト:
+- **最低:** 75%
+- **目標:** 80%
+- パッケージごとに計測（unit + integration）
+- E2E はカバレッジ対象外
+
+## dependency-cruiser ルール
+
+以下を強制する:
+1. **ドメイン層** はインフラ層・インターフェース層をインポートしてはならない
+2. **インフラ層** はインターフェース層をインポートしてはならない
+3. **循環依存の禁止**
+
+CI で依存グラフの SVG を自動生成する。
+
+## 設定ファイル
+
+- `biome.json` — フォーマッター設定（リンターは無効、OXLint が担当）
+- `.oxlintrc.json` — `"all": "warn"` ベース、必要に応じて個別ルールを無効化
+- `knip.json` — ワークスペース対応、entry/project パターン
+- `.dependency-cruiser.cjs` — 禁止依存ルール
+- `.husky/{pre-commit,pre-push,commit-msg}` — フック本体
+- `package.json` の `lint-staged` セクション — staged files に対する format/lint 定義
+- `commitlint.config.cjs` — Conventional Commits 設定（scope enum 付き）
+
+## よくある間違い
+
+| 間違い | 正しい対応 |
+|--------|-----------|
+| Biome と OXLint の両方で lint を有効化 | Biome はフォーマットのみ、lint は OXLint に一元化 |
+| knip の未使用警告を無視 | 必ず解消（削除 or entry に追加） |
+| dep-check 違反を許可コメントで回避 | import 方向を直す |
+| 新規パッケージ追加時に dep-check 設定を忘れる | `.dependency-cruiser.cjs` に層情報を追加 |

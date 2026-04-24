@@ -1,0 +1,52 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# build outputs
+dist/
+build/
+.output/
+.vinxi/
+
+# Cloudflare
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# env
+.env
+.env.*
+!.env.example
+
+# testing
+coverage/
+
+# TypeScript
+*.tsbuildinfo
+
+# logs
+*-debug.log*
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+*.swp
+
+# generated docs
+/docs/api/
+/docs/generated/
+
+# local-only AI plans / specs (not published)
+/docs/superpowers/
+
+# scratch
+/tmp/
