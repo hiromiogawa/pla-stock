@@ -50,3 +50,6 @@ Thumbs.db
 
 # scratch
 /tmp/
+
+# visual companion working dir
+/.superpowers/
