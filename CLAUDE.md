@@ -102,7 +102,16 @@ Phase 2 で以下を整備予定：
 
 ## コマンド
 
-**スキャフォールド後に追記**。
+| コマンド | 用途 |
+|---|---|
+| `pnpm dev` | 開発サーバ起動（Vite, http://localhost:3000 ） |
+| `pnpm build` | プロダクションビルド (`vite build && tsc --noEmit`) |
+| `pnpm preview` | ビルド済みアセットのローカルプレビュー |
+| `pnpm deploy` | Cloudflare Workers にデプロイ (`wrangler deploy`) |
+| `pnpm cf-typegen` | Cloudflare バインディングの型生成 (`wrangler types`) |
+| `pnpm install` | 依存インストール（postinstall で cf-typegen 自動実行） |
+
+Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta pin` で `.nvmrc` に追従。
 
 ## Git Hooks
 
