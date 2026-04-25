@@ -1,24 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
 
 export const Route = createFileRoute('/')({
-  loader: () => getData(),
   component: Home,
 })
 
-const getData = createServerFn().handler(() => {
-  return {
-    message: `Running in ${navigator.userAgent}`,
-  }
-})
-
 function Home() {
-  const data = Route.useLoaderData()
-
   return (
-    <div className="p-2">
-      <h3>Welcome Home!!!</h3>
-      <p>{data.message}</p>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold">pla-stock</h1>
+      <p className="text-sm text-gray-600">Phase A-1: scaffold cleanup done</p>
     </div>
   )
 }
