@@ -10,6 +10,8 @@ export function BottomTabBar() {
           <li key={item.key} className="flex-1">
             {item.disabled ? (
               <span
+                role="link"
+                aria-disabled="true"
                 className="flex flex-col items-center justify-center py-2 text-xs text-muted-foreground/60"
                 title="Phase A-2 以降で実装"
               >

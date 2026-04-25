@@ -13,6 +13,8 @@ export function Sidebar() {
           item.disabled ? (
             <span
               key={item.key}
+              role="link"
+              aria-disabled="true"
               className="block px-3 py-2 text-sm text-muted-foreground/60 cursor-not-allowed"
               title="Phase A-2 以降で実装"
             >
