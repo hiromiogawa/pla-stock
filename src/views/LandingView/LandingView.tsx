@@ -8,7 +8,6 @@ export function LandingView() {
 
   const handleMockLogin = (role: UserRole) => {
     mockLogin(role)
-    // @ts-expect-error – /app route is registered in Task 8
     void navigate({ to: '/app' })
   }
 

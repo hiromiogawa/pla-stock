@@ -4,7 +4,9 @@
 
 ## ステータス
 
-**Phase 1 — AI ハーネスのみ**。フレームワーク / ツール類は未スキャフォールド。
+**Phase A-1 完了 — モックプロトタイプ基盤**。
+FSD スケルトン + shadcn/ui + モック認証 + AppShell + Landing + Dashboard 動作確認済み。
+Kit / Paint / Project / Settings 画面および Admin 画面は Phase A-2 以降で追加予定。
 
 ## スコープ
 
