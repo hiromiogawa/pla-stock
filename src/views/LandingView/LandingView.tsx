@@ -1,11 +1,12 @@
 import { useNavigate } from '@tanstack/react-router'
+import type { UserRole } from '~/entities/user'
 import { Button } from '~/shared/ui/button'
 import { mockLogin } from '~/shared/lib/mock-auth'
 
 export function LandingView() {
   const navigate = useNavigate()
 
-  const handleMockLogin = (role: 'user' | 'admin') => {
+  const handleMockLogin = (role: UserRole) => {
     mockLogin(role)
     // @ts-expect-error – /app route is registered in Task 8
     void navigate({ to: '/app' })
@@ -49,7 +50,7 @@ export function LandingView() {
       </main>
       <footer className="border-t border-border">
         <div className="max-w-3xl mx-auto px-6 py-4 text-xs text-muted-foreground">
-          © 2026 pla-stock
+          © {new Date().getFullYear()} pla-stock
         </div>
       </footer>
     </div>
