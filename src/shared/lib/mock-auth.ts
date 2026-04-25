@@ -1,4 +1,4 @@
-import type { User } from '~/entities/user'
+import type { User, UserRole } from '~/entities/user'
 
 /**
  * Phase A-1 用の疑似セッション。
@@ -33,7 +33,7 @@ export function getMockSession(): MockSession {
 }
 
 /** モックログイン: user または admin を選んでセッション開始。 */
-export function mockLogin(role: 'user' | 'admin' = 'user'): void {
+export function mockLogin(role: UserRole = 'user'): void {
   currentSession = { user: role === 'admin' ? MOCK_ADMIN : MOCK_USER }
 }
 
