@@ -1,20 +1,23 @@
 import { getMockSession } from '~/shared/lib/mock-auth'
 
+const STUB_STATS = [
+  { label: '未組立', value: 0, unit: '個' },
+  { label: '組立中', value: 0, unit: '個' },
+  { label: '完成', value: 0, unit: '個' },
+  { label: 'アクティブプロジェクト', value: 0, unit: '件' },
+  { label: '使用中塗料', value: 0, unit: '本' },
+] as const
+
 /**
  * Phase A-1 の Dashboard。
  * 統計は全部スタブ (0 固定)。A-2 以降で mock データ経由で実数が入る。
  */
 export function DashboardView() {
+  // TODO(Phase-B): getMockSession は module-scope 変数の素読み。ログイン状態が
+  // 変化しても再レンダーされない。Phase B で useSyncExternalStore または
+  // React Context に移行するまでの暫定実装。
   const session = getMockSession()
   const userName = session?.user.name ?? 'ゲスト'
-
-  const stats = [
-    { label: '未組立', value: 0, unit: '個' },
-    { label: '組立中', value: 0, unit: '個' },
-    { label: '完成', value: 0, unit: '個' },
-    { label: 'アクティブプロジェクト', value: 0, unit: '件' },
-    { label: 'in_use 塗料', value: 0, unit: '本' },
-  ]
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-10">
@@ -25,7 +28,7 @@ export function DashboardView() {
         </p>
       </div>
       <section className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
-        {stats.map((s) => (
+        {STUB_STATS.map((s) => (
           <div
             key={s.label}
             className="rounded-lg border border-border bg-card p-4 flex flex-col gap-1"
