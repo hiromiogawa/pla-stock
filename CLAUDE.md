@@ -28,6 +28,7 @@
 | **エージェントが同じミスを繰り返した時** | `failure-record` | ADR-0007 形式で記録 |
 | **「ルールを改善して」依頼時** | `rule-cycle` | measure → explore → improve → audit |
 | **ドキュメント追加・更新時** | `docs-freshness` | Why/What/How 分類、自動生成先か手動か判定 |
+| **Issue 起票時** | `writing-issues` | Type 別本文構成・親子紐付け・アンチパターン |
 | **新スキル作成・編集時** | `writing-project-skills` | プロジェクト skill 規約 |
 
 ### 一覧（参照用）
@@ -49,6 +50,7 @@
 - **failure-record** — エージェント失敗の記録と再発防止
 - **rule-measure / rule-explore / rule-improve / rule-audit / rule-cycle** — ルール改善サイクル
 - **project-bootstrap** — 新プロジェクト初期化オーケストレーター
+- **writing-issues** — Issue 本文構成・タイトル命名・親子紐付け・アンチパターンの規約
 - **writing-project-skills** — プロジェクト skill 規約
 
 > **注**: 移植元の st-cost は Next.js / pnpm 前提で書かれている skill が多い。pla-stock は TanStack Start + Cloudflare + Neon + Drizzle を採用予定のため、Phase 2（スキャフォールド時）に `code-quality`, `self-review`, `conventional-commits` などを本プロジェクトのスタックに合わせて更新すること。
