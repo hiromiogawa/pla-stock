@@ -1,0 +1,29 @@
+name: Epic
+description: 大きな機能単位（複数Task/Storyを束ねる）
+labels: ["epic"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: ゴール
+      description: このEpicで達成したいこと
+    validations:
+      required: true
+  - type: textarea
+    id: completion
+    attributes:
+      label: 完了条件
+      description: チェックボックスで列挙
+      placeholder: |
+        - [ ] 条件1
+        - [ ] 条件2
+    validations:
+      required: true
+  - type: textarea
+    id: children
+    attributes:
+      label: 子Issue
+      description: sub-issueとして紐付けるTask/Story/Bug
+      placeholder: |
+        - #1
+        - #2

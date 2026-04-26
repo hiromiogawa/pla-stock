@@ -1,0 +1,29 @@
+name: Task
+description: 技術的な実装作業（基本1PR）
+labels: ["task"]
+body:
+  - type: input
+    id: parent
+    attributes:
+      label: 親Epic
+      description: "例: #12"
+  - type: textarea
+    id: description
+    attributes:
+      label: やること
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 受け入れ条件
+      placeholder: |
+        - [ ] 条件1
+        - [ ] 条件2
+    validations:
+      required: true
+  - type: textarea
+    id: tech_notes
+    attributes:
+      label: 技術メモ
+      description: 設計判断・参考資料・懸念点など

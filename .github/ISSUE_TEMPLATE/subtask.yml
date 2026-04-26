@@ -1,0 +1,25 @@
+name: Subtask
+description: 親Taskを分割した1PR単位の作業
+labels: ["subtask"]
+body:
+  - type: input
+    id: parent
+    attributes:
+      label: 親Task
+      description: "例: #12"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: やること
+    validations:
+      required: true
+  - type: textarea
+    id: completion
+    attributes:
+      label: 完了条件
+      placeholder: |
+        - [ ] 条件1
+    validations:
+      required: true

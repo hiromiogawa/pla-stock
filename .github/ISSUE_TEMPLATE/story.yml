@@ -1,0 +1,25 @@
+name: Story
+description: ユーザー視点の機能（基本1PR）
+labels: ["story"]
+body:
+  - type: input
+    id: parent
+    attributes:
+      label: 親Epic
+      description: "例: #12"
+  - type: textarea
+    id: story
+    attributes:
+      label: ユーザーストーリー
+      description: "As a … I want … so that …"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 受け入れ条件
+      placeholder: |
+        - [ ] 条件1
+        - [ ] 条件2
+    validations:
+      required: true
