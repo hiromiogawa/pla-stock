@@ -1,21 +1,19 @@
-import type { Paint } from '~/entities/paint'
+import type { Paint, PaintStock } from '~/entities/paint'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 
 export interface PaintDetailHeaderProps {
   paint: Paint
-  editing: boolean
-  onEdit: () => void
-  onCancelEdit: () => void
-  onDelete: () => void
+  stock: PaintStock
+  onPurchase: () => void
+  onRelease: () => void
 }
 
 export function PaintDetailHeader({
   paint,
-  editing,
-  onEdit,
-  onCancelEdit,
-  onDelete,
+  stock,
+  onPurchase,
+  onRelease,
 }: PaintDetailHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
@@ -30,16 +28,13 @@ export function PaintDetailHeader({
             <Badge variant="outline" className="ml-1">private</Badge>
           )}
         </div>
+        <p className="text-sm font-medium mt-1">在庫: {stock.count} 本</p>
       </div>
       <div className="flex gap-2 shrink-0">
-        {editing ? (
-          <Button variant="outline" onClick={onCancelEdit}>キャンセル</Button>
-        ) : (
-          <>
-            <Button variant="outline" onClick={onEdit}>編集</Button>
-            <Button variant="destructive" onClick={onDelete}>削除</Button>
-          </>
-        )}
+        <Button onClick={onPurchase}>+1 本（購入）</Button>
+        <Button variant="outline" onClick={onRelease} disabled={stock.count === 0}>
+          −1 本（手放し）
+        </Button>
       </div>
     </div>
   )

@@ -1,9 +1,10 @@
-import type { Kit, KitStock } from '~/entities/kit'
-import { nullifyKitStockIdInProjects } from './projects'
+import type { Kit, KitStock, KitEvent, KitEventReason } from '~/entities/kit'
 
 /**
- * モック層: キット master / kit_stock の in-memory データと CRUD アクセサ。
+ * モック層: キット master / kit_stock (count cache) / kit_events (ledger) の
+ * in-memory データと CRUD アクセサ。
  *
+ * 在庫モデルを per-unit → count + event log pattern に統一 (2026-04-27)。
  * Phase C で実 server fn (createServerFn + Drizzle + D1) に差し替える前提。
  * 関数 signature は server fn 互換形 (async, 入力は1引数オブジェクト) にしておくと
  * 差し替え時の差分が最小になる。
@@ -88,61 +89,121 @@ const kits: Kit[] = [
   },
 ]
 
+/**
+ * kit_stocks: (userId, kitId) per 1 行のカウント。
+ * 旧 per-unit 5 行 → 新 5 (user, kit) pair。
+ * kit-2, kit-3 はプロジェクトが消費して count=0。
+ */
 const kitStocks: KitStock[] = [
+  { userId: MOCK_USER_ID, kitId: 'kit-1', count: 1 },
+  { userId: MOCK_USER_ID, kitId: 'kit-2', count: 0 }, // project-2 (シャアザク) が消費
+  { userId: MOCK_USER_ID, kitId: 'kit-3', count: 0 }, // project-1 (Sazabi) が消費
+  { userId: MOCK_USER_ID, kitId: 'kit-5', count: 1 },
+  { userId: MOCK_USER_ID, kitId: 'kit-6', count: 1 },
+]
+
+/**
+ * kit_events: 入出庫の audit ledger。
+ * SUM(delta) で kitStocks.count が再計算できることを保証する。
+ */
+const kitEvents: KitEvent[] = [
+  // kit-1: 購入 +1 → count=1
   {
-    id: 'kit-stock-1',
+    id: 'ke-1',
     userId: MOCK_USER_ID,
     kitId: 'kit-1',
+    delta: 1,
+    reason: 'purchase',
+    projectId: null,
     purchasedAt: '2026-02-10',
-    purchasePriceYen: 990,
+    priceYen: 990,
     purchaseLocation: 'ヨドバシ梅田',
-    assemblyStatus: 'unbuilt',
-    photoUrl: null,
-    remark: null,
+    note: null,
+    createdAt: '2026-02-10T10:00:00Z',
   },
+  // kit-2: 購入 +1
   {
-    id: 'kit-stock-2',
+    id: 'ke-2',
     userId: MOCK_USER_ID,
     kitId: 'kit-2',
+    delta: 1,
+    reason: 'purchase',
+    projectId: null,
     purchasedAt: '2026-03-05',
-    purchasePriceYen: 2200,
+    priceYen: 2200,
     purchaseLocation: 'Joshin スーパーキッズランド',
-    assemblyStatus: 'building',
-    photoUrl: null,
-    remark: 'シャア専用カラー再現用にガイア赤系を準備中',
+    note: 'シャア専用カラー再現用にガイア赤系を準備中',
+    createdAt: '2026-03-05T10:00:00Z',
   },
+  // kit-2: project-2 (シャアザク) に消費 -1 → count=0
   {
-    id: 'kit-stock-3',
+    id: 'ke-3',
+    userId: MOCK_USER_ID,
+    kitId: 'kit-2',
+    delta: -1,
+    reason: 'project',
+    projectId: 'project-2',
+    purchasedAt: null,
+    priceYen: null,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-03-20T10:00:00Z',
+  },
+  // kit-3: 購入 +1
+  {
+    id: 'ke-4',
     userId: MOCK_USER_ID,
     kitId: 'kit-3',
+    delta: 1,
+    reason: 'purchase',
+    projectId: null,
     purchasedAt: '2025-12-20',
-    purchasePriceYen: 9800,
+    priceYen: 9800,
     purchaseLocation: 'Amazon',
-    assemblyStatus: 'completed',
-    photoUrl: null,
-    remark: '完成作。次はディテールアップ予定',
+    note: null,
+    createdAt: '2025-12-20T10:00:00Z',
   },
+  // kit-3: project-1 (Sazabi) に消費 -1 → count=0
   {
-    id: 'kit-stock-4',
+    id: 'ke-5',
+    userId: MOCK_USER_ID,
+    kitId: 'kit-3',
+    delta: -1,
+    reason: 'project',
+    projectId: 'project-1',
+    purchasedAt: null,
+    priceYen: null,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-01-05T10:00:00Z',
+  },
+  // kit-5: 購入 +1 → count=1
+  {
+    id: 'ke-6',
     userId: MOCK_USER_ID,
     kitId: 'kit-5',
+    delta: 1,
+    reason: 'purchase',
+    projectId: null,
     purchasedAt: '2026-04-01',
-    purchasePriceYen: 770,
+    priceYen: 770,
     purchaseLocation: 'コンビニ受取',
-    assemblyStatus: 'unbuilt',
-    photoUrl: null,
-    remark: '初心者向けに買ってみた',
+    note: '初心者向けに買ってみた',
+    createdAt: '2026-04-01T10:00:00Z',
   },
+  // kit-6: 入手 (private item) +1 → count=1
   {
-    id: 'kit-stock-5',
+    id: 'ke-7',
     userId: MOCK_USER_ID,
     kitId: 'kit-6',
+    delta: 1,
+    reason: 'gift',
+    projectId: null,
     purchasedAt: null,
-    purchasePriceYen: null,
+    priceYen: null,
     purchaseLocation: null,
-    assemblyStatus: 'unbuilt',
-    photoUrl: null,
-    remark: 'private item として登録した実家ジャンク',
+    note: 'private item として登録した実家ジャンク',
+    createdAt: '2026-01-01T00:00:00Z',
   },
 ]
 
@@ -164,21 +225,45 @@ export async function getKit(input: { kitId: string; userId: string }): Promise<
   return null
 }
 
-/** 自分の kit_stock 全件 */
-export async function getKitStocks(input: { userId: string }): Promise<KitStock[]> {
+/** (userId, kitId) composite key で kit_stock 1 行を取得 */
+export async function getKitStock(input: { userId: string; kitId: string }): Promise<KitStock | null> {
+  return kitStocks.find(
+    (s) => s.userId === input.userId && s.kitId === input.kitId,
+  ) ?? null
+}
+
+/** user の全 kit_stock を返す */
+export async function getKitStocksAll(input: { userId: string }): Promise<KitStock[]> {
   return kitStocks.filter((s) => s.userId === input.userId)
 }
 
-/** 自分の kit_stock 単一取得 */
-export async function getKitStock(input: { stockId: string; userId: string }): Promise<KitStock | null> {
-  const stock = kitStocks.find((s) => s.id === input.stockId && s.userId === input.userId)
-  return stock ?? null
+/** user の count > 0 の kit_stock のみ返す */
+export async function getKitStocksWithStock(input: { userId: string }): Promise<KitStock[]> {
+  return kitStocks.filter((s) => s.userId === input.userId && s.count > 0)
+}
+
+/** kit_event 履歴を (userId, kitId) で取得 */
+export async function getKitEvents(input: { userId: string; kitId: string }): Promise<KitEvent[]> {
+  return kitEvents.filter(
+    (e) => e.userId === input.userId && e.kitId === input.kitId,
+  )
+}
+
+// === Compute ===
+
+/** events から count を再計算 (整合性チェック用) */
+export async function recomputeKitStockCount(input: {
+  userId: string
+  kitId: string
+}): Promise<number> {
+  const events = await getKitEvents(input)
+  return events.reduce((sum, e) => sum + e.delta, 0)
 }
 
 // === Mutations (in-memory; Phase C では DB INSERT/UPDATE/DELETE) ===
 
 let kitIdCounter = kits.length + 1
-let kitStockIdCounter = kitStocks.length + 1
+let kitEventIdCounter = kitEvents.length + 1
 
 /** 新規 private kit を作成 (master に無いキットを自分用に追加する時) */
 export async function addPrivateKit(input: {
@@ -206,49 +291,60 @@ export async function addPrivateKit(input: {
   return newKit
 }
 
-/** 既存キット (public master or 自分の private) を在庫に追加 */
-export async function addKitStock(input: {
+/**
+ * kit_event を追加し、kit_stock の count を更新する。
+ *
+ * - delta=0 は禁止 (throw)。
+ * - 結果 count < 0 は禁止 (throw)。
+ * - kit_stock 行が未存在なら自動作成 (count = delta)。
+ */
+export async function addKitEvent(input: {
   userId: string
   kitId: string
+  delta: number
+  reason: KitEventReason
+  projectId?: string | null
   purchasedAt?: string | null
-  purchasePriceYen?: number | null
+  priceYen?: number | null
   purchaseLocation?: string | null
-  remark?: string | null
-}): Promise<KitStock> {
-  const newStock: KitStock = {
-    id: `kit-stock-${kitStockIdCounter++}`,
+  note?: string | null
+}): Promise<KitEvent> {
+  if (input.delta === 0) {
+    throw new Error('addKitEvent: delta must be non-zero')
+  }
+
+  // kit_stock を探すまたは作成
+  let stock = kitStocks.find(
+    (s) => s.userId === input.userId && s.kitId === input.kitId,
+  )
+  if (!stock) {
+    stock = { userId: input.userId, kitId: input.kitId, count: 0 }
+    kitStocks.push(stock)
+  }
+
+  const newCount = stock.count + input.delta
+  if (newCount < 0) {
+    throw new Error(
+      `addKitEvent: result count would be ${newCount} (< 0). Current count: ${stock.count}, delta: ${input.delta}`,
+    )
+  }
+
+  // count 更新
+  stock.count = newCount
+
+  const newEvent: KitEvent = {
+    id: `ke-${kitEventIdCounter++}`,
     userId: input.userId,
     kitId: input.kitId,
+    delta: input.delta,
+    reason: input.reason,
+    projectId: input.projectId ?? null,
     purchasedAt: input.purchasedAt ?? null,
-    purchasePriceYen: input.purchasePriceYen ?? null,
+    priceYen: input.priceYen ?? null,
     purchaseLocation: input.purchaseLocation ?? null,
-    assemblyStatus: 'unbuilt',
-    photoUrl: null,
-    remark: input.remark ?? null,
+    note: input.note ?? null,
+    createdAt: new Date().toISOString(),
   }
-  kitStocks.push(newStock)
-  return newStock
-}
-
-/** kit_stock を更新 (assembly_status / remark / 購入情報) */
-export async function updateKitStock(input: {
-  stockId: string
-  userId: string
-  patch: Partial<Pick<KitStock, 'assemblyStatus' | 'remark' | 'purchasedAt' | 'purchasePriceYen' | 'purchaseLocation' | 'photoUrl'>>
-}): Promise<KitStock | null> {
-  const idx = kitStocks.findIndex((s) => s.id === input.stockId && s.userId === input.userId)
-  if (idx === -1) return null
-  kitStocks[idx] = { ...kitStocks[idx], ...input.patch }
-  return kitStocks[idx]
-}
-
-/** kit_stock を削除 */
-export async function deleteKitStock(input: { stockId: string; userId: string }): Promise<boolean> {
-  const idx = kitStocks.findIndex((s) => s.id === input.stockId && s.userId === input.userId)
-  if (idx === -1) return false
-  const deletedId = kitStocks[idx].id
-  kitStocks.splice(idx, 1)
-  // 紐付くプロジェクトの kitStockId を null にする (アプリ層 cascade、Phase C で FK SET NULL に置換)
-  await nullifyKitStockIdInProjects({ kitStockId: deletedId })
-  return true
+  kitEvents.push(newEvent)
+  return newEvent
 }

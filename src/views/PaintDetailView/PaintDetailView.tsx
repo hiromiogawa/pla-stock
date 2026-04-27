@@ -1,66 +1,80 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import type { Paint, PaintStock } from '~/entities/paint'
+import type { Paint, PaintStock, PaintEvent } from '~/entities/paint'
 import type { Project } from '~/entities/project'
-import { deletePaintStock, updatePaintStock } from '~/shared/api/mock/paints'
+import { addPaintEvent } from '~/shared/api/mock/paints'
 import { getMockSession } from '~/shared/lib/mock-auth'
 import { Button } from '~/shared/ui/button'
 import { PaintDetailHeader } from './PaintDetailHeader'
 import { PaintDetailFields } from './PaintDetailFields'
-import { PaintEditForm, type PaintEditValues } from './PaintEditForm'
-import { PaintDeleteDialog } from './PaintDeleteDialog'
+import { PaintPurchaseDialog, type PaintPurchaseValues } from './PaintPurchaseDialog'
+import { PaintReleaseDialog, type PaintReleaseValues } from './PaintReleaseDialog'
 import { LinkedProjectsForPaint } from './LinkedProjectsForPaint'
 
 export interface PaintDetailViewProps {
   stock: PaintStock | null
   paint: Paint | null
+  events: PaintEvent[]
   linkedProjects: Project[]
 }
 
-export function PaintDetailView({ stock, paint, linkedProjects }: PaintDetailViewProps) {
+export function PaintDetailView({ stock: initialStock, paint, events: initialEvents, linkedProjects }: PaintDetailViewProps) {
   const navigate = useNavigate()
-  const [editing, setEditing] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [currentStock, setCurrentStock] = useState(stock)
+  const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)
+  const [showReleaseDialog, setShowReleaseDialog] = useState(false)
+  const [currentStock, setCurrentStock] = useState(initialStock)
+  const [currentEvents, setCurrentEvents] = useState(initialEvents)
 
   if (!currentStock || !paint) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 md:px-8 text-center space-y-4">
         <h1 className="text-2xl font-bold">塗料が見つかりません</h1>
         <p className="text-sm text-muted-foreground">
-          指定された stockId の塗料は存在しないか、削除済みです。
+          指定された paintId の塗料は存在しないか、在庫がありません。
         </p>
-        <Button onClick={() => navigate({ to: '/app/paints' })}>塗料一覧へ戻る</Button>
+        <Button onClick={() => navigate({ to: '/paints' })}>塗料一覧へ戻る</Button>
       </div>
     )
   }
 
-  const handleSave = async (values: PaintEditValues) => {
+  const paintLabel = `${paint.brand} ${paint.code} ${paint.name}`
+
+  const handlePurchase = async (values: PaintPurchaseValues) => {
     const session = getMockSession()
     const userId = session?.user.id ?? 'mock-user-1'
-    const updated = await updatePaintStock({
-      stockId: currentStock.id,
-      userId,
-      patch: values,
-    })
-    if (updated) {
-      setCurrentStock(updated)
-      setEditing(false)
-    } else {
-      // TODO(Phase-C): toast / error UI に差し替え
-      console.warn('updatePaintStock returned null', { stockId: currentStock.id })
+    try {
+      const newEvent = await addPaintEvent({
+        userId,
+        paintId: paint.id,
+        delta: 1,
+        reason: 'purchase',
+        purchasedAt: values.purchasedAt,
+        priceYen: values.priceYen,
+        purchaseLocation: values.purchaseLocation,
+        note: values.note,
+      })
+      setCurrentStock({ ...currentStock, count: currentStock.count + 1 })
+      setCurrentEvents([newEvent, ...currentEvents])
+    } catch (err) {
+      console.warn('addPaintEvent (purchase) failed', err)
     }
   }
 
-  const handleDelete = async () => {
+  const handleRelease = async (values: PaintReleaseValues) => {
     const session = getMockSession()
     const userId = session?.user.id ?? 'mock-user-1'
-    const ok = await deletePaintStock({ stockId: currentStock.id, userId })
-    if (ok) {
-      void navigate({ to: '/app/paints' })
-    } else {
-      // TODO(Phase-C): toast / error UI に差し替え
-      console.warn('deletePaintStock returned false', { stockId: currentStock.id })
+    try {
+      const newEvent = await addPaintEvent({
+        userId,
+        paintId: paint.id,
+        delta: -1,
+        reason: values.reason,
+        note: values.note,
+      })
+      setCurrentStock({ ...currentStock, count: currentStock.count - 1 })
+      setCurrentEvents([newEvent, ...currentEvents])
+    } catch (err) {
+      console.warn('addPaintEvent (release) failed', err)
     }
   }
 
@@ -68,26 +82,23 @@ export function PaintDetailView({ stock, paint, linkedProjects }: PaintDetailVie
     <div className="max-w-3xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
       <PaintDetailHeader
         paint={paint}
-        editing={editing}
-        onEdit={() => setEditing(true)}
-        onCancelEdit={() => setEditing(false)}
-        onDelete={() => setShowDeleteDialog(true)}
+        stock={currentStock}
+        onPurchase={() => setShowPurchaseDialog(true)}
+        onRelease={() => setShowReleaseDialog(true)}
       />
-      {editing ? (
-        <PaintEditForm
-          stock={currentStock}
-          onSave={handleSave}
-          onCancel={() => setEditing(false)}
-        />
-      ) : (
-        <PaintDetailFields stock={currentStock} paint={paint} />
-      )}
+      <PaintDetailFields stock={currentStock} paint={paint} events={currentEvents} />
       <LinkedProjectsForPaint projects={linkedProjects} />
-      <PaintDeleteDialog
-        open={showDeleteDialog}
-        paintLabel={`${paint.brand} ${paint.code} ${paint.name}`}
-        onOpenChange={setShowDeleteDialog}
-        onConfirm={handleDelete}
+      <PaintPurchaseDialog
+        open={showPurchaseDialog}
+        paintLabel={paintLabel}
+        onOpenChange={setShowPurchaseDialog}
+        onConfirm={handlePurchase}
+      />
+      <PaintReleaseDialog
+        open={showReleaseDialog}
+        paintLabel={paintLabel}
+        onOpenChange={setShowReleaseDialog}
+        onConfirm={handleRelease}
       />
     </div>
   )

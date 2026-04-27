@@ -8,7 +8,7 @@ export function LandingView() {
 
   const handleMockLogin = (role: UserRole) => {
     mockLogin(role)
-    void navigate({ to: '/app' })
+    void navigate({ to: '/dashboard' })
   }
 
   return (

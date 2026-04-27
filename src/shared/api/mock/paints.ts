@@ -1,8 +1,10 @@
-import type { Paint, PaintStock } from '~/entities/paint'
+import type { Paint, PaintStock, PaintEvent, PaintEventReason } from '~/entities/paint'
 
 /**
- * モック層: 塗料 master / paint_stock の in-memory データと CRUD アクセサ。
+ * モック層: 塗料 master / paint_stock (count cache) / paint_events (ledger) の
+ * in-memory データと CRUD アクセサ。
  *
+ * 在庫モデルを per-unit → count + event log pattern に統一 (2026-04-27)。
  * Phase C で実 server fn (createServerFn + Drizzle + D1) に差し替える前提。
  */
 
@@ -132,96 +134,163 @@ const paints: Paint[] = [
   },
 ]
 
+/**
+ * paint_stocks: (userId, paintId) per 1 行のカウント。
+ * 旧 per-bottle 10 行 → 新 10 (user, paint) pair。
+ * paint-6 (Mr.Surfacer) は使い切って count=0。
+ * paint-7 は旧データにストックなし (未登録)。
+ */
 const paintStocks: PaintStock[] = [
+  { userId: MOCK_USER_ID, paintId: 'paint-1', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-2', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-3', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-4', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-5', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-6', count: 0 }, // 使い切り (空)
+  { userId: MOCK_USER_ID, paintId: 'paint-8', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-9', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-10', count: 1 },
+  { userId: MOCK_USER_ID, paintId: 'paint-11', count: 1 },
+]
+
+/**
+ * paint_events: 入出庫の audit ledger。
+ * SUM(delta) で paintStocks.count が再計算できることを保証する。
+ */
+const paintEvents: PaintEvent[] = [
   {
-    id: 'paint-stock-1',
+    id: 'pe-1',
     userId: MOCK_USER_ID,
     paintId: 'paint-1',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-01-15',
-    purchasePriceYen: 220,
-    status: 'in_use',
-    remark: null,
+    priceYen: 220,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-01-15T10:00:00Z',
   },
   {
-    id: 'paint-stock-2',
+    id: 'pe-2',
     userId: MOCK_USER_ID,
     paintId: 'paint-2',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-01-15',
-    purchasePriceYen: 220,
-    status: 'in_use',
-    remark: null,
+    priceYen: 220,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-01-15T10:01:00Z',
   },
   {
-    id: 'paint-stock-3',
+    id: 'pe-3',
     userId: MOCK_USER_ID,
     paintId: 'paint-3',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-01-15',
-    purchasePriceYen: 280,
-    status: 'new',
-    remark: null,
+    priceYen: 280,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-01-15T10:02:00Z',
   },
   {
-    id: 'paint-stock-4',
+    id: 'pe-4',
     userId: MOCK_USER_ID,
     paintId: 'paint-4',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-02-20',
-    purchasePriceYen: 440,
-    status: 'in_use',
-    remark: null,
+    priceYen: 440,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-02-20T10:00:00Z',
   },
   {
-    id: 'paint-stock-5',
+    id: 'pe-5',
     userId: MOCK_USER_ID,
     paintId: 'paint-5',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-03-01',
-    purchasePriceYen: 220,
-    status: 'in_use',
-    remark: 'シャアザク用',
+    priceYen: 220,
+    purchaseLocation: null,
+    note: 'シャアザク用',
+    createdAt: '2026-03-01T10:00:00Z',
   },
+  // paint-6: 購入 +1
   {
-    id: 'paint-stock-6',
+    id: 'pe-6',
     userId: MOCK_USER_ID,
     paintId: 'paint-6',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2025-12-10',
-    purchasePriceYen: 770,
-    status: 'empty',
-    remark: '使い切った',
+    priceYen: 770,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2025-12-10T10:00:00Z',
+  },
+  // paint-6: 使い切り廃棄 -1 → count=0
+  {
+    id: 'pe-7',
+    userId: MOCK_USER_ID,
+    paintId: 'paint-6',
+    delta: -1,
+    reason: 'discard',
+    purchasedAt: null,
+    priceYen: null,
+    purchaseLocation: null,
+    note: 'used up',
+    createdAt: '2026-03-01T10:00:00Z',
   },
   {
-    id: 'paint-stock-7',
+    id: 'pe-8',
     userId: MOCK_USER_ID,
     paintId: 'paint-8',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-03-01',
-    purchasePriceYen: 506,
-    status: 'in_use',
-    remark: 'シャアザク用',
+    priceYen: 506,
+    purchaseLocation: null,
+    note: 'シャアザク用',
+    createdAt: '2026-03-01T10:01:00Z',
   },
   {
-    id: 'paint-stock-8',
+    id: 'pe-9',
     userId: MOCK_USER_ID,
     paintId: 'paint-9',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-02-25',
-    purchasePriceYen: 660,
-    status: 'new',
-    remark: null,
+    priceYen: 660,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-02-25T10:00:00Z',
   },
   {
-    id: 'paint-stock-9',
+    id: 'pe-10',
     userId: MOCK_USER_ID,
     paintId: 'paint-10',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-04-10',
-    purchasePriceYen: 990,
-    status: 'new',
-    remark: null,
+    priceYen: 990,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-04-10T10:00:00Z',
   },
   {
-    id: 'paint-stock-10',
+    id: 'pe-11',
     userId: MOCK_USER_ID,
     paintId: 'paint-11',
+    delta: 1,
+    reason: 'purchase',
     purchasedAt: '2026-01-15',
-    purchasePriceYen: 220,
-    status: 'in_use',
-    remark: null,
+    priceYen: 220,
+    purchaseLocation: null,
+    note: null,
+    createdAt: '2026-01-15T10:03:00Z',
   },
 ]
 
@@ -241,18 +310,51 @@ export async function getPaint(input: { paintId: string; userId: string }): Prom
   return null
 }
 
-export async function getPaintStocks(input: { userId: string }): Promise<PaintStock[]> {
+/** (userId, paintId) composite key で paint_stock 1 行を取得 */
+export async function getPaintStock(input: {
+  userId: string
+  paintId: string
+}): Promise<PaintStock | null> {
+  return (
+    paintStocks.find(
+      (s) => s.userId === input.userId && s.paintId === input.paintId,
+    ) ?? null
+  )
+}
+
+/** user の全 paint_stock を返す */
+export async function getPaintStocksAll(input: { userId: string }): Promise<PaintStock[]> {
   return paintStocks.filter((s) => s.userId === input.userId)
 }
 
-export async function getPaintStock(input: { stockId: string; userId: string }): Promise<PaintStock | null> {
-  return paintStocks.find((s) => s.id === input.stockId && s.userId === input.userId) ?? null
+/** user の count > 0 の paint_stock のみ返す */
+export async function getPaintStocksWithStock(input: { userId: string }): Promise<PaintStock[]> {
+  return paintStocks.filter((s) => s.userId === input.userId && s.count > 0)
+}
+
+/** paint_event 履歴を (userId, paintId) で取得 */
+export async function getPaintEvents(input: {
+  userId: string
+  paintId: string
+}): Promise<PaintEvent[]> {
+  return paintEvents.filter(
+    (e) => e.userId === input.userId && e.paintId === input.paintId,
+  )
+}
+
+/** events から count を再計算 (整合性チェック用) */
+export async function recomputePaintStockCount(input: {
+  userId: string
+  paintId: string
+}): Promise<number> {
+  const events = await getPaintEvents(input)
+  return events.reduce((sum, e) => sum + e.delta, 0)
 }
 
 // === Mutations ===
 
 let paintIdCounter = paints.length + 1
-let paintStockIdCounter = paintStocks.length + 1
+let paintEventIdCounter = paintEvents.length + 1
 
 export async function addPrivatePaint(input: {
   userId: string
@@ -277,40 +379,56 @@ export async function addPrivatePaint(input: {
   return newPaint
 }
 
-export async function addPaintStock(input: {
+/**
+ * paint_event を追加し、paint_stock の count を更新する。
+ *
+ * - delta=0 は禁止 (throw)。
+ * - 結果 count < 0 は禁止 (throw)。
+ * - paint_stock 行が未存在なら自動作成 (count = delta)。
+ */
+export async function addPaintEvent(input: {
   userId: string
   paintId: string
+  delta: number
+  reason: PaintEventReason
   purchasedAt?: string | null
-  purchasePriceYen?: number | null
-  remark?: string | null
-}): Promise<PaintStock> {
-  const newStock: PaintStock = {
-    id: `paint-stock-${paintStockIdCounter++}`,
+  priceYen?: number | null
+  purchaseLocation?: string | null
+  note?: string | null
+}): Promise<PaintEvent> {
+  if (input.delta === 0) {
+    throw new Error('addPaintEvent: delta must be non-zero')
+  }
+
+  let stock = paintStocks.find(
+    (s) => s.userId === input.userId && s.paintId === input.paintId,
+  )
+  if (!stock) {
+    stock = { userId: input.userId, paintId: input.paintId, count: 0 }
+    paintStocks.push(stock)
+  }
+
+  const newCount = stock.count + input.delta
+  if (newCount < 0) {
+    throw new Error(
+      `addPaintEvent: result count would be ${newCount} (< 0). Current count: ${stock.count}, delta: ${input.delta}`,
+    )
+  }
+
+  stock.count = newCount
+
+  const newEvent: PaintEvent = {
+    id: `pe-${paintEventIdCounter++}`,
     userId: input.userId,
     paintId: input.paintId,
+    delta: input.delta,
+    reason: input.reason,
     purchasedAt: input.purchasedAt ?? null,
-    purchasePriceYen: input.purchasePriceYen ?? null,
-    status: 'new',
-    remark: input.remark ?? null,
+    priceYen: input.priceYen ?? null,
+    purchaseLocation: input.purchaseLocation ?? null,
+    note: input.note ?? null,
+    createdAt: new Date().toISOString(),
   }
-  paintStocks.push(newStock)
-  return newStock
-}
-
-export async function updatePaintStock(input: {
-  stockId: string
-  userId: string
-  patch: Partial<Pick<PaintStock, 'status' | 'remark' | 'purchasedAt' | 'purchasePriceYen'>>
-}): Promise<PaintStock | null> {
-  const idx = paintStocks.findIndex((s) => s.id === input.stockId && s.userId === input.userId)
-  if (idx === -1) return null
-  paintStocks[idx] = { ...paintStocks[idx], ...input.patch }
-  return paintStocks[idx]
-}
-
-export async function deletePaintStock(input: { stockId: string; userId: string }): Promise<boolean> {
-  const idx = paintStocks.findIndex((s) => s.id === input.stockId && s.userId === input.userId)
-  if (idx === -1) return false
-  paintStocks.splice(idx, 1)
-  return true
+  paintEvents.push(newEvent)
+  return newEvent
 }

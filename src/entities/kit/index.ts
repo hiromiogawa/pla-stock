@@ -1,1 +1,1 @@
-export type { Kit, KitStock, Grade, Scale, Visibility, AssemblyStatus } from './model'
+export type { Kit, KitStock, KitEvent, KitEventReason, Grade, Scale, Visibility } from './model'

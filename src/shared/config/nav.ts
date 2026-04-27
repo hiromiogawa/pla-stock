@@ -11,9 +11,9 @@ export type NavItem = {
 }
 
 export const APP_NAV_ITEMS: NavItem[] = [
-  { key: 'dashboard', label: 'ホーム', to: '/app' },
-  { key: 'kits', label: 'キット', to: '/app/kits', disabled: true },
-  { key: 'paints', label: '塗料', to: '/app/paints', disabled: true },
-  { key: 'projects', label: 'プロジェクト', to: '/app/projects', disabled: true },
-  { key: 'settings', label: '設定', to: '/app/settings', disabled: true },
+  { key: 'dashboard', label: 'ホーム', to: '/dashboard' },
+  { key: 'kits', label: 'キット', to: '/kits', disabled: true },
+  { key: 'paints', label: '塗料', to: '/paints', disabled: true },
+  { key: 'projects', label: 'プロジェクト', to: '/projects', disabled: true },
+  { key: 'settings', label: '設定', to: '/settings', disabled: true },
 ]

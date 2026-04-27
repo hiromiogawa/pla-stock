@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import type { Paint } from '~/entities/paint'
-import { paintStockSchema, type PaintStockInput } from '~/features/paint-stock-add'
+import { paintPurchaseEventSchema, type PaintStockInput } from '~/features/paint-stock-add'
 import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
@@ -17,16 +17,18 @@ export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProp
     defaultValues: {
       purchasedAt: '',
       purchasePriceYen: '' as string | number | null,
-      remark: '',
+      purchaseLocation: '',
+      note: '',
     },
     onSubmit: async ({ value }) => {
-      const parsed = paintStockSchema.parse({
+      const parsed = paintPurchaseEventSchema.parse({
         purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,
         purchasePriceYen:
           value.purchasePriceYen === '' || value.purchasePriceYen === null
             ? null
             : Number(value.purchasePriceYen),
-        remark: value.remark === '' ? null : value.remark,
+        purchaseLocation: value.purchaseLocation === '' ? null : value.purchaseLocation,
+        note: value.note === '' ? null : value.note,
       })
       await onSubmit(parsed)
     },
@@ -42,9 +44,9 @@ export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProp
       }}
     >
       <div>
-        <h2 className="text-sm font-semibold">在庫に追加</h2>
+        <h2 className="text-sm font-semibold">購入記録を追加</h2>
         <p className="text-xs text-muted-foreground mt-1">
-          {paint.brand} {paint.code} {paint.name} を自分の在庫に追加します。状態は「新品」で登録されます。
+          {paint.brand} {paint.code} {paint.name} の購入記録を追加して在庫に +1 します。
         </p>
       </div>
 
@@ -81,7 +83,23 @@ export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProp
         )}
       </form.Field>
 
-      <form.Field name="remark">
+      <form.Field name="purchaseLocation">
+        {(field) => (
+          <div className="space-y-2">
+            <Label htmlFor={field.name}>購入場所</Label>
+            <Input
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+              placeholder="ヨドバシ梅田 / Amazon など"
+            />
+          </div>
+        )}
+      </form.Field>
+
+      <form.Field name="note">
         {(field) => (
           <div className="space-y-2">
             <Label htmlFor={field.name}>メモ</Label>

@@ -1,6 +1,5 @@
-import type { Grade, Scale, AssemblyStatus } from '~/entities/kit'
+import type { Grade, Scale } from '~/entities/kit'
 import { Input } from '~/shared/ui/input'
-import { Checkbox } from '~/shared/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -13,30 +12,18 @@ export interface KitFilters {
   search: string
   grade: Grade | 'all'
   scale: Scale | 'all'
-  assemblyStatus: AssemblyStatus | 'all'
   maker: string | 'all'
-  hasPhoto: boolean
 }
 
 export const INITIAL_FILTERS: KitFilters = {
   search: '',
   grade: 'all',
   scale: 'all',
-  assemblyStatus: 'all',
   maker: 'all',
-  hasPhoto: false,
 }
 
 const GRADES: Array<Grade | 'all'> = ['all', 'HG', 'RG', 'EG', 'MG', 'PG', 'other']
 const SCALES: Array<Scale | 'all'> = ['all', '1/144', '1/100', '1/60', '1/48', 'other']
-const ASSEMBLY_STATUSES: Array<AssemblyStatus | 'all'> = ['all', 'unbuilt', 'building', 'completed']
-
-const ASSEMBLY_LABEL: Record<AssemblyStatus | 'all', string> = {
-  all: 'すべて',
-  unbuilt: '未組立',
-  building: '組立中',
-  completed: '完成',
-}
 
 export interface KitFilterBarProps {
   filters: KitFilters
@@ -85,23 +72,6 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
         </SelectContent>
       </Select>
       <Select
-        value={filters.assemblyStatus}
-        onValueChange={(v) =>
-          onChange({ ...filters, assemblyStatus: v as KitFilters['assemblyStatus'] })
-        }
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="組立状態" />
-        </SelectTrigger>
-        <SelectContent>
-          {ASSEMBLY_STATUSES.map((a) => (
-            <SelectItem key={a} value={a}>
-              {ASSEMBLY_LABEL[a]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select
         value={filters.maker}
         onValueChange={(v) => onChange({ ...filters, maker: v })}
       >
@@ -117,13 +87,6 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
           ))}
         </SelectContent>
       </Select>
-      <label className="flex items-center gap-2 px-3 text-sm text-foreground/80">
-        <Checkbox
-          checked={filters.hasPhoto}
-          onCheckedChange={(v) => onChange({ ...filters, hasPhoto: v === true })}
-        />
-        写真あり
-      </label>
     </div>
   )
 }

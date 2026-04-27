@@ -1,9 +1,12 @@
-import type { Paint, PaintStock } from '~/entities/paint'
+import type { Paint, PaintStock, PaintEvent } from '~/entities/paint'
 
-const STATUS_LABEL: Record<PaintStock['status'], string> = {
-  new: '新品',
-  in_use: '使用中',
-  empty: '空',
+const REASON_LABEL: Record<PaintEvent['reason'], string> = {
+  purchase: '購入',
+  gift: '贈り物',
+  sell: '売却',
+  discard: '廃棄',
+  lost: '紛失',
+  other: 'その他',
 }
 
 function FieldRow({
@@ -24,9 +27,10 @@ function FieldRow({
 export interface PaintDetailFieldsProps {
   stock: PaintStock
   paint: Paint
+  events: PaintEvent[]
 }
 
-export function PaintDetailFields({ stock, paint }: PaintDetailFieldsProps) {
+export function PaintDetailFields({ stock, paint, events }: PaintDetailFieldsProps) {
   return (
     <div className="space-y-4">
       {paint.swatchUrl && (
@@ -49,19 +53,42 @@ export function PaintDetailFields({ stock, paint }: PaintDetailFieldsProps) {
       <section className="rounded-lg border border-border bg-card p-4">
         <h2 className="text-sm font-semibold mb-2">在庫情報</h2>
         <dl>
-          <FieldRow label="購入日" value={stock.purchasedAt} />
-          <FieldRow
-            label="購入価格"
-            value={
-              stock.purchasePriceYen != null
-                ? `¥${stock.purchasePriceYen.toLocaleString()}`
-                : null
-            }
-          />
-          <FieldRow label="状態" value={STATUS_LABEL[stock.status]} />
-          <FieldRow label="メモ" value={stock.remark} />
+          <FieldRow label="現在の在庫数" value={`${stock.count} 本`} />
         </dl>
       </section>
+      {events.length > 0 && (
+        <section className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-sm font-semibold mb-3">入出庫履歴</h2>
+          <ul className="space-y-2">
+            {events.map((ev) => (
+              <li key={ev.id} className="flex items-start gap-3 text-sm">
+                <span
+                  className={`shrink-0 font-semibold tabular-nums ${ev.delta > 0 ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {ev.delta > 0 ? `+${ev.delta}` : ev.delta}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <span className="text-muted-foreground">{REASON_LABEL[ev.reason]}</span>
+                  {ev.priceYen != null && (
+                    <span className="ml-2 text-muted-foreground">
+                      ¥{ev.priceYen.toLocaleString()}
+                    </span>
+                  )}
+                  {ev.purchaseLocation && (
+                    <span className="ml-2 text-muted-foreground">@ {ev.purchaseLocation}</span>
+                  )}
+                  {ev.note && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{ev.note}</p>
+                  )}
+                </div>
+                <span className="shrink-0 text-xs text-muted-foreground">
+                  {ev.purchasedAt ?? ev.createdAt.slice(0, 10)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   )
 }

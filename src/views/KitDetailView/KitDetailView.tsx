@@ -1,66 +1,78 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import type { Kit, KitStock } from '~/entities/kit'
+import type { Kit, KitStock, KitEvent } from '~/entities/kit'
 import type { Project } from '~/entities/project'
-import { deleteKitStock, updateKitStock } from '~/shared/api/mock/kits'
+import { addKitEvent } from '~/shared/api/mock/kits'
 import { getMockSession } from '~/shared/lib/mock-auth'
 import { Button } from '~/shared/ui/button'
 import { KitDetailHeader } from './KitDetailHeader'
 import { KitDetailFields } from './KitDetailFields'
-import { KitEditForm, type KitEditValues } from './KitEditForm'
-import { KitDeleteDialog } from './KitDeleteDialog'
+import { KitPurchaseDialog, type KitPurchaseValues } from './KitPurchaseDialog'
+import { KitReleaseDialog, type KitReleaseValues } from './KitReleaseDialog'
 import { LinkedProjects } from './LinkedProjects'
 
 export interface KitDetailViewProps {
   stock: KitStock | null
   kit: Kit | null
+  events: KitEvent[]
   linkedProjects: Project[]
 }
 
-export function KitDetailView({ stock, kit, linkedProjects }: KitDetailViewProps) {
+export function KitDetailView({ stock: initialStock, kit, events: initialEvents, linkedProjects }: KitDetailViewProps) {
   const navigate = useNavigate()
-  const [editing, setEditing] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [currentStock, setCurrentStock] = useState(stock)
+  const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)
+  const [showReleaseDialog, setShowReleaseDialog] = useState(false)
+  const [currentStock, setCurrentStock] = useState(initialStock)
+  const [currentEvents, setCurrentEvents] = useState(initialEvents)
 
   if (!currentStock || !kit) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 md:px-8 text-center space-y-4">
         <h1 className="text-2xl font-bold">キットが見つかりません</h1>
         <p className="text-sm text-muted-foreground">
-          指定された stockId のキットは存在しないか、削除済みです。
+          指定された kitId のキットは存在しないか、在庫がありません。
         </p>
-        <Button onClick={() => navigate({ to: '/app/kits' })}>キット一覧へ戻る</Button>
+        <Button onClick={() => navigate({ to: '/kits' })}>キット一覧へ戻る</Button>
       </div>
     )
   }
 
-  const handleSave = async (values: KitEditValues) => {
+  const handlePurchase = async (values: KitPurchaseValues) => {
     const session = getMockSession()
     const userId = session?.user.id ?? 'mock-user-1'
-    const updated = await updateKitStock({
-      stockId: currentStock.id,
-      userId,
-      patch: values,
-    })
-    if (updated) {
-      setCurrentStock(updated)
-      setEditing(false)
-    } else {
-      // TODO(Phase-C): toast / error UI に差し替え。今は dev console に残すだけ。
-      console.warn('updateKitStock returned null', { stockId: currentStock.id })
+    try {
+      const newEvent = await addKitEvent({
+        userId,
+        kitId: kit.id,
+        delta: 1,
+        reason: 'purchase',
+        purchasedAt: values.purchasedAt,
+        priceYen: values.priceYen,
+        purchaseLocation: values.purchaseLocation,
+        note: values.note,
+      })
+      setCurrentStock({ ...currentStock, count: currentStock.count + 1 })
+      setCurrentEvents([newEvent, ...currentEvents])
+    } catch (err) {
+      console.warn('addKitEvent (purchase) failed', err)
     }
   }
 
-  const handleDelete = async () => {
+  const handleRelease = async (values: KitReleaseValues) => {
     const session = getMockSession()
     const userId = session?.user.id ?? 'mock-user-1'
-    const ok = await deleteKitStock({ stockId: currentStock.id, userId })
-    if (ok) {
-      void navigate({ to: '/app/kits' })
-    } else {
-      // TODO(Phase-C): toast / error UI に差し替え。
-      console.warn('deleteKitStock returned false', { stockId: currentStock.id })
+    try {
+      const newEvent = await addKitEvent({
+        userId,
+        kitId: kit.id,
+        delta: -1,
+        reason: values.reason,
+        note: values.note,
+      })
+      setCurrentStock({ ...currentStock, count: currentStock.count - 1 })
+      setCurrentEvents([newEvent, ...currentEvents])
+    } catch (err) {
+      console.warn('addKitEvent (release) failed', err)
     }
   }
 
@@ -68,26 +80,23 @@ export function KitDetailView({ stock, kit, linkedProjects }: KitDetailViewProps
     <div className="max-w-3xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
       <KitDetailHeader
         kit={kit}
-        editing={editing}
-        onEdit={() => setEditing(true)}
-        onCancelEdit={() => setEditing(false)}
-        onDelete={() => setShowDeleteDialog(true)}
+        stock={currentStock}
+        onPurchase={() => setShowPurchaseDialog(true)}
+        onRelease={() => setShowReleaseDialog(true)}
       />
-      {editing ? (
-        <KitEditForm
-          stock={currentStock}
-          onSave={handleSave}
-          onCancel={() => setEditing(false)}
-        />
-      ) : (
-        <KitDetailFields stock={currentStock} kit={kit} />
-      )}
+      <KitDetailFields stock={currentStock} kit={kit} events={currentEvents} />
       <LinkedProjects projects={linkedProjects} />
-      <KitDeleteDialog
-        open={showDeleteDialog}
+      <KitPurchaseDialog
+        open={showPurchaseDialog}
         kitName={kit.name}
-        onOpenChange={setShowDeleteDialog}
-        onConfirm={handleDelete}
+        onOpenChange={setShowPurchaseDialog}
+        onConfirm={handlePurchase}
+      />
+      <KitReleaseDialog
+        open={showReleaseDialog}
+        kitName={kit.name}
+        onOpenChange={setShowReleaseDialog}
+        onConfirm={handleRelease}
       />
     </div>
   )
