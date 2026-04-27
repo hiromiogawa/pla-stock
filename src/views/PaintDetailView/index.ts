@@ -1,0 +1,1 @@
+export { PaintDetailView } from './PaintDetailView'
