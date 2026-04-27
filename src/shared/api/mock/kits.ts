@@ -212,7 +212,7 @@ const kitEvents: KitEvent[] = [
 /** public カタログ全件 + 自分の private item を返す */
 export async function getKits(input: { userId: string }): Promise<Kit[]> {
   return kits.filter(
-    (k) => k.visibility === 'public' || k.ownerId === input.userId,
+    (k) => k.visibility === 'public' || k.ownerId === MOCK_USER_ID,
   )
 }
 
@@ -221,31 +221,31 @@ export async function getKit(input: { kitId: string; userId: string }): Promise<
   const kit = kits.find((k) => k.id === input.kitId)
   if (!kit) return null
   if (kit.visibility === 'public') return kit
-  if (kit.ownerId === input.userId) return kit
+  if (kit.ownerId === MOCK_USER_ID) return kit
   return null
 }
 
 /** (userId, kitId) composite key で kit_stock 1 行を取得 */
 export async function getKitStock(input: { userId: string; kitId: string }): Promise<KitStock | null> {
   return kitStocks.find(
-    (s) => s.userId === input.userId && s.kitId === input.kitId,
+    (s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId,
   ) ?? null
 }
 
 /** user の全 kit_stock を返す */
 export async function getKitStocksAll(input: { userId: string }): Promise<KitStock[]> {
-  return kitStocks.filter((s) => s.userId === input.userId)
+  return kitStocks.filter((s) => s.userId === MOCK_USER_ID)
 }
 
 /** user の count > 0 の kit_stock のみ返す */
 export async function getKitStocksWithStock(input: { userId: string }): Promise<KitStock[]> {
-  return kitStocks.filter((s) => s.userId === input.userId && s.count > 0)
+  return kitStocks.filter((s) => s.userId === MOCK_USER_ID && s.count > 0)
 }
 
 /** kit_event 履歴を (userId, kitId) で取得 */
 export async function getKitEvents(input: { userId: string; kitId: string }): Promise<KitEvent[]> {
   return kitEvents.filter(
-    (e) => e.userId === input.userId && e.kitId === input.kitId,
+    (e) => e.userId === MOCK_USER_ID && e.kitId === input.kitId,
   )
 }
 
@@ -285,7 +285,7 @@ export async function addPrivateKit(input: {
     janCode: input.janCode ?? null,
     boxArtUrl: null,
     visibility: 'private',
-    ownerId: input.userId,
+    ownerId: MOCK_USER_ID,
   }
   kits.push(newKit)
   return newKit
@@ -315,10 +315,10 @@ export async function addKitEvent(input: {
 
   // kit_stock を探すまたは作成
   let stock = kitStocks.find(
-    (s) => s.userId === input.userId && s.kitId === input.kitId,
+    (s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId,
   )
   if (!stock) {
-    stock = { userId: input.userId, kitId: input.kitId, count: 0 }
+    stock = { userId: MOCK_USER_ID, kitId: input.kitId, count: 0 }
     kitStocks.push(stock)
   }
 
@@ -334,7 +334,7 @@ export async function addKitEvent(input: {
 
   const newEvent: KitEvent = {
     id: `ke-${kitEventIdCounter++}`,
-    userId: input.userId,
+    userId: MOCK_USER_ID,
     kitId: input.kitId,
     delta: input.delta,
     reason: input.reason,

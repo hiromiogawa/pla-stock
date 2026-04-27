@@ -298,7 +298,7 @@ const paintEvents: PaintEvent[] = [
 
 export async function getPaints(input: { userId: string }): Promise<Paint[]> {
   return paints.filter(
-    (p) => p.visibility === 'public' || p.ownerId === input.userId,
+    (p) => p.visibility === 'public' || p.ownerId === MOCK_USER_ID,
   )
 }
 
@@ -306,7 +306,7 @@ export async function getPaint(input: { paintId: string; userId: string }): Prom
   const p = paints.find((x) => x.id === input.paintId)
   if (!p) return null
   if (p.visibility === 'public') return p
-  if (p.ownerId === input.userId) return p
+  if (p.ownerId === MOCK_USER_ID) return p
   return null
 }
 
@@ -317,19 +317,19 @@ export async function getPaintStock(input: {
 }): Promise<PaintStock | null> {
   return (
     paintStocks.find(
-      (s) => s.userId === input.userId && s.paintId === input.paintId,
+      (s) => s.userId === MOCK_USER_ID && s.paintId === input.paintId,
     ) ?? null
   )
 }
 
 /** user の全 paint_stock を返す */
 export async function getPaintStocksAll(input: { userId: string }): Promise<PaintStock[]> {
-  return paintStocks.filter((s) => s.userId === input.userId)
+  return paintStocks.filter((s) => s.userId === MOCK_USER_ID)
 }
 
 /** user の count > 0 の paint_stock のみ返す */
 export async function getPaintStocksWithStock(input: { userId: string }): Promise<PaintStock[]> {
-  return paintStocks.filter((s) => s.userId === input.userId && s.count > 0)
+  return paintStocks.filter((s) => s.userId === MOCK_USER_ID && s.count > 0)
 }
 
 /** paint_event 履歴を (userId, paintId) で取得 */
@@ -338,7 +338,7 @@ export async function getPaintEvents(input: {
   paintId: string
 }): Promise<PaintEvent[]> {
   return paintEvents.filter(
-    (e) => e.userId === input.userId && e.paintId === input.paintId,
+    (e) => e.userId === MOCK_USER_ID && e.paintId === input.paintId,
   )
 }
 
@@ -373,7 +373,7 @@ export async function addPrivatePaint(input: {
     finishType: input.finishType ?? null,
     swatchUrl: null,
     visibility: 'private',
-    ownerId: input.userId,
+    ownerId: MOCK_USER_ID,
   }
   paints.push(newPaint)
   return newPaint
@@ -401,10 +401,10 @@ export async function addPaintEvent(input: {
   }
 
   let stock = paintStocks.find(
-    (s) => s.userId === input.userId && s.paintId === input.paintId,
+    (s) => s.userId === MOCK_USER_ID && s.paintId === input.paintId,
   )
   if (!stock) {
-    stock = { userId: input.userId, paintId: input.paintId, count: 0 }
+    stock = { userId: MOCK_USER_ID, paintId: input.paintId, count: 0 }
     paintStocks.push(stock)
   }
 
@@ -419,7 +419,7 @@ export async function addPaintEvent(input: {
 
   const newEvent: PaintEvent = {
     id: `pe-${paintEventIdCounter++}`,
-    userId: input.userId,
+    userId: MOCK_USER_ID,
     paintId: input.paintId,
     delta: input.delta,
     reason: input.reason,
