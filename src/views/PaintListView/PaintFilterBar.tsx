@@ -1,4 +1,5 @@
 import type { ColorFamily, FinishType, PaintStatus } from '~/entities/paint'
+import { COLOR_FAMILY_VALUES, FINISH_TYPE_VALUES } from '~/entities/paint'
 import { Input } from '~/shared/ui/input'
 import {
   Select,
@@ -24,33 +25,8 @@ export const INITIAL_FILTERS: PaintFilters = {
   status: 'all',
 }
 
-const COLOR_FAMILIES: Array<ColorFamily | 'all'> = [
-  'all',
-  '赤',
-  '青',
-  '黄',
-  '緑',
-  '白',
-  '黒',
-  '銀',
-  '金',
-  '茶',
-  '蛍光',
-  'クリア',
-  'other',
-]
-
-const FINISH_TYPES: Array<FinishType | 'all'> = [
-  'all',
-  '光沢',
-  '半光沢',
-  'つや消し',
-  'メタリック',
-  'パール',
-  'クリア',
-  'プライマー',
-  'ウェザリング',
-]
+const COLOR_FAMILIES: Array<ColorFamily | 'all'> = ['all', ...COLOR_FAMILY_VALUES]
+const FINISH_TYPES: Array<FinishType | 'all'> = ['all', ...FINISH_TYPE_VALUES]
 
 const STATUSES: Array<PaintStatus | 'all'> = ['all', 'new', 'in_use', 'empty']
 

@@ -1,37 +1,12 @@
 import { z } from 'zod'
-
-const COLOR_FAMILIES = [
-  '赤',
-  '青',
-  '黄',
-  '緑',
-  '白',
-  '黒',
-  '銀',
-  '金',
-  '茶',
-  '蛍光',
-  'クリア',
-  'other',
-] as const
-
-const FINISH_TYPES = [
-  '光沢',
-  '半光沢',
-  'つや消し',
-  'メタリック',
-  'パール',
-  'クリア',
-  'プライマー',
-  'ウェザリング',
-] as const
+import { COLOR_FAMILY_VALUES, FINISH_TYPE_VALUES } from '~/entities/paint'
 
 export const privatePaintSchema = z.object({
   brand: z.string().min(1, 'ブランドは必須').max(100),
   code: z.string().min(1, 'コードは必須').max(50),
   name: z.string().min(1, '名前は必須').max(200),
-  colorFamily: z.enum(COLOR_FAMILIES).nullable().optional(),
-  finishType: z.enum(FINISH_TYPES).nullable().optional(),
+  colorFamily: z.enum(COLOR_FAMILY_VALUES).nullable().optional(),
+  finishType: z.enum(FINISH_TYPE_VALUES).nullable().optional(),
 })
 
 export type PrivatePaintInput = z.infer<typeof privatePaintSchema>

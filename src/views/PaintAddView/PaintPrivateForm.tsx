@@ -1,5 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import type { ColorFamily, FinishType } from '~/entities/paint'
+import { COLOR_FAMILY_VALUES, FINISH_TYPE_VALUES } from '~/entities/paint'
 import {
   privatePaintSchema,
   paintStockSchema,
@@ -18,33 +19,8 @@ import {
 } from '~/shared/ui/select'
 import { Textarea } from '~/shared/ui/textarea'
 
-const COLOR_FAMILIES: Array<ColorFamily | '__none__'> = [
-  '__none__',
-  '赤',
-  '青',
-  '黄',
-  '緑',
-  '白',
-  '黒',
-  '銀',
-  '金',
-  '茶',
-  '蛍光',
-  'クリア',
-  'other',
-]
-
-const FINISH_TYPES: Array<FinishType | '__none__'> = [
-  '__none__',
-  '光沢',
-  '半光沢',
-  'つや消し',
-  'メタリック',
-  'パール',
-  'クリア',
-  'プライマー',
-  'ウェザリング',
-]
+const COLOR_FAMILIES: Array<ColorFamily | '__none__'> = ['__none__', ...COLOR_FAMILY_VALUES]
+const FINISH_TYPES: Array<FinishType | '__none__'> = ['__none__', ...FINISH_TYPE_VALUES]
 
 const COLOR_LABEL = (v: ColorFamily | '__none__') =>
   v === '__none__' ? '未設定' : v
