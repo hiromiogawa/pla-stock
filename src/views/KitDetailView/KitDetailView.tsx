@@ -46,6 +46,9 @@ export function KitDetailView({ stock, kit, linkedProjects }: KitDetailViewProps
     if (updated) {
       setCurrentStock(updated)
       setEditing(false)
+    } else {
+      // TODO(Phase-C): toast / error UI に差し替え。今は dev console に残すだけ。
+      console.warn('updateKitStock returned null', { stockId: currentStock.id })
     }
   }
 
@@ -55,6 +58,9 @@ export function KitDetailView({ stock, kit, linkedProjects }: KitDetailViewProps
     const ok = await deleteKitStock({ stockId: currentStock.id, userId })
     if (ok) {
       void navigate({ to: '/app/kits' })
+    } else {
+      // TODO(Phase-C): toast / error UI に差し替え。
+      console.warn('deleteKitStock returned false', { stockId: currentStock.id })
     }
   }
 

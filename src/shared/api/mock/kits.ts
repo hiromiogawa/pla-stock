@@ -1,4 +1,5 @@
 import type { Kit, KitStock } from '~/entities/kit'
+import { nullifyKitStockIdInProjects } from './projects'
 
 /**
  * モック層: キット master / kit_stock の in-memory データと CRUD アクセサ。
@@ -245,6 +246,9 @@ export async function updateKitStock(input: {
 export async function deleteKitStock(input: { stockId: string; userId: string }): Promise<boolean> {
   const idx = kitStocks.findIndex((s) => s.id === input.stockId && s.userId === input.userId)
   if (idx === -1) return false
+  const deletedId = kitStocks[idx].id
   kitStocks.splice(idx, 1)
+  // 紐付くプロジェクトの kitStockId を null にする (アプリ層 cascade、Phase C で FK SET NULL に置換)
+  await nullifyKitStockIdInProjects({ kitStockId: deletedId })
   return true
 }

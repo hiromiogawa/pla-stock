@@ -31,8 +31,8 @@ export function KitDeleteDialog({ open, kitName, onOpenChange, onConfirm }: KitD
           </Button>
           <Button
             variant="destructive"
-            onClick={() => {
-              void onConfirm()
+            onClick={async () => {
+              await onConfirm()
               onOpenChange(false)
             }}
           >
