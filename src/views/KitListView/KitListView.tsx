@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import type { Kit, KitStock } from '~/entities/kit'
 import { Button } from '~/shared/ui/button'
 import { KitFilterBar, INITIAL_FILTERS, type KitFilters } from './KitFilterBar'
@@ -51,8 +52,9 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
             自分の在庫キット {stocks.length} 件中 {rows.length} 件を表示
           </p>
         </div>
-        {/* TODO(#15): 「+ 追加」リンクは Issue #15 で /app/kits/new 実装時に有効化 */}
-        <Button disabled title="Issue #15 で実装">+ 追加</Button>
+        <Button asChild>
+          <Link to="/app/kits/new">+ 追加</Link>
+        </Button>
       </div>
       <KitFilterBar filters={filters} makers={makers} onChange={setFilters} />
       <div className="md:hidden">
