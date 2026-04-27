@@ -1,0 +1,11 @@
+# mise (https://mise.jdx.dev/) でツールバージョンを宣言。
+# ディレクトリに入った時点で auto-install + activate される。
+#
+# Node: 24 系最新を使用 (engines.node: ">=24.0.0 <25.0.0" と整合)
+# pnpm: TanStack Router monorepo と揃えた 10.28.0 (packageManager フィールドと整合)
+#
+# .nvmrc と packageManager フィールドはフォールバックとして残置。
+
+[tools]
+node = "24"
+pnpm = "10.28.0"
