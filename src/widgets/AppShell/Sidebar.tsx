@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router'
-import { SignOutButton, UserButton } from '@clerk/tanstack-react-start'
+import { UserButton } from '@clerk/tanstack-react-start'
 import { APP_NAV_ITEMS } from '~/shared/config/nav'
-import { Button } from '~/shared/ui/button'
 import { cn } from '~/shared/lib/utils'
 
 export function Sidebar() {
@@ -36,13 +35,8 @@ export function Sidebar() {
           ),
         )}
       </nav>
-      <div className="p-4 border-t border-border space-y-3">
+      <div className="p-4 border-t border-border">
         <UserButton />
-        <SignOutButton>
-          <Button variant="outline" size="sm" className="w-full">
-            ログアウト
-          </Button>
-        </SignOutButton>
       </div>
     </aside>
   )
