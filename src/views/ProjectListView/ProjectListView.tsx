@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Button } from '~/shared/ui/button'
 import {
@@ -43,9 +44,8 @@ export function ProjectListView({ projects, kitNameByProjectId }: ProjectListVie
             {projects.length} 件中 {rows.length} 件を表示
           </p>
         </div>
-        {/* TODO(#21): 「+ 作成」リンクは Issue #21 で /projects/new 実装時に有効化 */}
-        <Button disabled title="Issue #21 で実装">
-          + 作成
+        <Button asChild>
+          <Link to="/projects/new">+ 作成</Link>
         </Button>
       </div>
       <ProjectFilterBar filters={filters} onChange={setFilters} />
