@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppPaintsIndexRouteImport } from './routes/app/paints/index'
 import { Route as AppKitsIndexRouteImport } from './routes/app/kits/index'
+import { Route as AppPaintsStockIdRouteImport } from './routes/app/paints/$stockId'
 import { Route as AppKitsNewRouteImport } from './routes/app/kits/new'
 import { Route as AppKitsStockIdRouteImport } from './routes/app/kits/$stockId'
 
@@ -42,6 +43,11 @@ const AppKitsIndexRoute = AppKitsIndexRouteImport.update({
   path: '/kits/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPaintsStockIdRoute = AppPaintsStockIdRouteImport.update({
+  id: '/paints/$stockId',
+  path: '/paints/$stockId',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppKitsNewRoute = AppKitsNewRouteImport.update({
   id: '/kits/new',
   path: '/kits/new',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/app/kits/$stockId': typeof AppKitsStockIdRoute
   '/app/kits/new': typeof AppKitsNewRoute
+  '/app/paints/$stockId': typeof AppPaintsStockIdRoute
   '/app/kits/': typeof AppKitsIndexRoute
   '/app/paints/': typeof AppPaintsIndexRoute
 }
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/app/kits/$stockId': typeof AppKitsStockIdRoute
   '/app/kits/new': typeof AppKitsNewRoute
+  '/app/paints/$stockId': typeof AppPaintsStockIdRoute
   '/app/kits': typeof AppKitsIndexRoute
   '/app/paints': typeof AppPaintsIndexRoute
 }
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/app/kits/$stockId': typeof AppKitsStockIdRoute
   '/app/kits/new': typeof AppKitsNewRoute
+  '/app/paints/$stockId': typeof AppPaintsStockIdRoute
   '/app/kits/': typeof AppKitsIndexRoute
   '/app/paints/': typeof AppPaintsIndexRoute
 }
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/kits/$stockId'
     | '/app/kits/new'
+    | '/app/paints/$stockId'
     | '/app/kits/'
     | '/app/paints/'
   fileRoutesByTo: FileRoutesByTo
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/kits/$stockId'
     | '/app/kits/new'
+    | '/app/paints/$stockId'
     | '/app/kits'
     | '/app/paints'
   id:
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/kits/$stockId'
     | '/app/kits/new'
+    | '/app/paints/$stockId'
     | '/app/kits/'
     | '/app/paints/'
   fileRoutesById: FileRoutesById
@@ -151,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppKitsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/paints/$stockId': {
+      id: '/app/paints/$stockId'
+      path: '/paints/$stockId'
+      fullPath: '/app/paints/$stockId'
+      preLoaderRoute: typeof AppPaintsStockIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/kits/new': {
       id: '/app/kits/new'
       path: '/kits/new'
@@ -172,6 +191,7 @@ interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppKitsStockIdRoute: typeof AppKitsStockIdRoute
   AppKitsNewRoute: typeof AppKitsNewRoute
+  AppPaintsStockIdRoute: typeof AppPaintsStockIdRoute
   AppKitsIndexRoute: typeof AppKitsIndexRoute
   AppPaintsIndexRoute: typeof AppPaintsIndexRoute
 }
@@ -180,6 +200,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppKitsStockIdRoute: AppKitsStockIdRoute,
   AppKitsNewRoute: AppKitsNewRoute,
+  AppPaintsStockIdRoute: AppPaintsStockIdRoute,
   AppKitsIndexRoute: AppKitsIndexRoute,
   AppPaintsIndexRoute: AppPaintsIndexRoute,
 }
