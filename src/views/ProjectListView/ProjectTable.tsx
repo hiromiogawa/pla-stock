@@ -7,6 +7,7 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 
@@ -81,6 +82,7 @@ export interface ProjectTableProps {
 }
 
 export function ProjectTable({ rows }: ProjectTableProps) {
+  const navigate = useNavigate()
   const [sorting, setSorting] = useState<SortingState>([])
   const table = useReactTable({
     data: rows,
@@ -121,7 +123,13 @@ export function ProjectTable({ rows }: ProjectTableProps) {
             </tr>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-t border-border">
+              <tr
+                key={row.id}
+                className="border-t border-border cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() =>
+                  void navigate({ to: '/projects/$id', params: { id: row.original.project.id } })
+                }
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-3 py-2">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

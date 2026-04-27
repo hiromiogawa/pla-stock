@@ -24,9 +24,6 @@ export function PaintDetailHeader({
         <div className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
           {paint.colorFamily && <Badge variant="outline">{paint.colorFamily}</Badge>}
           {paint.finishType && <Badge variant="outline">{paint.finishType}</Badge>}
-          {paint.visibility === 'private' && (
-            <Badge variant="outline" className="ml-1">private</Badge>
-          )}
         </div>
         <p className="text-sm font-medium mt-1">在庫: {stock.count} 本</p>
       </div>

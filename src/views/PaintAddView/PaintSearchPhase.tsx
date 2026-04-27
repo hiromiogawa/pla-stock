@@ -1,19 +1,16 @@
 import { useMemo, useState } from 'react'
 import type { Paint } from '~/entities/paint'
-import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { PaintMasterCandidate } from './PaintMasterCandidate'
 
 export interface PaintSearchPhaseProps {
   paints: Paint[]
   onSelectMaster: (paint: Paint) => void
-  onCreatePrivate: () => void
 }
 
 export function PaintSearchPhase({
   paints,
   onSelectMaster,
-  onCreatePrivate,
 }: PaintSearchPhaseProps) {
   const [query, setQuery] = useState('')
 
@@ -46,12 +43,9 @@ export function PaintSearchPhase({
             キーワードを入力してマスターから検索してください。
           </p>
         ) : candidates.length === 0 ? (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              「{query}」に一致する塗料が見つかりませんでした。
-            </p>
-            <Button onClick={onCreatePrivate}>private item として追加</Button>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            「{query}」に一致する塗料が見つかりませんでした。マスターに無い塗料は admin に申請してください (Phase E 以降の機能)。
+          </p>
         ) : (
           <ul className="space-y-2">
             {candidates.map((paint) => (
@@ -62,18 +56,6 @@ export function PaintSearchPhase({
           </ul>
         )}
       </div>
-      {query.trim() !== '' && candidates.length > 0 && (
-        <div className="text-sm text-muted-foreground text-center">
-          目的の塗料がマスターに無い場合は{' '}
-          <button
-            type="button"
-            onClick={onCreatePrivate}
-            className="underline text-foreground hover:text-foreground/80"
-          >
-            private item として追加
-          </button>
-        </div>
-      )}
     </div>
   )
 }

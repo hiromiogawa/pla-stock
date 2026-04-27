@@ -9,7 +9,6 @@ import {
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import type { Paint, PaintStock } from '~/entities/paint'
-import { Badge } from '~/shared/ui/badge'
 
 export interface PaintTableRow {
   stock: PaintStock
@@ -40,11 +39,6 @@ const columns: ColumnDef<PaintTableRow>[] = [
         >
           {row.original.paint.name}
         </Link>
-        {row.original.paint.visibility === 'private' && (
-          <Badge variant="outline" className="text-xs">
-            private
-          </Badge>
-        )}
       </div>
     ),
   },

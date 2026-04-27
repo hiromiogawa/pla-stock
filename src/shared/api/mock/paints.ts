@@ -6,6 +6,8 @@ import type { Paint, PaintStock, PaintEvent, PaintEventReason } from '~/entities
  *
  * 在庫モデルを per-unit → count + event log pattern に統一 (2026-04-27)。
  * Phase C で実 server fn (createServerFn + Drizzle + D1) に差し替える前提。
+ *
+ * マスターは admin curated only（private item 概念廃止 2026-04-24）。
  */
 
 const MOCK_USER_ID = 'mock-user-1'
@@ -19,8 +21,6 @@ const paints: Paint[] = [
     colorFamily: '白',
     finishType: '光沢',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-2',
@@ -30,8 +30,6 @@ const paints: Paint[] = [
     colorFamily: '黒',
     finishType: '光沢',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-3',
@@ -41,8 +39,6 @@ const paints: Paint[] = [
     colorFamily: '銀',
     finishType: 'メタリック',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-4',
@@ -52,8 +48,6 @@ const paints: Paint[] = [
     colorFamily: 'クリア',
     finishType: 'クリア',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-5',
@@ -63,8 +57,6 @@ const paints: Paint[] = [
     colorFamily: '赤',
     finishType: '光沢',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-6',
@@ -74,8 +66,6 @@ const paints: Paint[] = [
     colorFamily: '黒',
     finishType: 'プライマー',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-7',
@@ -85,8 +75,6 @@ const paints: Paint[] = [
     colorFamily: '白',
     finishType: '光沢',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-8',
@@ -96,8 +84,6 @@ const paints: Paint[] = [
     colorFamily: '赤',
     finishType: '半光沢',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-9',
@@ -107,8 +93,6 @@ const paints: Paint[] = [
     colorFamily: '銀',
     finishType: 'メタリック',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-10',
@@ -118,8 +102,6 @@ const paints: Paint[] = [
     colorFamily: '黒',
     finishType: 'ウェザリング',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'paint-11',
@@ -129,8 +111,6 @@ const paints: Paint[] = [
     colorFamily: '黒',
     finishType: '半光沢',
     swatchUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
 ]
 
@@ -296,18 +276,14 @@ const paintEvents: PaintEvent[] = [
 
 // === Read accessors ===
 
-export async function getPaints(input: { userId: string }): Promise<Paint[]> {
-  return paints.filter(
-    (p) => p.visibility === 'public' || p.ownerId === input.userId,
-  )
+/** カタログ全件を返す (admin curated only) */
+export async function getPaints(_input: { userId: string }): Promise<Paint[]> {
+  return paints
 }
 
+/** 単一塗料 master を ID で取得 */
 export async function getPaint(input: { paintId: string; userId: string }): Promise<Paint | null> {
-  const p = paints.find((x) => x.id === input.paintId)
-  if (!p) return null
-  if (p.visibility === 'public') return p
-  if (p.ownerId === input.userId) return p
-  return null
+  return paints.find((x) => x.id === input.paintId) ?? null
 }
 
 /** (userId, paintId) composite key で paint_stock 1 行を取得 */
@@ -317,19 +293,19 @@ export async function getPaintStock(input: {
 }): Promise<PaintStock | null> {
   return (
     paintStocks.find(
-      (s) => s.userId === input.userId && s.paintId === input.paintId,
+      (s) => s.userId === MOCK_USER_ID && s.paintId === input.paintId,
     ) ?? null
   )
 }
 
 /** user の全 paint_stock を返す */
 export async function getPaintStocksAll(input: { userId: string }): Promise<PaintStock[]> {
-  return paintStocks.filter((s) => s.userId === input.userId)
+  return paintStocks.filter((s) => s.userId === MOCK_USER_ID)
 }
 
 /** user の count > 0 の paint_stock のみ返す */
 export async function getPaintStocksWithStock(input: { userId: string }): Promise<PaintStock[]> {
-  return paintStocks.filter((s) => s.userId === input.userId && s.count > 0)
+  return paintStocks.filter((s) => s.userId === MOCK_USER_ID && s.count > 0)
 }
 
 /** paint_event 履歴を (userId, paintId) で取得 */
@@ -338,7 +314,7 @@ export async function getPaintEvents(input: {
   paintId: string
 }): Promise<PaintEvent[]> {
   return paintEvents.filter(
-    (e) => e.userId === input.userId && e.paintId === input.paintId,
+    (e) => e.userId === MOCK_USER_ID && e.paintId === input.paintId,
   )
 }
 
@@ -353,31 +329,7 @@ export async function recomputePaintStockCount(input: {
 
 // === Mutations ===
 
-let paintIdCounter = paints.length + 1
 let paintEventIdCounter = paintEvents.length + 1
-
-export async function addPrivatePaint(input: {
-  userId: string
-  brand: string
-  code: string
-  name: string
-  colorFamily?: Paint['colorFamily']
-  finishType?: Paint['finishType']
-}): Promise<Paint> {
-  const newPaint: Paint = {
-    id: `paint-${paintIdCounter++}`,
-    brand: input.brand,
-    code: input.code,
-    name: input.name,
-    colorFamily: input.colorFamily ?? null,
-    finishType: input.finishType ?? null,
-    swatchUrl: null,
-    visibility: 'private',
-    ownerId: input.userId,
-  }
-  paints.push(newPaint)
-  return newPaint
-}
 
 /**
  * paint_event を追加し、paint_stock の count を更新する。
@@ -401,10 +353,10 @@ export async function addPaintEvent(input: {
   }
 
   let stock = paintStocks.find(
-    (s) => s.userId === input.userId && s.paintId === input.paintId,
+    (s) => s.userId === MOCK_USER_ID && s.paintId === input.paintId,
   )
   if (!stock) {
-    stock = { userId: input.userId, paintId: input.paintId, count: 0 }
+    stock = { userId: MOCK_USER_ID, paintId: input.paintId, count: 0 }
     paintStocks.push(stock)
   }
 
@@ -419,7 +371,7 @@ export async function addPaintEvent(input: {
 
   const newEvent: PaintEvent = {
     id: `pe-${paintEventIdCounter++}`,
-    userId: input.userId,
+    userId: MOCK_USER_ID,
     paintId: input.paintId,
     delta: input.delta,
     reason: input.reason,

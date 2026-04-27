@@ -15,6 +15,7 @@ import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthProjectsIndexRouteImport } from './routes/_auth/projects/index'
 import { Route as AuthPaintsIndexRouteImport } from './routes/_auth/paints/index'
 import { Route as AuthKitsIndexRouteImport } from './routes/_auth/kits/index'
+import { Route as AuthProjectsIdRouteImport } from './routes/_auth/projects/$id'
 import { Route as AuthPaintsNewRouteImport } from './routes/_auth/paints/new'
 import { Route as AuthPaintsPaintIdRouteImport } from './routes/_auth/paints/$paintId'
 import { Route as AuthKitsNewRouteImport } from './routes/_auth/kits/new'
@@ -49,6 +50,11 @@ const AuthKitsIndexRoute = AuthKitsIndexRouteImport.update({
   path: '/kits/',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthProjectsIdRoute = AuthProjectsIdRouteImport.update({
+  id: '/projects/$id',
+  path: '/projects/$id',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthPaintsNewRoute = AuthPaintsNewRouteImport.update({
   id: '/paints/new',
   path: '/paints/new',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/kits/new': typeof AuthKitsNewRoute
   '/paints/$paintId': typeof AuthPaintsPaintIdRoute
   '/paints/new': typeof AuthPaintsNewRoute
+  '/projects/$id': typeof AuthProjectsIdRoute
   '/kits/': typeof AuthKitsIndexRoute
   '/paints/': typeof AuthPaintsIndexRoute
   '/projects/': typeof AuthProjectsIndexRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/kits/new': typeof AuthKitsNewRoute
   '/paints/$paintId': typeof AuthPaintsPaintIdRoute
   '/paints/new': typeof AuthPaintsNewRoute
+  '/projects/$id': typeof AuthProjectsIdRoute
   '/kits': typeof AuthKitsIndexRoute
   '/paints': typeof AuthPaintsIndexRoute
   '/projects': typeof AuthProjectsIndexRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/_auth/kits/new': typeof AuthKitsNewRoute
   '/_auth/paints/$paintId': typeof AuthPaintsPaintIdRoute
   '/_auth/paints/new': typeof AuthPaintsNewRoute
+  '/_auth/projects/$id': typeof AuthProjectsIdRoute
   '/_auth/kits/': typeof AuthKitsIndexRoute
   '/_auth/paints/': typeof AuthPaintsIndexRoute
   '/_auth/projects/': typeof AuthProjectsIndexRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/kits/new'
     | '/paints/$paintId'
     | '/paints/new'
+    | '/projects/$id'
     | '/kits/'
     | '/paints/'
     | '/projects/'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/kits/new'
     | '/paints/$paintId'
     | '/paints/new'
+    | '/projects/$id'
     | '/kits'
     | '/paints'
     | '/projects'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/_auth/kits/new'
     | '/_auth/paints/$paintId'
     | '/_auth/paints/new'
+    | '/_auth/projects/$id'
     | '/_auth/kits/'
     | '/_auth/paints/'
     | '/_auth/projects/'
@@ -191,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthKitsIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/projects/$id': {
+      id: '/_auth/projects/$id'
+      path: '/projects/$id'
+      fullPath: '/projects/$id'
+      preLoaderRoute: typeof AuthProjectsIdRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/paints/new': {
       id: '/_auth/paints/new'
       path: '/paints/new'
@@ -228,6 +247,7 @@ interface AuthRouteChildren {
   AuthKitsNewRoute: typeof AuthKitsNewRoute
   AuthPaintsPaintIdRoute: typeof AuthPaintsPaintIdRoute
   AuthPaintsNewRoute: typeof AuthPaintsNewRoute
+  AuthProjectsIdRoute: typeof AuthProjectsIdRoute
   AuthKitsIndexRoute: typeof AuthKitsIndexRoute
   AuthPaintsIndexRoute: typeof AuthPaintsIndexRoute
   AuthProjectsIndexRoute: typeof AuthProjectsIndexRoute
@@ -239,6 +259,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthKitsNewRoute: AuthKitsNewRoute,
   AuthPaintsPaintIdRoute: AuthPaintsPaintIdRoute,
   AuthPaintsNewRoute: AuthPaintsNewRoute,
+  AuthProjectsIdRoute: AuthProjectsIdRoute,
   AuthKitsIndexRoute: AuthKitsIndexRoute,
   AuthPaintsIndexRoute: AuthPaintsIndexRoute,
   AuthProjectsIndexRoute: AuthProjectsIndexRoute,

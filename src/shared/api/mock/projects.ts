@@ -10,6 +10,10 @@ import { addKitEvent } from './kits'
  * - project_paints → project_paint_use rename、paintStockId → paintId
  * - addProject が addKitEvent({delta:-1, reason:'project'}) を自動発火
  * - deleteProject で status='planning' なら count 戻す (+1 kit_event)
+ *
+ * Phase A-2 mock 仕様: アクセサ関数は input.userId を受け取るが内部で
+ * MOCK_USER_ID に固定。Clerk が実 userId を渡しても demo データに到達できる。
+ * Phase C で Drizzle + D1 に置換する時点で実 userId フィルタに切替予定。
  */
 
 const MOCK_USER_ID = 'mock-user-1'
@@ -87,14 +91,14 @@ const projectPhotos: ProjectPhoto[] = [
 // === Read accessors ===
 
 export async function getProjects(input: { userId: string }): Promise<Project[]> {
-  return projects.filter((p) => p.userId === input.userId)
+  return projects.filter((p) => p.userId === MOCK_USER_ID)
 }
 
 export async function getProject(input: {
   projectId: string
   userId: string
 }): Promise<Project | null> {
-  return projects.find((p) => p.id === input.projectId && p.userId === input.userId) ?? null
+  return projects.find((p) => p.id === input.projectId && p.userId === MOCK_USER_ID) ?? null
 }
 
 /** project に紐付く project_paint_use 一覧 */
@@ -137,7 +141,7 @@ export async function addProject(input: {
 }): Promise<Project> {
   const newProject: Project = {
     id: `project-${projectIdCounter++}`,
-    userId: input.userId,
+    userId: MOCK_USER_ID,
     kitId: input.kitId,
     name: input.name,
     description: input.description ?? null,
@@ -149,7 +153,7 @@ export async function addProject(input: {
 
   // kit_event: count -1 (project 消費)
   await addKitEvent({
-    userId: input.userId,
+    userId: MOCK_USER_ID,
     kitId: input.kitId,
     delta: -1,
     reason: 'project',
@@ -165,7 +169,7 @@ export async function updateProject(input: {
   patch: Partial<Pick<Project, 'name' | 'description' | 'status' | 'startedAt' | 'completedAt'>>
 }): Promise<Project | null> {
   const idx = projects.findIndex(
-    (p) => p.id === input.projectId && p.userId === input.userId,
+    (p) => p.id === input.projectId && p.userId === MOCK_USER_ID,
   )
   if (idx === -1) return null
   projects[idx] = { ...projects[idx], ...input.patch }
@@ -184,7 +188,7 @@ export async function deleteProject(input: {
   userId: string
 }): Promise<boolean> {
   const idx = projects.findIndex(
-    (p) => p.id === input.projectId && p.userId === input.userId,
+    (p) => p.id === input.projectId && p.userId === MOCK_USER_ID,
   )
   if (idx === -1) return false
 

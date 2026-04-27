@@ -2,13 +2,12 @@
  * 塗料ドメインモデル。
  *
  * Phase A-2 ではモック層と組み合わせて使う。Phase C で Drizzle の sqliteTable と
- * 整合させる。Paint は public master entry / private user entry の両方を表現する。
+ * 整合させる。マスターは admin curated only（Phase E でシード投入前提）。
  *
  * 在庫モデル: per-unit → count + event log (ledger) pattern に統一 (2026-04-27)。
  * PaintStatus 廃止。PaintStock は (userId, paintId) composite key で 1 行、count で管理。
  * Project ↔ Paint は M:N で count 変化させない (project_paint_use)。
  */
-import type { Visibility } from '~/entities/kit'
 
 export const COLOR_FAMILY_VALUES = [
   '赤',
@@ -40,7 +39,7 @@ export const FINISH_TYPE_VALUES = [
 
 export type FinishType = (typeof FINISH_TYPE_VALUES)[number]
 
-/** Public カタログ master または private user 作成の塗料定義 */
+/** Admin curated 公開カタログ master の塗料定義 */
 export interface Paint {
   id: string
   brand: string
@@ -49,9 +48,6 @@ export interface Paint {
   colorFamily: ColorFamily | null
   finishType: FinishType | null
   swatchUrl: string | null
-  visibility: Visibility
-  /** private 時の作成者 (users.id)。public は null */
-  ownerId: string | null
 }
 
 /**

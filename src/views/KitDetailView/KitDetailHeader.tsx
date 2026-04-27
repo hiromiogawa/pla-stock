@@ -19,9 +19,6 @@ export function KitDetailHeader({ kit, stock, onPurchase, onRelease }: KitDetail
           <Badge variant="outline">{kit.scale}</Badge>
           <span>·</span>
           <span>{kit.maker}</span>
-          {kit.visibility === 'private' && (
-            <Badge variant="outline" className="ml-1">private</Badge>
-          )}
         </div>
         <p className="text-sm font-medium mt-1">在庫: {stock.count} 個</p>
       </div>

@@ -1,16 +1,14 @@
 import { useMemo, useState } from 'react'
 import type { Kit } from '~/entities/kit'
-import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { KitMasterCandidate } from './KitMasterCandidate'
 
 export interface KitSearchPhaseProps {
   kits: Kit[]
   onSelectMaster: (kit: Kit) => void
-  onCreatePrivate: () => void
 }
 
-export function KitSearchPhase({ kits, onSelectMaster, onCreatePrivate }: KitSearchPhaseProps) {
+export function KitSearchPhase({ kits, onSelectMaster }: KitSearchPhaseProps) {
   const [query, setQuery] = useState('')
 
   const candidates = useMemo(() => {
@@ -36,12 +34,9 @@ export function KitSearchPhase({ kits, onSelectMaster, onCreatePrivate }: KitSea
             キーワードを入力してマスターから検索してください。
           </p>
         ) : candidates.length === 0 ? (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              「{query}」に一致するキットが見つかりませんでした。
-            </p>
-            <Button onClick={onCreatePrivate}>private item として追加</Button>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            「{query}」に一致するキットが見つかりませんでした。マスターに無いキットは admin に申請してください (Phase E 以降の機能)。
+          </p>
         ) : (
           <ul className="space-y-2">
             {candidates.map((kit) => (
@@ -52,18 +47,6 @@ export function KitSearchPhase({ kits, onSelectMaster, onCreatePrivate }: KitSea
           </ul>
         )}
       </div>
-      {query.trim() !== '' && candidates.length > 0 && (
-        <div className="text-sm text-muted-foreground text-center">
-          目的のキットがマスターに無い場合は{' '}
-          <button
-            type="button"
-            onClick={onCreatePrivate}
-            className="underline text-foreground hover:text-foreground/80"
-          >
-            private item として追加
-          </button>
-        </div>
-      )}
     </div>
   )
 }

@@ -10,6 +10,8 @@ import type { Kit, KitStock, KitEvent, KitEventReason } from '~/entities/kit'
  * 差し替え時の差分が最小になる。
  *
  * mutation は配列を破壊的に書き換える (Phase C では DB INSERT/UPDATE 相当)。
+ *
+ * マスターは admin curated only（private item 概念廃止 2026-04-24）。
  */
 
 const MOCK_USER_ID = 'mock-user-1'
@@ -24,8 +26,6 @@ const kits: Kit[] = [
     retailPriceYen: 1100,
     janCode: '4573102607317',
     boxArtUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'kit-2',
@@ -36,8 +36,6 @@ const kits: Kit[] = [
     retailPriceYen: 2750,
     janCode: '4573102612922',
     boxArtUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'kit-3',
@@ -48,8 +46,6 @@ const kits: Kit[] = [
     retailPriceYen: 11000,
     janCode: '4573102609205',
     boxArtUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'kit-4',
@@ -60,8 +56,6 @@ const kits: Kit[] = [
     retailPriceYen: 27500,
     janCode: '4573102624550',
     boxArtUrl: null,
-    visibility: 'public',
-    ownerId: null,
   },
   {
     id: 'kit-5',
@@ -72,26 +66,11 @@ const kits: Kit[] = [
     retailPriceYen: 770,
     janCode: '4573102591470',
     boxArtUrl: null,
-    visibility: 'public',
-    ownerId: null,
-  },
-  {
-    id: 'kit-6',
-    name: 'Custom Old Kit (実家にあった謎のジャンク)',
-    grade: 'other',
-    scale: 'other',
-    maker: 'Bandai',
-    retailPriceYen: null,
-    janCode: null,
-    boxArtUrl: null,
-    visibility: 'private',
-    ownerId: MOCK_USER_ID,
   },
 ]
 
 /**
  * kit_stocks: (userId, kitId) per 1 行のカウント。
- * 旧 per-unit 5 行 → 新 5 (user, kit) pair。
  * kit-2, kit-3 はプロジェクトが消費して count=0。
  */
 const kitStocks: KitStock[] = [
@@ -99,7 +78,6 @@ const kitStocks: KitStock[] = [
   { userId: MOCK_USER_ID, kitId: 'kit-2', count: 0 }, // project-2 (シャアザク) が消費
   { userId: MOCK_USER_ID, kitId: 'kit-3', count: 0 }, // project-1 (Sazabi) が消費
   { userId: MOCK_USER_ID, kitId: 'kit-5', count: 1 },
-  { userId: MOCK_USER_ID, kitId: 'kit-6', count: 1 },
 ]
 
 /**
@@ -191,61 +169,41 @@ const kitEvents: KitEvent[] = [
     note: '初心者向けに買ってみた',
     createdAt: '2026-04-01T10:00:00Z',
   },
-  // kit-6: 入手 (private item) +1 → count=1
-  {
-    id: 'ke-7',
-    userId: MOCK_USER_ID,
-    kitId: 'kit-6',
-    delta: 1,
-    reason: 'gift',
-    projectId: null,
-    purchasedAt: null,
-    priceYen: null,
-    purchaseLocation: null,
-    note: 'private item として登録した実家ジャンク',
-    createdAt: '2026-01-01T00:00:00Z',
-  },
 ]
 
 // === Read accessors (Phase C で createServerFn にラップ) ===
 
-/** public カタログ全件 + 自分の private item を返す */
-export async function getKits(input: { userId: string }): Promise<Kit[]> {
-  return kits.filter(
-    (k) => k.visibility === 'public' || k.ownerId === input.userId,
-  )
+/** カタログ全件を返す (admin curated only) */
+export async function getKits(_input: { userId: string }): Promise<Kit[]> {
+  return kits
 }
 
-/** 単一キット master を ID で取得 (見える範囲内) */
+/** 単一キット master を ID で取得 */
 export async function getKit(input: { kitId: string; userId: string }): Promise<Kit | null> {
-  const kit = kits.find((k) => k.id === input.kitId)
-  if (!kit) return null
-  if (kit.visibility === 'public') return kit
-  if (kit.ownerId === input.userId) return kit
-  return null
+  return kits.find((k) => k.id === input.kitId) ?? null
 }
 
 /** (userId, kitId) composite key で kit_stock 1 行を取得 */
 export async function getKitStock(input: { userId: string; kitId: string }): Promise<KitStock | null> {
   return kitStocks.find(
-    (s) => s.userId === input.userId && s.kitId === input.kitId,
+    (s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId,
   ) ?? null
 }
 
 /** user の全 kit_stock を返す */
 export async function getKitStocksAll(input: { userId: string }): Promise<KitStock[]> {
-  return kitStocks.filter((s) => s.userId === input.userId)
+  return kitStocks.filter((s) => s.userId === MOCK_USER_ID)
 }
 
 /** user の count > 0 の kit_stock のみ返す */
 export async function getKitStocksWithStock(input: { userId: string }): Promise<KitStock[]> {
-  return kitStocks.filter((s) => s.userId === input.userId && s.count > 0)
+  return kitStocks.filter((s) => s.userId === MOCK_USER_ID && s.count > 0)
 }
 
 /** kit_event 履歴を (userId, kitId) で取得 */
 export async function getKitEvents(input: { userId: string; kitId: string }): Promise<KitEvent[]> {
   return kitEvents.filter(
-    (e) => e.userId === input.userId && e.kitId === input.kitId,
+    (e) => e.userId === MOCK_USER_ID && e.kitId === input.kitId,
   )
 }
 
@@ -262,34 +220,7 @@ export async function recomputeKitStockCount(input: {
 
 // === Mutations (in-memory; Phase C では DB INSERT/UPDATE/DELETE) ===
 
-let kitIdCounter = kits.length + 1
 let kitEventIdCounter = kitEvents.length + 1
-
-/** 新規 private kit を作成 (master に無いキットを自分用に追加する時) */
-export async function addPrivateKit(input: {
-  userId: string
-  name: string
-  grade: Kit['grade']
-  scale: Kit['scale']
-  maker: string
-  retailPriceYen?: number | null
-  janCode?: string | null
-}): Promise<Kit> {
-  const newKit: Kit = {
-    id: `kit-${kitIdCounter++}`,
-    name: input.name,
-    grade: input.grade,
-    scale: input.scale,
-    maker: input.maker,
-    retailPriceYen: input.retailPriceYen ?? null,
-    janCode: input.janCode ?? null,
-    boxArtUrl: null,
-    visibility: 'private',
-    ownerId: input.userId,
-  }
-  kits.push(newKit)
-  return newKit
-}
 
 /**
  * kit_event を追加し、kit_stock の count を更新する。
@@ -315,10 +246,10 @@ export async function addKitEvent(input: {
 
   // kit_stock を探すまたは作成
   let stock = kitStocks.find(
-    (s) => s.userId === input.userId && s.kitId === input.kitId,
+    (s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId,
   )
   if (!stock) {
-    stock = { userId: input.userId, kitId: input.kitId, count: 0 }
+    stock = { userId: MOCK_USER_ID, kitId: input.kitId, count: 0 }
     kitStocks.push(stock)
   }
 
@@ -334,7 +265,7 @@ export async function addKitEvent(input: {
 
   const newEvent: KitEvent = {
     id: `ke-${kitEventIdCounter++}`,
-    userId: input.userId,
+    userId: MOCK_USER_ID,
     kitId: input.kitId,
     delta: input.delta,
     reason: input.reason,
