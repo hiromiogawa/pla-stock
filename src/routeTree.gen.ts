@@ -15,6 +15,7 @@ import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthProjectsIndexRouteImport } from './routes/_auth/projects/index'
 import { Route as AuthPaintsIndexRouteImport } from './routes/_auth/paints/index'
 import { Route as AuthKitsIndexRouteImport } from './routes/_auth/kits/index'
+import { Route as AuthProjectsNewRouteImport } from './routes/_auth/projects/new'
 import { Route as AuthProjectsIdRouteImport } from './routes/_auth/projects/$id'
 import { Route as AuthPaintsNewRouteImport } from './routes/_auth/paints/new'
 import { Route as AuthPaintsPaintIdRouteImport } from './routes/_auth/paints/$paintId'
@@ -48,6 +49,11 @@ const AuthPaintsIndexRoute = AuthPaintsIndexRouteImport.update({
 const AuthKitsIndexRoute = AuthKitsIndexRouteImport.update({
   id: '/kits/',
   path: '/kits/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthProjectsNewRoute = AuthProjectsNewRouteImport.update({
+  id: '/projects/new',
+  path: '/projects/new',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthProjectsIdRoute = AuthProjectsIdRouteImport.update({
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/paints/$paintId': typeof AuthPaintsPaintIdRoute
   '/paints/new': typeof AuthPaintsNewRoute
   '/projects/$id': typeof AuthProjectsIdRoute
+  '/projects/new': typeof AuthProjectsNewRoute
   '/kits/': typeof AuthKitsIndexRoute
   '/paints/': typeof AuthPaintsIndexRoute
   '/projects/': typeof AuthProjectsIndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/paints/$paintId': typeof AuthPaintsPaintIdRoute
   '/paints/new': typeof AuthPaintsNewRoute
   '/projects/$id': typeof AuthProjectsIdRoute
+  '/projects/new': typeof AuthProjectsNewRoute
   '/kits': typeof AuthKitsIndexRoute
   '/paints': typeof AuthPaintsIndexRoute
   '/projects': typeof AuthProjectsIndexRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/_auth/paints/$paintId': typeof AuthPaintsPaintIdRoute
   '/_auth/paints/new': typeof AuthPaintsNewRoute
   '/_auth/projects/$id': typeof AuthProjectsIdRoute
+  '/_auth/projects/new': typeof AuthProjectsNewRoute
   '/_auth/kits/': typeof AuthKitsIndexRoute
   '/_auth/paints/': typeof AuthPaintsIndexRoute
   '/_auth/projects/': typeof AuthProjectsIndexRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/paints/$paintId'
     | '/paints/new'
     | '/projects/$id'
+    | '/projects/new'
     | '/kits/'
     | '/paints/'
     | '/projects/'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/paints/$paintId'
     | '/paints/new'
     | '/projects/$id'
+    | '/projects/new'
     | '/kits'
     | '/paints'
     | '/projects'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/_auth/paints/$paintId'
     | '/_auth/paints/new'
     | '/_auth/projects/$id'
+    | '/_auth/projects/new'
     | '/_auth/kits/'
     | '/_auth/paints/'
     | '/_auth/projects/'
@@ -203,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthKitsIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/projects/new': {
+      id: '/_auth/projects/new'
+      path: '/projects/new'
+      fullPath: '/projects/new'
+      preLoaderRoute: typeof AuthProjectsNewRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/projects/$id': {
       id: '/_auth/projects/$id'
       path: '/projects/$id'
@@ -248,6 +267,7 @@ interface AuthRouteChildren {
   AuthPaintsPaintIdRoute: typeof AuthPaintsPaintIdRoute
   AuthPaintsNewRoute: typeof AuthPaintsNewRoute
   AuthProjectsIdRoute: typeof AuthProjectsIdRoute
+  AuthProjectsNewRoute: typeof AuthProjectsNewRoute
   AuthKitsIndexRoute: typeof AuthKitsIndexRoute
   AuthPaintsIndexRoute: typeof AuthPaintsIndexRoute
   AuthProjectsIndexRoute: typeof AuthProjectsIndexRoute
@@ -260,6 +280,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthPaintsPaintIdRoute: AuthPaintsPaintIdRoute,
   AuthPaintsNewRoute: AuthPaintsNewRoute,
   AuthProjectsIdRoute: AuthProjectsIdRoute,
+  AuthProjectsNewRoute: AuthProjectsNewRoute,
   AuthKitsIndexRoute: AuthKitsIndexRoute,
   AuthPaintsIndexRoute: AuthPaintsIndexRoute,
   AuthProjectsIndexRoute: AuthProjectsIndexRoute,
