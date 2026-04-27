@@ -1,0 +1,71 @@
+import type { ProjectStatus } from '~/entities/project'
+import { Input } from '~/shared/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/shared/ui/select'
+
+export interface ProjectFilters {
+  search: string
+  status: ProjectStatus | 'all'
+}
+
+export const INITIAL_FILTERS: ProjectFilters = {
+  search: '',
+  status: 'all',
+}
+
+const STATUSES: Array<ProjectStatus | 'all'> = [
+  'all',
+  'planning',
+  'building',
+  'completed',
+  'abandoned',
+]
+
+const STATUS_LABEL: Record<ProjectStatus | 'all', string> = {
+  all: 'すべて',
+  planning: '計画中',
+  building: '製作中',
+  completed: '完成',
+  abandoned: '頓挫',
+}
+
+export interface ProjectFilterBarProps {
+  filters: ProjectFilters
+  onChange: (next: ProjectFilters) => void
+}
+
+export function ProjectFilterBar({ filters, onChange }: ProjectFilterBarProps) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 rounded-lg border border-border bg-card">
+      <Input
+        type="search"
+        value={filters.search}
+        onChange={(e) => onChange({ ...filters, search: e.target.value })}
+        placeholder="プロジェクト名で検索"
+        className="md:col-span-2"
+      />
+      <Select
+        value={filters.status}
+        onValueChange={(v) =>
+          onChange({ ...filters, status: v as ProjectFilters['status'] })
+        }
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="ステータス" />
+        </SelectTrigger>
+        <SelectContent>
+          {STATUSES.map((s) => (
+            <SelectItem key={s} value={s}>
+              {STATUS_LABEL[s]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
