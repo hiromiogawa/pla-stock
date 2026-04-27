@@ -1,22 +1,12 @@
-import { useNavigate } from '@tanstack/react-router'
-import type { UserRole } from '~/entities/user'
+import { SignInButton, SignUpButton } from '@clerk/tanstack-react-start'
 import { Button } from '~/shared/ui/button'
-import { mockLogin } from '~/shared/lib/mock-auth'
 
 export function LandingView() {
-  const navigate = useNavigate()
-
-  const handleMockLogin = (role: UserRole) => {
-    mockLogin(role)
-    void navigate({ to: '/dashboard' })
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <header className="border-b border-border">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
           <span className="text-lg font-semibold tracking-tight">pla-stock</span>
-          <span className="text-xs text-muted-foreground">Phase A-1 (mock)</span>
         </div>
       </header>
       <main className="flex-1 flex items-center justify-center px-6">
@@ -27,23 +17,16 @@ export function LandingView() {
             </h1>
             <p className="text-muted-foreground">
               持っているキット・塗料を登録し、製作プロジェクトごとに紐付ける
-              モデラー向けツール。ホビーショップ店頭での「これ持ってた？」を
-              バーコードスキャンで一瞬で判別。
+              モデラー向けツール。
             </p>
           </div>
-          <div className="space-y-3">
-            <p className="text-xs text-muted-foreground">
-              Phase A-1: 本物の Google ログインは Phase C で実装予定。
-              今はモックログインで UI を確認できます。
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button onClick={() => handleMockLogin('user')}>
-                モックログイン (一般ユーザー)
-              </Button>
-              <Button variant="outline" onClick={() => handleMockLogin('admin')}>
-                モックログイン (管理者)
-              </Button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <SignInButton mode="modal">
+              <Button>ログイン</Button>
+            </SignInButton>
+            <SignUpButton mode="modal">
+              <Button variant="outline">サインアップ</Button>
+            </SignUpButton>
           </div>
         </div>
       </main>

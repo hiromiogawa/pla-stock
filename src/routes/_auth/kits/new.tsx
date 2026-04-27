@@ -1,12 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getKits } from '~/shared/api/mock/kits'
-import { getMockSession } from '~/shared/lib/mock-auth'
 import { KitAddView } from '~/views/KitAddView'
 
 export const Route = createFileRoute('/_auth/kits/new')({
-  loader: async () => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+  loader: async ({ context }) => {
+    const { userId } = context
     const kits = await getKits({ userId })
     return { kits, userId }
   },

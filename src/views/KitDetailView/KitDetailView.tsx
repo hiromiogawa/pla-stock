@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useAuth } from '@clerk/tanstack-react-start'
 import type { Kit, KitStock, KitEvent } from '~/entities/kit'
 import type { Project } from '~/entities/project'
 import { addKitEvent } from '~/shared/api/mock/kits'
-import { getMockSession } from '~/shared/lib/mock-auth'
 import { Button } from '~/shared/ui/button'
 import { KitDetailHeader } from './KitDetailHeader'
 import { KitDetailFields } from './KitDetailFields'
@@ -20,6 +20,7 @@ export interface KitDetailViewProps {
 
 export function KitDetailView({ stock: initialStock, kit, events: initialEvents, linkedProjects }: KitDetailViewProps) {
   const navigate = useNavigate()
+  const { userId } = useAuth()
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)
   const [showReleaseDialog, setShowReleaseDialog] = useState(false)
   const [currentStock, setCurrentStock] = useState(initialStock)
@@ -38,8 +39,7 @@ export function KitDetailView({ stock: initialStock, kit, events: initialEvents,
   }
 
   const handlePurchase = async (values: KitPurchaseValues) => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+    if (!userId) return
     try {
       const newEvent = await addKitEvent({
         userId,
@@ -59,8 +59,7 @@ export function KitDetailView({ stock: initialStock, kit, events: initialEvents,
   }
 
   const handleRelease = async (values: KitReleaseValues) => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+    if (!userId) return
     try {
       const newEvent = await addKitEvent({
         userId,

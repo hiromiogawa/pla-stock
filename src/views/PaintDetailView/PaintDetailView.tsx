@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useAuth } from '@clerk/tanstack-react-start'
 import type { Paint, PaintStock, PaintEvent } from '~/entities/paint'
 import type { Project } from '~/entities/project'
 import { addPaintEvent } from '~/shared/api/mock/paints'
-import { getMockSession } from '~/shared/lib/mock-auth'
 import { Button } from '~/shared/ui/button'
 import { PaintDetailHeader } from './PaintDetailHeader'
 import { PaintDetailFields } from './PaintDetailFields'
@@ -20,6 +20,7 @@ export interface PaintDetailViewProps {
 
 export function PaintDetailView({ stock: initialStock, paint, events: initialEvents, linkedProjects }: PaintDetailViewProps) {
   const navigate = useNavigate()
+  const { userId } = useAuth()
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)
   const [showReleaseDialog, setShowReleaseDialog] = useState(false)
   const [currentStock, setCurrentStock] = useState(initialStock)
@@ -40,8 +41,7 @@ export function PaintDetailView({ stock: initialStock, paint, events: initialEve
   const paintLabel = `${paint.brand} ${paint.code} ${paint.name}`
 
   const handlePurchase = async (values: PaintPurchaseValues) => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+    if (!userId) return
     try {
       const newEvent = await addPaintEvent({
         userId,
@@ -61,8 +61,7 @@ export function PaintDetailView({ stock: initialStock, paint, events: initialEve
   }
 
   const handleRelease = async (values: PaintReleaseValues) => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+    if (!userId) return
     try {
       const newEvent = await addPaintEvent({
         userId,
