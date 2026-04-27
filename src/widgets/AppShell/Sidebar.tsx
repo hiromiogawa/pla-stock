@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { UserButton } from '@clerk/tanstack-react-start'
 import { APP_NAV_ITEMS } from '~/shared/config/nav'
 import { cn } from '~/shared/lib/utils'
 
@@ -34,6 +35,9 @@ export function Sidebar() {
           ),
         )}
       </nav>
+      <div className="p-4 border-t border-border">
+        <UserButton />
+      </div>
     </aside>
   )
 }

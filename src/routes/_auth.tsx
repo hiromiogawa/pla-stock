@@ -1,13 +1,14 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { auth } from '@clerk/tanstack-react-start/server'
 import { AppShell } from '~/widgets/AppShell'
-import { getMockSession } from '~/shared/lib/mock-auth'
 
-export const Route = createFileRoute('/app')({
-  beforeLoad: () => {
-    const session = getMockSession()
-    if (!session) {
+export const Route = createFileRoute('/_auth')({
+  beforeLoad: async () => {
+    const { userId } = await auth()
+    if (!userId) {
       throw redirect({ to: '/' })
     }
+    return { userId }
   },
   component: AppLayout,
 })

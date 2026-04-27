@@ -1,13 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getKits } from '~/shared/api/mock/kits'
 import { getProjects } from '~/shared/api/mock/projects'
-import { getMockSession } from '~/shared/lib/mock-auth'
 import { ProjectListView } from '~/views/ProjectListView'
 
 export const Route = createFileRoute('/_auth/projects/')({
-  loader: async () => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+  loader: async ({ context }) => {
+    const { userId } = context
     const [projects, kits] = await Promise.all([
       getProjects({ userId }),
       getKits({ userId }),

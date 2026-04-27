@@ -1,12 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getKits, getKitStocksWithStock } from '~/shared/api/mock/kits'
-import { getMockSession } from '~/shared/lib/mock-auth'
 import { KitListView } from '~/views/KitListView'
 
 export const Route = createFileRoute('/_auth/kits/')({
-  loader: async () => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+  loader: async ({ context }) => {
+    const { userId } = context
     const [stocks, kits] = await Promise.all([
       getKitStocksWithStock({ userId }), // count > 0 のみ
       getKits({ userId }),

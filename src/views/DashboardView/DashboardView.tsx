@@ -1,4 +1,4 @@
-import { getMockSession } from '~/shared/lib/mock-auth'
+import { useUser } from '@clerk/tanstack-react-start'
 
 /**
  * Phase A-2 の Dashboard。
@@ -21,11 +21,8 @@ const STUB_STATS = [
 ] as const
 
 export function DashboardView() {
-  // TODO(Phase-B): getMockSession は module-scope 変数の素読み。ログイン状態が
-  // 変化しても再レンダーされない。Phase B で useSyncExternalStore または
-  // React Context に移行するまでの暫定実装。
-  const session = getMockSession()
-  const userName = session?.user.name ?? 'ゲスト'
+  const { user } = useUser()
+  const userName = user?.firstName ?? user?.username ?? 'ゲスト'
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-10">

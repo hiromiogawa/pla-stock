@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { UserButton } from '@clerk/tanstack-react-start'
 import { APP_NAV_ITEMS } from '~/shared/config/nav'
 import { cn } from '~/shared/lib/utils'
 
@@ -30,6 +31,9 @@ export function BottomTabBar() {
             )}
           </li>
         ))}
+        <li className="flex-none flex items-center justify-center px-3">
+          <UserButton />
+        </li>
       </ul>
     </nav>
   )

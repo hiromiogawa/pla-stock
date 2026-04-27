@@ -1,12 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getPaints } from '~/shared/api/mock/paints'
-import { getMockSession } from '~/shared/lib/mock-auth'
 import { PaintAddView } from '~/views/PaintAddView'
 
 export const Route = createFileRoute('/_auth/paints/new')({
-  loader: async () => {
-    const session = getMockSession()
-    const userId = session?.user.id ?? 'mock-user-1'
+  loader: async ({ context }) => {
+    const { userId } = context
     const paints = await getPaints({ userId })
     return { paints, userId }
   },
