@@ -25,11 +25,6 @@ export function PaintMasterCandidate({ paint, onSelect }: PaintMasterCandidatePr
               {paint.finishType}
             </Badge>
           )}
-          {paint.visibility === 'private' && (
-            <Badge variant="outline" className="ml-1 text-xs">
-              private
-            </Badge>
-          )}
         </div>
       </div>
       <Button onClick={onSelect}>在庫に追加</Button>

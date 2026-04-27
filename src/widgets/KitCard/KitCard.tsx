@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
 import type { Kit, KitStock } from '~/entities/kit'
-import { Badge } from '~/shared/ui/badge'
 
 export interface KitCardProps {
   stock: KitStock
@@ -25,9 +24,6 @@ export function KitCard({ stock, kit }: KitCardProps) {
           </p>
           <div className="mt-2 flex gap-1.5 items-center">
             <span className="text-xs font-medium">在庫: {stock.count} 個</span>
-            {kit.visibility === 'private' && (
-              <Badge variant="outline" className="text-xs">private</Badge>
-            )}
           </div>
         </div>
       </div>

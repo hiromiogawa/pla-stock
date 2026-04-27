@@ -2,7 +2,7 @@
  * キット (Gunpla / scale model) ドメインモデル。
  *
  * Phase A-2 ではモック層と組み合わせて使う。Phase C で Drizzle の sqliteTable と
- * 整合させる。Kit は public master entry / private user entry の両方を表現する。
+ * 整合させる。マスターは admin curated only（Phase E でシード投入前提）。
  *
  * 在庫モデル: per-unit → count + event log (ledger) pattern に統一 (2026-04-27)。
  * KitStock は (userId, kitId) composite key で 1 行、count で在庫数を管理。
@@ -12,9 +12,7 @@ export type Grade = 'HG' | 'RG' | 'EG' | 'MG' | 'PG' | 'other'
 
 export type Scale = '1/144' | '1/100' | '1/60' | '1/48' | 'other'
 
-export type Visibility = 'public' | 'private'
-
-/** Public カタログ master または private user 作成のキット定義 */
+/** Admin curated 公開カタログ master のキット定義 */
 export interface Kit {
   id: string
   name: string
@@ -24,9 +22,6 @@ export interface Kit {
   retailPriceYen: number | null
   janCode: string | null
   boxArtUrl: string | null
-  visibility: Visibility
-  /** private 時の作成者 (users.id)。public は null */
-  ownerId: string | null
 }
 
 /**

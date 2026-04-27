@@ -9,7 +9,6 @@ import {
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import type { Kit, KitStock } from '~/entities/kit'
-import { Badge } from '~/shared/ui/badge'
 
 export interface KitTableRow {
   stock: KitStock
@@ -30,9 +29,6 @@ const columns: ColumnDef<KitTableRow>[] = [
         >
           {row.original.kit.name}
         </Link>
-        {row.original.kit.visibility === 'private' && (
-          <Badge variant="outline" className="text-xs mt-1 ml-1">private</Badge>
-        )}
       </div>
     ),
   },

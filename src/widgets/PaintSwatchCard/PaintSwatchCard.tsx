@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
 import type { Paint, PaintStock } from '~/entities/paint'
-import { Badge } from '~/shared/ui/badge'
 
 export interface PaintSwatchCardProps {
   stock: PaintStock
@@ -31,11 +30,6 @@ export function PaintSwatchCard({ stock, paint }: PaintSwatchCardProps) {
           </p>
           <div className="mt-2 flex gap-1.5 items-center">
             <span className="text-xs font-medium">在庫: {stock.count} 本</span>
-            {paint.visibility === 'private' && (
-              <Badge variant="outline" className="text-xs">
-                private
-              </Badge>
-            )}
           </div>
         </div>
       </div>

@@ -18,9 +18,6 @@ export function KitMasterCandidate({ kit, onSelect }: KitMasterCandidateProps) {
           <span>{kit.scale}</span>
           <span>·</span>
           <span>{kit.maker}</span>
-          {kit.visibility === 'private' && (
-            <Badge variant="outline" className="ml-1 text-xs">private</Badge>
-          )}
         </div>
       </div>
       <Button onClick={onSelect}>在庫に追加</Button>
