@@ -1,52 +1,68 @@
 import type { Project, ProjectPhoto } from '~/entities/project'
+import { addKitEvent } from './kits'
 
 /**
- * モック層: project / project_paints / project_photos の in-memory データと CRUD アクセサ。
+ * モック層: project / project_paint_use / project_photos の in-memory データと
+ * CRUD アクセサ。
  *
- * project_paints は entities に型が無いため (M:N junction) ここでローカル型を定義。
- * Phase C で Drizzle で実テーブル化する時に entities に昇格してもよい。
+ * 変更 (2026-04-27):
+ * - Project.kitStockId 廃止 → Project.kitId (kit master 直リンク)
+ * - project_paints → project_paint_use rename、paintStockId → paintId
+ * - addProject が addKitEvent({delta:-1, reason:'project'}) を自動発火
+ * - deleteProject で status='planning' なら count 戻す (+1 kit_event)
  */
 
 const MOCK_USER_ID = 'mock-user-1'
 
-/** Project と PaintStock の M:N 中間テーブル */
-export interface ProjectPaintLink {
+/** Project と Paint master の M:N 中間テーブル (count 変化なし) */
+export interface ProjectPaintUseLink {
   id: string
   projectId: string
-  paintStockId: string
+  /** paint master の ID (旧: paintStockId から変更) */
+  paintId: string
+  createdAt: string
 }
 
 const projects: Project[] = [
   {
     id: 'project-1',
     userId: MOCK_USER_ID,
+    kitId: 'kit-3', // Sazabi Ver.Ka (旧 kit-stock-3 → kit-3 に変換)
     name: 'Sazabi Ver.Ka 塗装計画',
     description: 'シャア専用カラーをガイア赤系で塗装、つや消しで仕上げる',
     status: 'completed',
     startedAt: '2026-01-05',
     completedAt: '2026-03-15',
-    kitStockId: 'kit-stock-3',
   },
   {
     id: 'project-2',
     userId: MOCK_USER_ID,
+    kitId: 'kit-2', // Char's Zaku II (旧 kit-stock-2 → kit-2 に変換)
     name: 'シャアザク 製作中',
     description: 'RG Char Zaku II をベースに少しディテールアップ',
     status: 'building',
     startedAt: '2026-03-20',
     completedAt: null,
-    kitStockId: 'kit-stock-2',
   },
 ]
 
-const projectPaints: ProjectPaintLink[] = [
+/**
+ * project_paint_use: paint master 直リンク M:N。
+ * 旧 paintStockId → paintId に変換:
+ *   paint-stock-5 → paint-5 (キャラクターレッド)
+ *   paint-stock-2 → paint-2 (ブラック)
+ *   paint-stock-4 → paint-4 (スーパークリア)
+ *   paint-stock-7 → paint-8 (ガイア フレームレッド)
+ *   paint-stock-1 → paint-1 (ホワイト)
+ */
+const projectPaintUses: ProjectPaintUseLink[] = [
   // project-1 (Sazabi) で使った塗料
-  { id: 'pp-1', projectId: 'project-1', paintStockId: 'paint-stock-5' }, // キャラクターレッド
-  { id: 'pp-2', projectId: 'project-1', paintStockId: 'paint-stock-2' }, // ブラック
-  { id: 'pp-3', projectId: 'project-1', paintStockId: 'paint-stock-4' }, // スーパークリア
+  { id: 'ppu-1', projectId: 'project-1', paintId: 'paint-5', createdAt: '2026-01-05T10:00:00Z' },
+  { id: 'ppu-2', projectId: 'project-1', paintId: 'paint-2', createdAt: '2026-01-05T10:01:00Z' },
+  { id: 'ppu-3', projectId: 'project-1', paintId: 'paint-4', createdAt: '2026-01-05T10:02:00Z' },
   // project-2 (シャアザク) で使ってる塗料
-  { id: 'pp-4', projectId: 'project-2', paintStockId: 'paint-stock-7' }, // ガイア フレームレッド
-  { id: 'pp-5', projectId: 'project-2', paintStockId: 'paint-stock-1' }, // ホワイト
+  { id: 'ppu-4', projectId: 'project-2', paintId: 'paint-8', createdAt: '2026-03-20T10:00:00Z' },
+  { id: 'ppu-5', projectId: 'project-2', paintId: 'paint-1', createdAt: '2026-03-20T10:01:00Z' },
 ]
 
 const projectPhotos: ProjectPhoto[] = [
@@ -74,15 +90,25 @@ export async function getProjects(input: { userId: string }): Promise<Project[]>
   return projects.filter((p) => p.userId === input.userId)
 }
 
-export async function getProject(input: { projectId: string; userId: string }): Promise<Project | null> {
+export async function getProject(input: {
+  projectId: string
+  userId: string
+}): Promise<Project | null> {
   return projects.find((p) => p.id === input.projectId && p.userId === input.userId) ?? null
 }
 
-/** project に紐付く paint_stock_id 一覧 */
-export async function getProjectPaintStockIds(input: { projectId: string }): Promise<string[]> {
-  return projectPaints
+/** project に紐付く project_paint_use 一覧 */
+export async function getProjectPaintUses(input: {
+  projectId: string
+}): Promise<ProjectPaintUseLink[]> {
+  return projectPaintUses.filter((link) => link.projectId === input.projectId)
+}
+
+/** project に紐付く paint_id 一覧 (旧 getProjectPaintStockIds の後継) */
+export async function getProjectPaintIds(input: { projectId: string }): Promise<string[]> {
+  return projectPaintUses
     .filter((link) => link.projectId === input.projectId)
-    .map((link) => link.paintStockId)
+    .map((link) => link.paintId)
 }
 
 export async function getProjectPhotos(input: { projectId: string }): Promise<ProjectPhoto[]> {
@@ -92,76 +118,136 @@ export async function getProjectPhotos(input: { projectId: string }): Promise<Pr
 // === Mutations ===
 
 let projectIdCounter = projects.length + 1
-let projectPaintIdCounter = projectPaints.length + 1
+let projectPaintUseIdCounter = projectPaintUses.length + 1
 let projectPhotoIdCounter = projectPhotos.length + 1
 
+/**
+ * プロジェクトを作成する。
+ *
+ * 前提: getKitStock(userId, kitId).count >= 1 をアプリ層で確認すること。
+ * 内部で addKitEvent({delta: -1, reason: 'project', projectId}) を発火して
+ * kit_stock.count を 1 減らす。
+ * status は 'planning' で初期化。
+ */
 export async function addProject(input: {
   userId: string
+  kitId: string
   name: string
   description?: string | null
-  kitStockId?: string | null
 }): Promise<Project> {
   const newProject: Project = {
     id: `project-${projectIdCounter++}`,
     userId: input.userId,
+    kitId: input.kitId,
     name: input.name,
     description: input.description ?? null,
     status: 'planning',
     startedAt: null,
     completedAt: null,
-    kitStockId: input.kitStockId ?? null,
   }
   projects.push(newProject)
+
+  // kit_event: count -1 (project 消費)
+  await addKitEvent({
+    userId: input.userId,
+    kitId: input.kitId,
+    delta: -1,
+    reason: 'project',
+    projectId: newProject.id,
+  })
+
   return newProject
 }
 
 export async function updateProject(input: {
   projectId: string
   userId: string
-  patch: Partial<Pick<Project, 'name' | 'description' | 'status' | 'startedAt' | 'completedAt' | 'kitStockId'>>
+  patch: Partial<Pick<Project, 'name' | 'description' | 'status' | 'startedAt' | 'completedAt'>>
 }): Promise<Project | null> {
-  const idx = projects.findIndex((p) => p.id === input.projectId && p.userId === input.userId)
+  const idx = projects.findIndex(
+    (p) => p.id === input.projectId && p.userId === input.userId,
+  )
   if (idx === -1) return null
   projects[idx] = { ...projects[idx], ...input.patch }
   return projects[idx]
 }
 
-export async function deleteProject(input: { projectId: string; userId: string }): Promise<boolean> {
-  const idx = projects.findIndex((p) => p.id === input.projectId && p.userId === input.userId)
+/**
+ * プロジェクトを削除する。
+ *
+ * - status='planning' なら addKitEvent({delta: +1, reason: 'project', note: 'returned'}) を発火。
+ * - status='building' 以降は count を戻さない (既に開封済の前提)。
+ * - 紐付く project_paint_use, project_photos は cascade 削除。
+ */
+export async function deleteProject(input: {
+  projectId: string
+  userId: string
+}): Promise<boolean> {
+  const idx = projects.findIndex(
+    (p) => p.id === input.projectId && p.userId === input.userId,
+  )
   if (idx === -1) return false
+
+  const project = projects[idx]
+
+  // planning 状態なら在庫を戻す
+  if (project.status === 'planning') {
+    await addKitEvent({
+      userId: project.userId,
+      kitId: project.kitId,
+      delta: +1,
+      reason: 'project',
+      projectId: project.id,
+      note: 'returned from cancelled planning',
+    })
+  }
+
   projects.splice(idx, 1)
-  // 紐付く project_paints, project_photos も削除 (cascade)
-  for (let i = projectPaints.length - 1; i >= 0; i--) {
-    if (projectPaints[i].projectId === input.projectId) projectPaints.splice(i, 1)
+
+  // cascade: project_paint_use
+  for (let i = projectPaintUses.length - 1; i >= 0; i--) {
+    if (projectPaintUses[i].projectId === input.projectId) {
+      projectPaintUses.splice(i, 1)
+    }
   }
+  // cascade: project_photos
   for (let i = projectPhotos.length - 1; i >= 0; i--) {
-    if (projectPhotos[i].projectId === input.projectId) projectPhotos.splice(i, 1)
+    if (projectPhotos[i].projectId === input.projectId) {
+      projectPhotos.splice(i, 1)
+    }
   }
+
   return true
 }
 
-export async function addProjectPaint(input: {
+/**
+ * project_paint_use を追加 (paint master 直リンク)。
+ * count 変化なし。unique(projectId, paintId) をアプリ層で管理。
+ */
+export async function addProjectPaintUse(input: {
   projectId: string
-  paintStockId: string
-}): Promise<ProjectPaintLink> {
-  const newLink: ProjectPaintLink = {
-    id: `pp-${projectPaintIdCounter++}`,
+  paintId: string
+}): Promise<ProjectPaintUseLink> {
+  const newLink: ProjectPaintUseLink = {
+    id: `ppu-${projectPaintUseIdCounter++}`,
     projectId: input.projectId,
-    paintStockId: input.paintStockId,
+    paintId: input.paintId,
+    createdAt: new Date().toISOString(),
   }
-  projectPaints.push(newLink)
+  projectPaintUses.push(newLink)
   return newLink
 }
 
-export async function removeProjectPaint(input: {
+/** project_paint_use を削除。count 変化なし。 */
+export async function removeProjectPaintUse(input: {
   projectId: string
-  paintStockId: string
+  paintId: string
 }): Promise<boolean> {
-  const idx = projectPaints.findIndex(
-    (link) => link.projectId === input.projectId && link.paintStockId === input.paintStockId,
+  const idx = projectPaintUses.findIndex(
+    (link) => link.projectId === input.projectId && link.paintId === input.paintId,
   )
   if (idx === -1) return false
-  projectPaints.splice(idx, 1)
+  projectPaintUses.splice(idx, 1)
   return true
 }
 
@@ -189,16 +275,4 @@ export async function deleteProjectPhoto(input: { photoId: string }): Promise<bo
   if (idx === -1) return false
   projectPhotos.splice(idx, 1)
   return true
-}
-
-/**
- * 指定 kit_stock_id を kitStockId に持つ project を全て探し、kitStockId を null にする。
- * Phase C で D1 の ON DELETE SET NULL FK 制約に置換予定 (現状はアプリ層で代替)。
- */
-export async function nullifyKitStockIdInProjects(input: { kitStockId: string }): Promise<void> {
-  for (const p of projects) {
-    if (p.kitStockId === input.kitStockId) {
-      p.kitStockId = null
-    }
-  }
 }

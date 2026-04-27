@@ -16,7 +16,7 @@ export function PaintCardList({ rows }: PaintCardListProps) {
   return (
     <div className="space-y-3">
       {rows.map(({ stock, paint }) => (
-        <PaintSwatchCard key={stock.id} stock={stock} paint={paint} />
+        <PaintSwatchCard key={paint.id} stock={stock} paint={paint} />
       ))}
     </div>
   )

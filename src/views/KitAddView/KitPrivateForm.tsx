@@ -2,7 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import type { Grade, Scale } from '~/entities/kit'
 import {
   privateKitSchema,
-  stockSchema,
+  purchaseEventSchema,
   type PrivateKitInput,
   type StockInput,
 } from '~/features/kit-stock-add'
@@ -37,7 +37,7 @@ export function KitPrivateForm({ onSubmit, onCancel }: KitPrivateFormProps) {
       purchasedAt: '',
       purchasePriceYen: '' as string | number | null,
       purchaseLocation: '',
-      remark: '',
+      note: '',
     },
     onSubmit: async ({ value }) => {
       const privateInput = privateKitSchema.parse({
@@ -50,14 +50,14 @@ export function KitPrivateForm({ onSubmit, onCancel }: KitPrivateFormProps) {
             ? null
             : Number(value.retailPriceYen),
       })
-      const stockInput = stockSchema.parse({
+      const stockInput = purchaseEventSchema.parse({
         purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,
         purchasePriceYen:
           value.purchasePriceYen === '' || value.purchasePriceYen === null
             ? null
             : Number(value.purchasePriceYen),
         purchaseLocation: value.purchaseLocation === '' ? null : value.purchaseLocation,
-        remark: value.remark === '' ? null : value.remark,
+        note: value.note === '' ? null : value.note,
       })
       await onSubmit(privateInput, stockInput)
     },
@@ -194,7 +194,7 @@ export function KitPrivateForm({ onSubmit, onCancel }: KitPrivateFormProps) {
         )}
       </form.Field>
 
-      <h3 className="text-xs uppercase tracking-wider text-muted-foreground pt-2">在庫情報</h3>
+      <h3 className="text-xs uppercase tracking-wider text-muted-foreground pt-2">購入情報</h3>
 
       <form.Field name="purchasedAt">
         {(field) => (
@@ -244,7 +244,7 @@ export function KitPrivateForm({ onSubmit, onCancel }: KitPrivateFormProps) {
         )}
       </form.Field>
 
-      <form.Field name="remark">
+      <form.Field name="note">
         {(field) => (
           <div className="space-y-2">
             <Label htmlFor={field.name}>メモ</Label>

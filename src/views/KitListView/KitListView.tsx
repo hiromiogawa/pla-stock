@@ -7,6 +7,7 @@ import { KitTable } from './KitTable'
 import { KitCardList } from './KitCardList'
 
 export interface KitListViewProps {
+  /** count > 0 の kit_stock のみ渡す (ローダー側で絞り込み済み) */
   stocks: KitStock[]
   kits: Kit[]
 }
@@ -24,17 +25,13 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
         return { stock, kit }
       })
       .filter((row): row is { stock: KitStock; kit: Kit } => row !== null)
-      .filter(({ stock, kit }) => {
+      .filter(({ kit }) => {
         if (filters.search && !kit.name.toLowerCase().includes(filters.search.toLowerCase())) {
           return false
         }
         if (filters.grade !== 'all' && kit.grade !== filters.grade) return false
         if (filters.scale !== 'all' && kit.scale !== filters.scale) return false
-        if (filters.assemblyStatus !== 'all' && stock.assemblyStatus !== filters.assemblyStatus) {
-          return false
-        }
         if (filters.maker !== 'all' && kit.maker !== filters.maker) return false
-        if (filters.hasPhoto && !stock.photoUrl) return false
         return true
       })
   }, [stocks, kitById, filters])
@@ -49,11 +46,11 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">キット</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            自分の在庫キット {stocks.length} 件中 {rows.length} 件を表示
+            在庫キット {stocks.length} 件中 {rows.length} 件を表示 (count = 0 は非表示)
           </p>
         </div>
         <Button asChild>
-          <Link to="/app/kits/new">+ 追加</Link>
+          <Link to="/kits/new">+ 在庫を追加</Link>
         </Button>
       </div>
       <KitFilterBar filters={filters} makers={makers} onChange={setFilters} />

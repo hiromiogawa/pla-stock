@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { Kit } from '~/entities/kit'
-import { addKitStock, addPrivateKit } from '~/shared/api/mock/kits'
+import { addKitEvent, addPrivateKit } from '~/shared/api/mock/kits'
 import type { PrivateKitInput, StockInput } from '~/features/kit-stock-add'
 import { Button } from '~/shared/ui/button'
 import { KitSearchPhase } from './KitSearchPhase'
@@ -23,17 +23,20 @@ export function KitAddView({ kits, userId }: KitAddViewProps) {
   const [phase, setPhase] = useState<Phase>({ kind: 'search' })
 
   const handleStockSubmit = async (kitId: string, values: StockInput) => {
-    const newStock = await addKitStock({
+    // 購入イベント (+1) を作成 → kit_stock.count += 1 (自動作成あり)
+    await addKitEvent({
       userId,
       kitId,
+      delta: 1,
+      reason: 'purchase',
       purchasedAt: values.purchasedAt ?? null,
-      purchasePriceYen: values.purchasePriceYen ?? null,
+      priceYen: values.purchasePriceYen ?? null,
       purchaseLocation: values.purchaseLocation ?? null,
-      remark: values.remark ?? null,
+      note: values.note ?? null,
     })
     void navigate({
-      to: '/app/kits/$stockId',
-      params: { stockId: newStock.id },
+      to: '/kits/$kitId',
+      params: { kitId },
     })
   }
 
@@ -49,17 +52,19 @@ export function KitAddView({ kits, userId }: KitAddViewProps) {
       maker: privateInput.maker,
       retailPriceYen: privateInput.retailPriceYen ?? null,
     })
-    const newStock = await addKitStock({
+    await addKitEvent({
       userId,
       kitId: newKit.id,
+      delta: 1,
+      reason: 'purchase',
       purchasedAt: stockInput.purchasedAt ?? null,
-      purchasePriceYen: stockInput.purchasePriceYen ?? null,
+      priceYen: stockInput.purchasePriceYen ?? null,
       purchaseLocation: stockInput.purchaseLocation ?? null,
-      remark: stockInput.remark ?? null,
+      note: stockInput.note ?? null,
     })
     void navigate({
-      to: '/app/kits/$stockId',
-      params: { stockId: newStock.id },
+      to: '/kits/$kitId',
+      params: { kitId: newKit.id },
     })
   }
 
@@ -69,7 +74,7 @@ export function KitAddView({ kits, userId }: KitAddViewProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">キットを在庫に追加</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            マスターから検索してキットを在庫に追加できます。マスターに無い場合は private item として登録。
+            マスターから検索してキットの購入記録を追加できます。マスターに無い場合は private item として登録。
           </p>
         </div>
         {phase.kind !== 'search' && (

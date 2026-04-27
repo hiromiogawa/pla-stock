@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { Paint } from '~/entities/paint'
-import { addPaintStock, addPrivatePaint } from '~/shared/api/mock/paints'
+import { addPaintEvent, addPrivatePaint } from '~/shared/api/mock/paints'
 import type { PrivatePaintInput, PaintStockInput } from '~/features/paint-stock-add'
 import { Button } from '~/shared/ui/button'
 import { PaintSearchPhase } from './PaintSearchPhase'
@@ -23,16 +23,19 @@ export function PaintAddView({ paints, userId }: PaintAddViewProps) {
   const [phase, setPhase] = useState<Phase>({ kind: 'search' })
 
   const handleStockSubmit = async (paintId: string, values: PaintStockInput) => {
-    const newStock = await addPaintStock({
+    await addPaintEvent({
       userId,
       paintId,
+      delta: 1,
+      reason: 'purchase',
       purchasedAt: values.purchasedAt ?? null,
-      purchasePriceYen: values.purchasePriceYen ?? null,
-      remark: values.remark ?? null,
+      priceYen: values.purchasePriceYen ?? null,
+      purchaseLocation: values.purchaseLocation ?? null,
+      note: values.note ?? null,
     })
     void navigate({
-      to: '/app/paints/$stockId',
-      params: { stockId: newStock.id },
+      to: '/paints/$paintId',
+      params: { paintId },
     })
   }
 
@@ -48,16 +51,19 @@ export function PaintAddView({ paints, userId }: PaintAddViewProps) {
       colorFamily: privateInput.colorFamily ?? undefined,
       finishType: privateInput.finishType ?? undefined,
     })
-    const newStock = await addPaintStock({
+    await addPaintEvent({
       userId,
       paintId: newPaint.id,
+      delta: 1,
+      reason: 'purchase',
       purchasedAt: stockInput.purchasedAt ?? null,
-      purchasePriceYen: stockInput.purchasePriceYen ?? null,
-      remark: stockInput.remark ?? null,
+      priceYen: stockInput.purchasePriceYen ?? null,
+      purchaseLocation: stockInput.purchaseLocation ?? null,
+      note: stockInput.note ?? null,
     })
     void navigate({
-      to: '/app/paints/$stockId',
-      params: { stockId: newStock.id },
+      to: '/paints/$paintId',
+      params: { paintId: newPaint.id },
     })
   }
 
@@ -67,7 +73,7 @@ export function PaintAddView({ paints, userId }: PaintAddViewProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">塗料を在庫に追加</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            マスターから検索して塗料を在庫に追加できます。マスターに無い場合は private item として登録。
+            マスターから検索して塗料の購入記録を追加できます。マスターに無い場合は private item として登録。
           </p>
         </div>
         {phase.kind !== 'search' && (

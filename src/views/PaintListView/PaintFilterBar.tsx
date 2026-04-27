@@ -1,4 +1,4 @@
-import type { ColorFamily, FinishType, PaintStatus } from '~/entities/paint'
+import type { ColorFamily, FinishType } from '~/entities/paint'
 import { COLOR_FAMILY_VALUES, FINISH_TYPE_VALUES } from '~/entities/paint'
 import { Input } from '~/shared/ui/input'
 import {
@@ -14,7 +14,6 @@ export interface PaintFilters {
   brand: string | 'all'
   colorFamily: ColorFamily | 'all'
   finishType: FinishType | 'all'
-  status: PaintStatus | 'all'
 }
 
 export const INITIAL_FILTERS: PaintFilters = {
@@ -22,20 +21,10 @@ export const INITIAL_FILTERS: PaintFilters = {
   brand: 'all',
   colorFamily: 'all',
   finishType: 'all',
-  status: 'all',
 }
 
 const COLOR_FAMILIES: Array<ColorFamily | 'all'> = ['all', ...COLOR_FAMILY_VALUES]
 const FINISH_TYPES: Array<FinishType | 'all'> = ['all', ...FINISH_TYPE_VALUES]
-
-const STATUSES: Array<PaintStatus | 'all'> = ['all', 'new', 'in_use', 'empty']
-
-const STATUS_LABEL: Record<PaintStatus | 'all', string> = {
-  all: 'すべて',
-  new: '新品',
-  in_use: '使用中',
-  empty: '空',
-}
 
 export interface PaintFilterBarProps {
   filters: PaintFilters
@@ -45,13 +34,13 @@ export interface PaintFilterBarProps {
 
 export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 rounded-lg border border-border bg-card">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 rounded-lg border border-border bg-card">
       <Input
         type="search"
         value={filters.search}
         onChange={(e) => onChange({ ...filters, search: e.target.value })}
         placeholder="名前 / コードで検索"
-        className="md:col-span-4"
+        className="md:col-span-3"
       />
       <Select
         value={filters.brand}
@@ -99,21 +88,6 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
           {FINISH_TYPES.map((f) => (
             <SelectItem key={f} value={f}>
               {f === 'all' ? 'すべてのフィニッシュ' : f}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select
-        value={filters.status}
-        onValueChange={(v) => onChange({ ...filters, status: v as PaintFilters['status'] })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="状態" />
-        </SelectTrigger>
-        <SelectContent>
-          {STATUSES.map((s) => (
-            <SelectItem key={s} value={s}>
-              {STATUS_LABEL[s]}
             </SelectItem>
           ))}
         </SelectContent>

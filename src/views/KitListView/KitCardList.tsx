@@ -16,7 +16,7 @@ export function KitCardList({ rows }: KitCardListProps) {
   return (
     <div className="space-y-3">
       {rows.map(({ stock, kit }) => (
-        <KitCard key={stock.id} stock={stock} kit={kit} />
+        <KitCard key={kit.id} stock={stock} kit={kit} />
       ))}
     </div>
   )

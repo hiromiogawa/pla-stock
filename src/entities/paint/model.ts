@@ -3,6 +3,10 @@
  *
  * Phase A-2 ではモック層と組み合わせて使う。Phase C で Drizzle の sqliteTable と
  * 整合させる。Paint は public master entry / private user entry の両方を表現する。
+ *
+ * 在庫モデル: per-unit → count + event log (ledger) pattern に統一 (2026-04-27)。
+ * PaintStatus 廃止。PaintStock は (userId, paintId) composite key で 1 行、count で管理。
+ * Project ↔ Paint は M:N で count 変化させない (project_paint_use)。
  */
 import type { Visibility } from '~/entities/kit'
 
@@ -36,8 +40,6 @@ export const FINISH_TYPE_VALUES = [
 
 export type FinishType = (typeof FINISH_TYPE_VALUES)[number]
 
-export type PaintStatus = 'new' | 'in_use' | 'empty'
-
 /** Public カタログ master または private user 作成の塗料定義 */
 export interface Paint {
   id: string
@@ -52,13 +54,47 @@ export interface Paint {
   ownerId: string | null
 }
 
-/** ユーザー所有の塗料在庫 */
+/**
+ * ユーザーの塗料在庫 (count cache)。
+ * unique key = (userId, paintId)。synthetic id なし。
+ * count は events の SUM(delta) から再計算可能。count = 0 でも行は残す。
+ */
 export interface PaintStock {
+  userId: string
+  paintId: string
+  /** 在庫数 >= 0 */
+  count: number
+}
+
+/**
+ * 塗料入出庫の理由。
+ * 注: 'project' はない — project_paint_use は count に影響しない M:N 関係。
+ */
+export type PaintEventReason =
+  | 'purchase'
+  | 'gift'
+  | 'sell'
+  | 'discard'
+  | 'lost'
+  | 'other'
+
+/**
+ * 塗料入出庫イベント (audit ledger)。
+ * delta > 0: 入庫、delta < 0: 出庫。delta = 0 は禁止。
+ */
+export interface PaintEvent {
   id: string
   userId: string
   paintId: string
+  /** 非ゼロ。+N: 入庫、-N: 出庫 */
+  delta: number
+  reason: PaintEventReason
+  /** reason='purchase' 時に設定 */
   purchasedAt: string | null
-  purchasePriceYen: number | null
-  status: PaintStatus
-  remark: string | null
+  /** reason='purchase' 時に設定 (円) */
+  priceYen: number | null
+  /** reason='purchase' 時に設定 */
+  purchaseLocation: string | null
+  note: string | null
+  createdAt: string
 }

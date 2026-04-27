@@ -7,18 +7,13 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import type { Kit, KitStock } from '~/entities/kit'
 import { Badge } from '~/shared/ui/badge'
 
 export interface KitTableRow {
   stock: KitStock
   kit: Kit
-}
-
-const ASSEMBLY_LABEL: Record<KitStock['assemblyStatus'], string> = {
-  unbuilt: '未組立',
-  building: '組立中',
-  completed: '完成',
 }
 
 const columns: ColumnDef<KitTableRow>[] = [
@@ -28,9 +23,15 @@ const columns: ColumnDef<KitTableRow>[] = [
     header: '名前',
     cell: ({ row }) => (
       <div>
-        <div className="font-medium">{row.original.kit.name}</div>
+        <Link
+          to="/kits/$kitId"
+          params={{ kitId: row.original.kit.id }}
+          className="font-medium hover:underline"
+        >
+          {row.original.kit.name}
+        </Link>
         {row.original.kit.visibility === 'private' && (
-          <Badge variant="outline" className="text-xs mt-1">private</Badge>
+          <Badge variant="outline" className="text-xs mt-1 ml-1">private</Badge>
         )}
       </div>
     ),
@@ -51,15 +52,12 @@ const columns: ColumnDef<KitTableRow>[] = [
     header: 'ブランド',
   },
   {
-    id: 'assemblyStatus',
-    accessorFn: (row) => row.stock.assemblyStatus,
-    header: '組立状態',
-    cell: ({ getValue }) => ASSEMBLY_LABEL[getValue() as KitStock['assemblyStatus']],
-  },
-  {
-    id: 'photo',
-    accessorFn: (row) => (row.stock.photoUrl ? '有' : '無'),
-    header: '写真',
+    id: 'count',
+    accessorFn: (row) => row.stock.count,
+    header: '在庫数',
+    cell: ({ getValue }) => (
+      <span className="font-medium">{getValue() as number} 個</span>
+    ),
   },
 ]
 
@@ -108,7 +106,7 @@ export function KitTable({ rows }: KitTableProps) {
             </tr>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-t border-border">
+              <tr key={row.id} className="border-t border-border hover:bg-muted/30 transition-colors">
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-3 py-2">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

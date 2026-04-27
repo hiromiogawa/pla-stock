@@ -7,18 +7,13 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import type { Paint, PaintStock } from '~/entities/paint'
 import { Badge } from '~/shared/ui/badge'
 
 export interface PaintTableRow {
   stock: PaintStock
   paint: Paint
-}
-
-const STATUS_LABEL: Record<PaintStock['status'], string> = {
-  new: '新品',
-  in_use: '使用中',
-  empty: '空',
 }
 
 const columns: ColumnDef<PaintTableRow>[] = [
@@ -38,7 +33,13 @@ const columns: ColumnDef<PaintTableRow>[] = [
     header: '名前',
     cell: ({ row }) => (
       <div className="flex items-center gap-1">
-        <span>{row.original.paint.name}</span>
+        <Link
+          to="/paints/$paintId"
+          params={{ paintId: row.original.paint.id }}
+          className="hover:underline"
+        >
+          {row.original.paint.name}
+        </Link>
         {row.original.paint.visibility === 'private' && (
           <Badge variant="outline" className="text-xs">
             private
@@ -58,10 +59,12 @@ const columns: ColumnDef<PaintTableRow>[] = [
     header: 'フィニッシュ',
   },
   {
-    id: 'status',
-    accessorFn: (row) => row.stock.status,
-    header: '状態',
-    cell: ({ getValue }) => STATUS_LABEL[getValue() as PaintStock['status']],
+    id: 'count',
+    accessorFn: (row) => row.stock.count,
+    header: '在庫数',
+    cell: ({ getValue }) => (
+      <span className="font-medium">{getValue() as number} 本</span>
+    ),
   },
 ]
 
@@ -110,7 +113,7 @@ export function PaintTable({ rows }: PaintTableProps) {
             </tr>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-t border-border">
+              <tr key={row.id} className="border-t border-border hover:bg-muted/30 transition-colors">
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-3 py-2">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

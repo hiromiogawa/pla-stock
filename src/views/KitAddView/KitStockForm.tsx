@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import type { Kit } from '~/entities/kit'
-import { stockSchema, type StockInput } from '~/features/kit-stock-add'
+import { purchaseEventSchema, type StockInput } from '~/features/kit-stock-add'
 import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
@@ -18,17 +18,17 @@ export function KitStockForm({ kit, onSubmit, onCancel }: KitStockFormProps) {
       purchasedAt: '',
       purchasePriceYen: '' as string | number | null,
       purchaseLocation: '',
-      remark: '',
+      note: '',
     },
     onSubmit: async ({ value }) => {
-      const parsed = stockSchema.parse({
+      const parsed = purchaseEventSchema.parse({
         purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,
         purchasePriceYen:
           value.purchasePriceYen === '' || value.purchasePriceYen === null
             ? null
             : Number(value.purchasePriceYen),
         purchaseLocation: value.purchaseLocation === '' ? null : value.purchaseLocation,
-        remark: value.remark === '' ? null : value.remark,
+        note: value.note === '' ? null : value.note,
       })
       await onSubmit(parsed)
     },
@@ -44,9 +44,9 @@ export function KitStockForm({ kit, onSubmit, onCancel }: KitStockFormProps) {
       }}
     >
       <div>
-        <h2 className="text-sm font-semibold">在庫に追加</h2>
+        <h2 className="text-sm font-semibold">購入記録を追加</h2>
         <p className="text-xs text-muted-foreground mt-1">
-          {kit.name}（{kit.grade} · {kit.scale}）を自分の在庫に追加します。
+          {kit.name}（{kit.grade} · {kit.scale}）の購入記録を追加して在庫に +1 します。
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export function KitStockForm({ kit, onSubmit, onCancel }: KitStockFormProps) {
         )}
       </form.Field>
 
-      <form.Field name="remark">
+      <form.Field name="note">
         {(field) => (
           <div className="space-y-2">
             <Label htmlFor={field.name}>メモ</Label>

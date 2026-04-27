@@ -3,7 +3,7 @@ import { getPaints } from '~/shared/api/mock/paints'
 import { getMockSession } from '~/shared/lib/mock-auth'
 import { PaintAddView } from '~/views/PaintAddView'
 
-export const Route = createFileRoute('/app/paints/new')({
+export const Route = createFileRoute('/_auth/paints/new')({
   loader: async () => {
     const session = getMockSession()
     const userId = session?.user.id ?? 'mock-user-1'

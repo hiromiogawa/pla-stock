@@ -27,8 +27,8 @@ export function LinkedProjectsForPaint({ projects }: LinkedProjectsForPaintProps
           <li key={p.id} className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
               <Link
-                // @ts-expect-error /app/projects/:id route is registered in Issue #20
-                to={`/app/projects/${p.id}`}
+                // @ts-expect-error /projects/:id route is registered in Issue #20
+                to={`/projects/${p.id}`}
                 className="text-sm font-medium hover:underline truncate block"
               >
                 {p.name}

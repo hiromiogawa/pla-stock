@@ -3,7 +3,7 @@ import type { ColorFamily, FinishType } from '~/entities/paint'
 import { COLOR_FAMILY_VALUES, FINISH_TYPE_VALUES } from '~/entities/paint'
 import {
   privatePaintSchema,
-  paintStockSchema,
+  paintPurchaseEventSchema,
   type PrivatePaintInput,
   type PaintStockInput,
 } from '~/features/paint-stock-add'
@@ -45,7 +45,8 @@ export function PaintPrivateForm({ onSubmit, onCancel }: PaintPrivateFormProps) 
       finishType: '__none__' as FinishType | '__none__',
       purchasedAt: '',
       purchasePriceYen: '' as string | number | null,
-      remark: '',
+      purchaseLocation: '',
+      note: '',
     },
     onSubmit: async ({ value }) => {
       const privateInput = privatePaintSchema.parse({
@@ -55,13 +56,14 @@ export function PaintPrivateForm({ onSubmit, onCancel }: PaintPrivateFormProps) 
         colorFamily: value.colorFamily === '__none__' ? null : value.colorFamily,
         finishType: value.finishType === '__none__' ? null : value.finishType,
       })
-      const stockInput = paintStockSchema.parse({
+      const stockInput = paintPurchaseEventSchema.parse({
         purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,
         purchasePriceYen:
           value.purchasePriceYen === '' || value.purchasePriceYen === null
             ? null
             : Number(value.purchasePriceYen),
-        remark: value.remark === '' ? null : value.remark,
+        purchaseLocation: value.purchaseLocation === '' ? null : value.purchaseLocation,
+        note: value.note === '' ? null : value.note,
       })
       await onSubmit(privateInput, stockInput)
     },
@@ -208,7 +210,7 @@ export function PaintPrivateForm({ onSubmit, onCancel }: PaintPrivateFormProps) 
         </form.Field>
       </div>
 
-      <h3 className="text-xs uppercase tracking-wider text-muted-foreground pt-2">在庫情報</h3>
+      <h3 className="text-xs uppercase tracking-wider text-muted-foreground pt-2">購入情報</h3>
 
       <form.Field name="purchasedAt">
         {(field) => (
@@ -243,7 +245,23 @@ export function PaintPrivateForm({ onSubmit, onCancel }: PaintPrivateFormProps) 
         )}
       </form.Field>
 
-      <form.Field name="remark">
+      <form.Field name="purchaseLocation">
+        {(field) => (
+          <div className="space-y-2">
+            <Label htmlFor={field.name}>購入場所</Label>
+            <Input
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+              placeholder="ヨドバシ梅田 / Amazon など"
+            />
+          </div>
+        )}
+      </form.Field>
+
+      <form.Field name="note">
         {(field) => (
           <div className="space-y-2">
             <Label htmlFor={field.name}>メモ</Label>

@@ -1,16 +1,15 @@
-import type { Kit } from '~/entities/kit'
+import type { Kit, KitStock } from '~/entities/kit'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 
 export interface KitDetailHeaderProps {
   kit: Kit
-  editing: boolean
-  onEdit: () => void
-  onCancelEdit: () => void
-  onDelete: () => void
+  stock: KitStock
+  onPurchase: () => void
+  onRelease: () => void
 }
 
-export function KitDetailHeader({ kit, editing, onEdit, onCancelEdit, onDelete }: KitDetailHeaderProps) {
+export function KitDetailHeader({ kit, stock, onPurchase, onRelease }: KitDetailHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
       <div className="space-y-1">
@@ -24,16 +23,13 @@ export function KitDetailHeader({ kit, editing, onEdit, onCancelEdit, onDelete }
             <Badge variant="outline" className="ml-1">private</Badge>
           )}
         </div>
+        <p className="text-sm font-medium mt-1">在庫: {stock.count} 個</p>
       </div>
       <div className="flex gap-2 shrink-0">
-        {editing ? (
-          <Button variant="outline" onClick={onCancelEdit}>キャンセル</Button>
-        ) : (
-          <>
-            <Button variant="outline" onClick={onEdit}>編集</Button>
-            <Button variant="destructive" onClick={onDelete}>削除</Button>
-          </>
-        )}
+        <Button onClick={onPurchase}>+1 個（購入）</Button>
+        <Button variant="outline" onClick={onRelease} disabled={stock.count === 0}>
+          −1 個（手放し）
+        </Button>
       </div>
     </div>
   )

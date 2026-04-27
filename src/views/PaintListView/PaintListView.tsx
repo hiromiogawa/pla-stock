@@ -7,6 +7,7 @@ import { PaintTable } from './PaintTable'
 import { PaintCardList } from './PaintCardList'
 
 export interface PaintListViewProps {
+  /** count > 0 の paint_stock のみ渡す (ローダー側で絞り込み済み) */
   stocks: PaintStock[]
   paints: Paint[]
 }
@@ -24,7 +25,7 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
         return { stock, paint }
       })
       .filter((row): row is { stock: PaintStock; paint: Paint } => row !== null)
-      .filter(({ stock, paint }) => {
+      .filter(({ paint }) => {
         if (filters.search) {
           const q = filters.search.toLowerCase()
           const matches =
@@ -38,7 +39,6 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
         if (filters.finishType !== 'all' && paint.finishType !== filters.finishType) {
           return false
         }
-        if (filters.status !== 'all' && stock.status !== filters.status) return false
         return true
       })
   }, [stocks, paintById, filters])
@@ -53,11 +53,11 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">塗料</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            自分の在庫塗料 {stocks.length} 件中 {rows.length} 件を表示
+            在庫塗料 {stocks.length} 件中 {rows.length} 件を表示 (count = 0 は非表示)
           </p>
         </div>
         <Button asChild>
-          <Link to="/app/paints/new">+ 追加</Link>
+          <Link to="/paints/new">+ 追加</Link>
         </Button>
       </div>
       <PaintFilterBar filters={filters} brands={brands} onChange={setFilters} />

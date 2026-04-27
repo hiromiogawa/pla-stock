@@ -9,19 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AppRouteImport } from './routes/app'
+import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppIndexRouteImport } from './routes/app/index'
-import { Route as AppPaintsIndexRouteImport } from './routes/app/paints/index'
-import { Route as AppKitsIndexRouteImport } from './routes/app/kits/index'
-import { Route as AppPaintsNewRouteImport } from './routes/app/paints/new'
-import { Route as AppPaintsStockIdRouteImport } from './routes/app/paints/$stockId'
-import { Route as AppKitsNewRouteImport } from './routes/app/kits/new'
-import { Route as AppKitsStockIdRouteImport } from './routes/app/kits/$stockId'
+import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthProjectsIndexRouteImport } from './routes/_auth/projects/index'
+import { Route as AuthPaintsIndexRouteImport } from './routes/_auth/paints/index'
+import { Route as AuthKitsIndexRouteImport } from './routes/_auth/kits/index'
+import { Route as AuthPaintsNewRouteImport } from './routes/_auth/paints/new'
+import { Route as AuthPaintsPaintIdRouteImport } from './routes/_auth/paints/$paintId'
+import { Route as AuthKitsNewRouteImport } from './routes/_auth/kits/new'
+import { Route as AuthKitsKitIdRouteImport } from './routes/_auth/kits/$kitId'
 
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -29,122 +29,131 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppRoute,
+const AuthDashboardRoute = AuthDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthRoute,
 } as any)
-const AppPaintsIndexRoute = AppPaintsIndexRouteImport.update({
+const AuthProjectsIndexRoute = AuthProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthPaintsIndexRoute = AuthPaintsIndexRouteImport.update({
   id: '/paints/',
   path: '/paints/',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
-const AppKitsIndexRoute = AppKitsIndexRouteImport.update({
+const AuthKitsIndexRoute = AuthKitsIndexRouteImport.update({
   id: '/kits/',
   path: '/kits/',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
-const AppPaintsNewRoute = AppPaintsNewRouteImport.update({
+const AuthPaintsNewRoute = AuthPaintsNewRouteImport.update({
   id: '/paints/new',
   path: '/paints/new',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
-const AppPaintsStockIdRoute = AppPaintsStockIdRouteImport.update({
-  id: '/paints/$stockId',
-  path: '/paints/$stockId',
-  getParentRoute: () => AppRoute,
+const AuthPaintsPaintIdRoute = AuthPaintsPaintIdRouteImport.update({
+  id: '/paints/$paintId',
+  path: '/paints/$paintId',
+  getParentRoute: () => AuthRoute,
 } as any)
-const AppKitsNewRoute = AppKitsNewRouteImport.update({
+const AuthKitsNewRoute = AuthKitsNewRouteImport.update({
   id: '/kits/new',
   path: '/kits/new',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
-const AppKitsStockIdRoute = AppKitsStockIdRouteImport.update({
-  id: '/kits/$stockId',
-  path: '/kits/$stockId',
-  getParentRoute: () => AppRoute,
+const AuthKitsKitIdRoute = AuthKitsKitIdRouteImport.update({
+  id: '/kits/$kitId',
+  path: '/kits/$kitId',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/app': typeof AppRouteWithChildren
-  '/app/': typeof AppIndexRoute
-  '/app/kits/$stockId': typeof AppKitsStockIdRoute
-  '/app/kits/new': typeof AppKitsNewRoute
-  '/app/paints/$stockId': typeof AppPaintsStockIdRoute
-  '/app/paints/new': typeof AppPaintsNewRoute
-  '/app/kits/': typeof AppKitsIndexRoute
-  '/app/paints/': typeof AppPaintsIndexRoute
+  '/dashboard': typeof AuthDashboardRoute
+  '/kits/$kitId': typeof AuthKitsKitIdRoute
+  '/kits/new': typeof AuthKitsNewRoute
+  '/paints/$paintId': typeof AuthPaintsPaintIdRoute
+  '/paints/new': typeof AuthPaintsNewRoute
+  '/kits/': typeof AuthKitsIndexRoute
+  '/paints/': typeof AuthPaintsIndexRoute
+  '/projects/': typeof AuthProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/app': typeof AppIndexRoute
-  '/app/kits/$stockId': typeof AppKitsStockIdRoute
-  '/app/kits/new': typeof AppKitsNewRoute
-  '/app/paints/$stockId': typeof AppPaintsStockIdRoute
-  '/app/paints/new': typeof AppPaintsNewRoute
-  '/app/kits': typeof AppKitsIndexRoute
-  '/app/paints': typeof AppPaintsIndexRoute
+  '/dashboard': typeof AuthDashboardRoute
+  '/kits/$kitId': typeof AuthKitsKitIdRoute
+  '/kits/new': typeof AuthKitsNewRoute
+  '/paints/$paintId': typeof AuthPaintsPaintIdRoute
+  '/paints/new': typeof AuthPaintsNewRoute
+  '/kits': typeof AuthKitsIndexRoute
+  '/paints': typeof AuthPaintsIndexRoute
+  '/projects': typeof AuthProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/app': typeof AppRouteWithChildren
-  '/app/': typeof AppIndexRoute
-  '/app/kits/$stockId': typeof AppKitsStockIdRoute
-  '/app/kits/new': typeof AppKitsNewRoute
-  '/app/paints/$stockId': typeof AppPaintsStockIdRoute
-  '/app/paints/new': typeof AppPaintsNewRoute
-  '/app/kits/': typeof AppKitsIndexRoute
-  '/app/paints/': typeof AppPaintsIndexRoute
+  '/_auth': typeof AuthRouteWithChildren
+  '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/kits/$kitId': typeof AuthKitsKitIdRoute
+  '/_auth/kits/new': typeof AuthKitsNewRoute
+  '/_auth/paints/$paintId': typeof AuthPaintsPaintIdRoute
+  '/_auth/paints/new': typeof AuthPaintsNewRoute
+  '/_auth/kits/': typeof AuthKitsIndexRoute
+  '/_auth/paints/': typeof AuthPaintsIndexRoute
+  '/_auth/projects/': typeof AuthProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/app'
-    | '/app/'
-    | '/app/kits/$stockId'
-    | '/app/kits/new'
-    | '/app/paints/$stockId'
-    | '/app/paints/new'
-    | '/app/kits/'
-    | '/app/paints/'
+    | '/dashboard'
+    | '/kits/$kitId'
+    | '/kits/new'
+    | '/paints/$paintId'
+    | '/paints/new'
+    | '/kits/'
+    | '/paints/'
+    | '/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/app'
-    | '/app/kits/$stockId'
-    | '/app/kits/new'
-    | '/app/paints/$stockId'
-    | '/app/paints/new'
-    | '/app/kits'
-    | '/app/paints'
+    | '/dashboard'
+    | '/kits/$kitId'
+    | '/kits/new'
+    | '/paints/$paintId'
+    | '/paints/new'
+    | '/kits'
+    | '/paints'
+    | '/projects'
   id:
     | '__root__'
     | '/'
-    | '/app'
-    | '/app/'
-    | '/app/kits/$stockId'
-    | '/app/kits/new'
-    | '/app/paints/$stockId'
-    | '/app/paints/new'
-    | '/app/kits/'
-    | '/app/paints/'
+    | '/_auth'
+    | '/_auth/dashboard'
+    | '/_auth/kits/$kitId'
+    | '/_auth/kits/new'
+    | '/_auth/paints/$paintId'
+    | '/_auth/paints/new'
+    | '/_auth/kits/'
+    | '/_auth/paints/'
+    | '/_auth/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -154,83 +163,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/': {
-      id: '/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
+    '/_auth/dashboard': {
+      id: '/_auth/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthDashboardRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/app/paints/': {
-      id: '/app/paints/'
+    '/_auth/projects/': {
+      id: '/_auth/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof AuthProjectsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/paints/': {
+      id: '/_auth/paints/'
       path: '/paints'
-      fullPath: '/app/paints/'
-      preLoaderRoute: typeof AppPaintsIndexRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/paints/'
+      preLoaderRoute: typeof AuthPaintsIndexRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/app/kits/': {
-      id: '/app/kits/'
+    '/_auth/kits/': {
+      id: '/_auth/kits/'
       path: '/kits'
-      fullPath: '/app/kits/'
-      preLoaderRoute: typeof AppKitsIndexRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/kits/'
+      preLoaderRoute: typeof AuthKitsIndexRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/app/paints/new': {
-      id: '/app/paints/new'
+    '/_auth/paints/new': {
+      id: '/_auth/paints/new'
       path: '/paints/new'
-      fullPath: '/app/paints/new'
-      preLoaderRoute: typeof AppPaintsNewRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/paints/new'
+      preLoaderRoute: typeof AuthPaintsNewRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/app/paints/$stockId': {
-      id: '/app/paints/$stockId'
-      path: '/paints/$stockId'
-      fullPath: '/app/paints/$stockId'
-      preLoaderRoute: typeof AppPaintsStockIdRouteImport
-      parentRoute: typeof AppRoute
+    '/_auth/paints/$paintId': {
+      id: '/_auth/paints/$paintId'
+      path: '/paints/$paintId'
+      fullPath: '/paints/$paintId'
+      preLoaderRoute: typeof AuthPaintsPaintIdRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/app/kits/new': {
-      id: '/app/kits/new'
+    '/_auth/kits/new': {
+      id: '/_auth/kits/new'
       path: '/kits/new'
-      fullPath: '/app/kits/new'
-      preLoaderRoute: typeof AppKitsNewRouteImport
-      parentRoute: typeof AppRoute
+      fullPath: '/kits/new'
+      preLoaderRoute: typeof AuthKitsNewRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/app/kits/$stockId': {
-      id: '/app/kits/$stockId'
-      path: '/kits/$stockId'
-      fullPath: '/app/kits/$stockId'
-      preLoaderRoute: typeof AppKitsStockIdRouteImport
-      parentRoute: typeof AppRoute
+    '/_auth/kits/$kitId': {
+      id: '/_auth/kits/$kitId'
+      path: '/kits/$kitId'
+      fullPath: '/kits/$kitId'
+      preLoaderRoute: typeof AuthKitsKitIdRouteImport
+      parentRoute: typeof AuthRoute
     }
   }
 }
 
-interface AppRouteChildren {
-  AppIndexRoute: typeof AppIndexRoute
-  AppKitsStockIdRoute: typeof AppKitsStockIdRoute
-  AppKitsNewRoute: typeof AppKitsNewRoute
-  AppPaintsStockIdRoute: typeof AppPaintsStockIdRoute
-  AppPaintsNewRoute: typeof AppPaintsNewRoute
-  AppKitsIndexRoute: typeof AppKitsIndexRoute
-  AppPaintsIndexRoute: typeof AppPaintsIndexRoute
+interface AuthRouteChildren {
+  AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthKitsKitIdRoute: typeof AuthKitsKitIdRoute
+  AuthKitsNewRoute: typeof AuthKitsNewRoute
+  AuthPaintsPaintIdRoute: typeof AuthPaintsPaintIdRoute
+  AuthPaintsNewRoute: typeof AuthPaintsNewRoute
+  AuthKitsIndexRoute: typeof AuthKitsIndexRoute
+  AuthPaintsIndexRoute: typeof AuthPaintsIndexRoute
+  AuthProjectsIndexRoute: typeof AuthProjectsIndexRoute
 }
 
-const AppRouteChildren: AppRouteChildren = {
-  AppIndexRoute: AppIndexRoute,
-  AppKitsStockIdRoute: AppKitsStockIdRoute,
-  AppKitsNewRoute: AppKitsNewRoute,
-  AppPaintsStockIdRoute: AppPaintsStockIdRoute,
-  AppPaintsNewRoute: AppPaintsNewRoute,
-  AppKitsIndexRoute: AppKitsIndexRoute,
-  AppPaintsIndexRoute: AppPaintsIndexRoute,
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthDashboardRoute: AuthDashboardRoute,
+  AuthKitsKitIdRoute: AuthKitsKitIdRoute,
+  AuthKitsNewRoute: AuthKitsNewRoute,
+  AuthPaintsPaintIdRoute: AuthPaintsPaintIdRoute,
+  AuthPaintsNewRoute: AuthPaintsNewRoute,
+  AuthKitsIndexRoute: AuthKitsIndexRoute,
+  AuthPaintsIndexRoute: AuthPaintsIndexRoute,
+  AuthProjectsIndexRoute: AuthProjectsIndexRoute,
 }
 
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
