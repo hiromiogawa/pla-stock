@@ -32,7 +32,7 @@ export function PaintSwatchCard({ stock, paint }: PaintSwatchCardProps) {
             className="w-full h-full object-cover rounded"
           />
         ) : (
-          'No\nSwatch'
+          'No Swatch'
         )}
       </div>
       <div className="flex-1 min-w-0">
