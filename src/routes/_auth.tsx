@@ -1,10 +1,10 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
-import { auth } from '@clerk/tanstack-react-start/server'
+import { fetchClerkAuth } from '~/shared/lib/auth'
 import { AppShell } from '~/widgets/AppShell'
 
 export const Route = createFileRoute('/_auth')({
   beforeLoad: async () => {
-    const { userId } = await auth()
+    const { userId } = await fetchClerkAuth()
     if (!userId) {
       throw redirect({ to: '/' })
     }
