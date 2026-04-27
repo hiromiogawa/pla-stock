@@ -6,29 +6,35 @@
  */
 import type { Visibility } from '~/entities/kit'
 
-export type ColorFamily =
-  | '赤'
-  | '青'
-  | '黄'
-  | '緑'
-  | '白'
-  | '黒'
-  | '銀'
-  | '金'
-  | '茶'
-  | '蛍光'
-  | 'クリア'
-  | 'other'
+export const COLOR_FAMILY_VALUES = [
+  '赤',
+  '青',
+  '黄',
+  '緑',
+  '白',
+  '黒',
+  '銀',
+  '金',
+  '茶',
+  '蛍光',
+  'クリア',
+  'other',
+] as const
 
-export type FinishType =
-  | '光沢'
-  | '半光沢'
-  | 'つや消し'
-  | 'メタリック'
-  | 'パール'
-  | 'クリア'
-  | 'プライマー'
-  | 'ウェザリング'
+export type ColorFamily = (typeof COLOR_FAMILY_VALUES)[number]
+
+export const FINISH_TYPE_VALUES = [
+  '光沢',
+  '半光沢',
+  'つや消し',
+  'メタリック',
+  'パール',
+  'クリア',
+  'プライマー',
+  'ウェザリング',
+] as const
+
+export type FinishType = (typeof FINISH_TYPE_VALUES)[number]
 
 export type PaintStatus = 'new' | 'in_use' | 'empty'
 

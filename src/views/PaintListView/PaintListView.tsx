@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import type { Paint, PaintStock } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
 import { PaintFilterBar, INITIAL_FILTERS, type PaintFilters } from './PaintFilterBar'
@@ -55,9 +56,8 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
             自分の在庫塗料 {stocks.length} 件中 {rows.length} 件を表示
           </p>
         </div>
-        {/* TODO(#18): 「+ 追加」リンクは Issue #18 で /app/paints/new 実装時に有効化 */}
-        <Button disabled title="Issue #18 で実装">
-          + 追加
+        <Button asChild>
+          <Link to="/app/paints/new">+ 追加</Link>
         </Button>
       </div>
       <PaintFilterBar filters={filters} brands={brands} onChange={setFilters} />
