@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 
@@ -26,7 +27,11 @@ const STATUS_VARIANT: Record<
 
 export function ProjectCard({ project, linkedKitName }: ProjectCardProps) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-2">
+    <Link
+      to="/projects/$id"
+      params={{ id: project.id }}
+      className="block rounded-lg border border-border bg-card p-4 space-y-2 hover:bg-accent/50 transition-colors"
+    >
       <div className="flex items-start justify-between gap-3">
         <h3 className="text-sm font-semibold flex-1 min-w-0 truncate">{project.name}</h3>
         <Badge variant={STATUS_VARIANT[project.status]} className="text-xs shrink-0">
@@ -50,6 +55,6 @@ export function ProjectCard({ project, linkedKitName }: ProjectCardProps) {
           <dd>{project.completedAt ?? '—'}</dd>
         </div>
       </dl>
-    </div>
+    </Link>
   )
 }
