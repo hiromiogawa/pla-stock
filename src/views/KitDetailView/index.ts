@@ -1,0 +1,1 @@
+export { KitDetailView } from './KitDetailView'

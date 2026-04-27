@@ -190,3 +190,15 @@ export async function deleteProjectPhoto(input: { photoId: string }): Promise<bo
   projectPhotos.splice(idx, 1)
   return true
 }
+
+/**
+ * 指定 kit_stock_id を kitStockId に持つ project を全て探し、kitStockId を null にする。
+ * Phase C で D1 の ON DELETE SET NULL FK 制約に置換予定 (現状はアプリ層で代替)。
+ */
+export async function nullifyKitStockIdInProjects(input: { kitStockId: string }): Promise<void> {
+  for (const p of projects) {
+    if (p.kitStockId === input.kitStockId) {
+      p.kitStockId = null
+    }
+  }
+}

@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppKitsIndexRouteImport } from './routes/app/kits/index'
+import { Route as AppKitsStockIdRouteImport } from './routes/app/kits/$stockId'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -34,16 +35,23 @@ const AppKitsIndexRoute = AppKitsIndexRouteImport.update({
   path: '/kits/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppKitsStockIdRoute = AppKitsStockIdRouteImport.update({
+  id: '/kits/$stockId',
+  path: '/kits/$stockId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/kits/$stockId': typeof AppKitsStockIdRoute
   '/app/kits/': typeof AppKitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppIndexRoute
+  '/app/kits/$stockId': typeof AppKitsStockIdRoute
   '/app/kits': typeof AppKitsIndexRoute
 }
 export interface FileRoutesById {
@@ -51,14 +59,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/app/': typeof AppIndexRoute
+  '/app/kits/$stockId': typeof AppKitsStockIdRoute
   '/app/kits/': typeof AppKitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/app/' | '/app/kits/'
+  fullPaths: '/' | '/app' | '/app/' | '/app/kits/$stockId' | '/app/kits/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/app/kits'
-  id: '__root__' | '/' | '/app' | '/app/' | '/app/kits/'
+  to: '/' | '/app' | '/app/kits/$stockId' | '/app/kits'
+  id: '__root__' | '/' | '/app' | '/app/' | '/app/kits/$stockId' | '/app/kits/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -96,16 +105,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppKitsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/kits/$stockId': {
+      id: '/app/kits/$stockId'
+      path: '/kits/$stockId'
+      fullPath: '/app/kits/$stockId'
+      preLoaderRoute: typeof AppKitsStockIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppKitsStockIdRoute: typeof AppKitsStockIdRoute
   AppKitsIndexRoute: typeof AppKitsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppKitsStockIdRoute: AppKitsStockIdRoute,
   AppKitsIndexRoute: AppKitsIndexRoute,
 }
 
