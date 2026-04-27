@@ -1,3 +1,7 @@
+// Phase A-2: Kit 版 LinkedProjects (src/views/KitDetailView/LinkedProjects.tsx) の
+// Paint 用コピー。section heading と prop 名のみ異なる。
+// Phase B で汎用 LinkedProjectsList に統合予定。
+
 import { Link } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'

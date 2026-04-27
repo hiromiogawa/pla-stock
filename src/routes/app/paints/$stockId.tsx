@@ -17,6 +17,11 @@ export const Route = createFileRoute('/app/paints/$stockId')({
       return { stock: null, paint: null, linkedProjects: [] }
     }
     const projects = await getProjects({ userId })
+    // TODO(Phase-C): M:N 逆引き。現在は全プロジェクトを舐めて project_paints を
+    // 個別取得する O(N*M) 実装。Phase C では単一 JOIN クエリに置換予定:
+    //   SELECT p.* FROM projects p
+    //   JOIN project_paints pp ON pp.project_id = p.id
+    //   WHERE pp.paint_stock_id = :stockId AND p.user_id = :userId
     const linkedProjects = []
     for (const p of projects) {
       const paintStockIds = await getProjectPaintStockIds({ projectId: p.id })
