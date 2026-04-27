@@ -95,6 +95,7 @@ export function ProjectCreateForm({
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
               placeholder="Sazabi Ver.Ka 塗装計画 など"
+              maxLength={200}
               required
             />
           </div>
@@ -112,6 +113,7 @@ export function ProjectCreateForm({
               value={field.state.value}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
+              maxLength={2000}
             />
           </div>
         )}
