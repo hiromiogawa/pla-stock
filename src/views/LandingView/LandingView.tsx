@@ -16,8 +16,7 @@ export function LandingView() {
               プラモデル・塗料の在庫管理
             </h1>
             <p className="text-muted-foreground">
-              持っているキット・塗料を登録し、製作プロジェクトごとに紐付ける
-              モデラー向けツール。
+              持っているキット・塗料を登録し、製作プロジェクトごとに紐付ける モデラー向けツール。
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

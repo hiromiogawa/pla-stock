@@ -1,5 +1,5 @@
-import type { Project, ProjectPhoto } from '~/entities/project'
-import { addKitEvent } from './kits'
+import type { Project, ProjectPhoto } from '../../model'
+import { addKitEvent } from '~/entities/kit/api/mock/kits'
 
 /**
  * モック層: project / project_paint_use / project_photos の in-memory データと
@@ -19,7 +19,7 @@ import { addKitEvent } from './kits'
 const MOCK_USER_ID = 'mock-user-1'
 
 /** Project と Paint master の M:N 中間テーブル (count 変化なし) */
-export interface ProjectPaintUseLink {
+interface ProjectPaintUseLink {
   id: string
   projectId: string
   /** paint master の ID (旧: paintStockId から変更) */
@@ -90,7 +90,7 @@ const projectPhotos: ProjectPhoto[] = [
 
 // === Read accessors ===
 
-export async function getProjects(input: { userId: string }): Promise<Project[]> {
+export async function getProjects(_input: { userId: string }): Promise<Project[]> {
   return projects.filter((p) => p.userId === MOCK_USER_ID)
 }
 
@@ -168,9 +168,7 @@ export async function updateProject(input: {
   userId: string
   patch: Partial<Pick<Project, 'name' | 'description' | 'status' | 'startedAt' | 'completedAt'>>
 }): Promise<Project | null> {
-  const idx = projects.findIndex(
-    (p) => p.id === input.projectId && p.userId === MOCK_USER_ID,
-  )
+  const idx = projects.findIndex((p) => p.id === input.projectId && p.userId === MOCK_USER_ID)
   if (idx === -1) return null
   projects[idx] = { ...projects[idx], ...input.patch }
   return projects[idx]
@@ -187,9 +185,7 @@ export async function deleteProject(input: {
   projectId: string
   userId: string
 }): Promise<boolean> {
-  const idx = projects.findIndex(
-    (p) => p.id === input.projectId && p.userId === MOCK_USER_ID,
-  )
+  const idx = projects.findIndex((p) => p.id === input.projectId && p.userId === MOCK_USER_ID)
   if (idx === -1) return false
 
   const project = projects[idx]

@@ -2,15 +2,11 @@ import { useMemo, useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Button } from '~/shared/ui/button'
-import {
-  ProjectFilterBar,
-  INITIAL_FILTERS,
-  type ProjectFilters,
-} from './ProjectFilterBar'
+import { ProjectFilterBar, INITIAL_FILTERS, type ProjectFilters } from './ProjectFilterBar'
 import { ProjectTable } from './ProjectTable'
 import { ProjectCardList } from './ProjectCardList'
 
-export interface ProjectListViewProps {
+interface ProjectListViewProps {
   projects: Project[]
   /** project.id → 紐付きキット名 (未紐付き or 解決失敗時は null) の map */
   kitNameByProjectId: Record<string, string | null>

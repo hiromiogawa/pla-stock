@@ -9,13 +9,7 @@ const REASON_LABEL: Record<PaintEvent['reason'], string> = {
   other: 'その他',
 }
 
-function FieldRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string | number | null | undefined
-}) {
+function FieldRow({ label, value }: { label: string; value: string | number | null | undefined }) {
   return (
     <div className="grid grid-cols-3 gap-3 py-2 border-b border-border last:border-b-0">
       <dt className="text-sm text-muted-foreground">{label}</dt>
@@ -24,7 +18,7 @@ function FieldRow({
   )
 }
 
-export interface PaintDetailFieldsProps {
+interface PaintDetailFieldsProps {
   stock: PaintStock
   paint: Paint
   events: PaintEvent[]
@@ -77,9 +71,7 @@ export function PaintDetailFields({ stock, paint, events }: PaintDetailFieldsPro
                   {ev.purchaseLocation && (
                     <span className="ml-2 text-muted-foreground">@ {ev.purchaseLocation}</span>
                   )}
-                  {ev.note && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{ev.note}</p>
-                  )}
+                  {ev.note && <p className="text-xs text-muted-foreground mt-0.5">{ev.note}</p>}
                 </div>
                 <span className="shrink-0 text-xs text-muted-foreground">
                   {ev.purchasedAt ?? ev.createdAt.slice(0, 10)}

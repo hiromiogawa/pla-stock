@@ -10,7 +10,7 @@ import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { Paint, PaintStock } from '~/entities/paint'
 
-export interface PaintTableRow {
+interface PaintTableRow {
   stock: PaintStock
   paint: Paint
 }
@@ -45,13 +45,11 @@ const columns: ColumnDef<PaintTableRow>[] = [
     id: 'count',
     accessorFn: (row) => row.stock.count,
     header: '在庫数',
-    cell: ({ getValue }) => (
-      <span className="font-medium">{getValue() as number} 本</span>
-    ),
+    cell: ({ getValue }) => <span className="font-medium">{getValue() as number} 本</span>,
   },
 ]
 
-export interface PaintTableProps {
+interface PaintTableProps {
   rows: PaintTableRow[]
 }
 
@@ -101,7 +99,10 @@ export function PaintTable({ rows }: PaintTableProps) {
                 key={row.id}
                 className="border-t border-border cursor-pointer hover:bg-accent/50 transition-colors"
                 onClick={() =>
-                  void navigate({ to: '/paints/$paintId', params: { paintId: row.original.paint.id } })
+                  void navigate({
+                    to: '/paints/$paintId',
+                    params: { paintId: row.original.paint.id },
+                  })
                 }
               >
                 {row.getVisibleCells().map((cell) => (

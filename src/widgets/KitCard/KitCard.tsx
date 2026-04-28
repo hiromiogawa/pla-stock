@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import type { Kit, KitStock } from '~/entities/kit'
 
-export interface KitCardProps {
+interface KitCardProps {
   stock: KitStock
   kit: Kit
 }
@@ -12,7 +12,11 @@ export function KitCard({ stock, kit }: KitCardProps) {
       <div className="rounded-lg border border-border bg-card p-4 flex gap-3 items-start hover:bg-muted/30 transition-colors">
         <div className="w-16 h-16 shrink-0 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">
           {kit.boxArtUrl ? (
-            <img src={kit.boxArtUrl} alt={kit.name} className="w-full h-full object-cover rounded" />
+            <img
+              src={kit.boxArtUrl}
+              alt={kit.name}
+              className="w-full h-full object-cover rounded"
+            />
           ) : (
             'No Image'
           )}

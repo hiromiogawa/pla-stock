@@ -3,7 +3,7 @@ import type { Kit } from '~/entities/kit'
 import { Input } from '~/shared/ui/input'
 import { KitMasterCandidate } from './KitMasterCandidate'
 
-export interface KitSearchPhaseProps {
+interface KitSearchPhaseProps {
   kits: Kit[]
   onSelectMaster: (kit: Kit) => void
 }
@@ -14,9 +14,7 @@ export function KitSearchPhase({ kits, onSelectMaster }: KitSearchPhaseProps) {
   const candidates = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (q === '') return [] as Kit[]
-    return kits
-      .filter((k) => k.name.toLowerCase().includes(q))
-      .slice(0, 20)
+    return kits.filter((k) => k.name.toLowerCase().includes(q)).slice(0, 20)
   }, [kits, query])
 
   return (
@@ -35,7 +33,8 @@ export function KitSearchPhase({ kits, onSelectMaster }: KitSearchPhaseProps) {
           </p>
         ) : candidates.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            「{query}」に一致するキットが見つかりませんでした。マスターに無いキットは admin に申請してください (Phase E 以降の機能)。
+            「{query}」に一致するキットが見つかりませんでした。マスターに無いキットは admin
+            に申請してください (Phase E 以降の機能)。
           </p>
         ) : (
           <ul className="space-y-2">

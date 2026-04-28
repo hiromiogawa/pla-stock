@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getProject, getProjectPaintUses, getProjectPhotos } from '~/shared/api/mock/projects'
-import { getKit } from '~/shared/api/mock/kits'
-import { getPaints } from '~/shared/api/mock/paints'
+import { getProject, getProjectPaintUses, getProjectPhotos } from '~/entities/project'
+import { getKit } from '~/entities/kit'
+import { getPaints } from '~/entities/paint'
 import { ProjectDetailView } from '~/views/ProjectDetailView'
 
 export const Route = createFileRoute('/_auth/projects/$id')({
@@ -9,7 +9,14 @@ export const Route = createFileRoute('/_auth/projects/$id')({
     const { userId } = context
     const project = await getProject({ projectId: params.id, userId })
     if (!project) {
-      return { project: null, kit: null, paintUses: [], paintsForProject: [], allPaints: [], photos: [] }
+      return {
+        project: null,
+        kit: null,
+        paintUses: [],
+        paintsForProject: [],
+        allPaints: [],
+        photos: [],
+      }
     }
     const [kit, paintUses, photos, allPaints] = await Promise.all([
       getKit({ kitId: project.kitId, userId }),

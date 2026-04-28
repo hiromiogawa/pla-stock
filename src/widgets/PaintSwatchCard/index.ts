@@ -1,1 +1,1 @@
-export { PaintSwatchCard, type PaintSwatchCardProps } from './PaintSwatchCard'
+export { PaintSwatchCard } from './PaintSwatchCard'

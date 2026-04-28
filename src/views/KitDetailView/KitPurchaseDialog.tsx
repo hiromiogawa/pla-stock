@@ -19,7 +19,7 @@ export interface KitPurchaseValues {
   note: string | null
 }
 
-export interface KitPurchaseDialogProps {
+interface KitPurchaseDialogProps {
   open: boolean
   kitName: string
   onOpenChange: (open: boolean) => void
@@ -51,9 +51,7 @@ export function KitPurchaseDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>購入記録を追加</DialogTitle>
-          <DialogDescription>
-            「{kitName}」を 1 個購入して在庫に追加します。
-          </DialogDescription>
+          <DialogDescription>「{kitName}」を 1 個購入して在庫に追加します。</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
@@ -85,9 +83,7 @@ export function KitPurchaseDialog({
             <Input
               id="purchaseLocation"
               value={values.purchaseLocation ?? ''}
-              onChange={(e) =>
-                setValues({ ...values, purchaseLocation: e.target.value || null })
-              }
+              onChange={(e) => setValues({ ...values, purchaseLocation: e.target.value || null })}
               placeholder="ヨドバシ梅田 / Amazon など"
             />
           </div>

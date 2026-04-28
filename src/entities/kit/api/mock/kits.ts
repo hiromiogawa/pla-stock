@@ -1,4 +1,4 @@
-import type { Kit, KitStock, KitEvent, KitEventReason } from '~/entities/kit'
+import type { Kit, KitStock, KitEvent, KitEventReason } from '../../model'
 
 /**
  * モック層: キット master / kit_stock (count cache) / kit_events (ledger) の
@@ -184,38 +184,21 @@ export async function getKit(input: { kitId: string; userId: string }): Promise<
 }
 
 /** (userId, kitId) composite key で kit_stock 1 行を取得 */
-export async function getKitStock(input: { userId: string; kitId: string }): Promise<KitStock | null> {
-  return kitStocks.find(
-    (s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId,
-  ) ?? null
-}
-
-/** user の全 kit_stock を返す */
-export async function getKitStocksAll(input: { userId: string }): Promise<KitStock[]> {
-  return kitStocks.filter((s) => s.userId === MOCK_USER_ID)
+export async function getKitStock(input: {
+  userId: string
+  kitId: string
+}): Promise<KitStock | null> {
+  return kitStocks.find((s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId) ?? null
 }
 
 /** user の count > 0 の kit_stock のみ返す */
-export async function getKitStocksWithStock(input: { userId: string }): Promise<KitStock[]> {
+export async function getKitStocksWithStock(_input: { userId: string }): Promise<KitStock[]> {
   return kitStocks.filter((s) => s.userId === MOCK_USER_ID && s.count > 0)
 }
 
 /** kit_event 履歴を (userId, kitId) で取得 */
 export async function getKitEvents(input: { userId: string; kitId: string }): Promise<KitEvent[]> {
-  return kitEvents.filter(
-    (e) => e.userId === MOCK_USER_ID && e.kitId === input.kitId,
-  )
-}
-
-// === Compute ===
-
-/** events から count を再計算 (整合性チェック用) */
-export async function recomputeKitStockCount(input: {
-  userId: string
-  kitId: string
-}): Promise<number> {
-  const events = await getKitEvents(input)
-  return events.reduce((sum, e) => sum + e.delta, 0)
+  return kitEvents.filter((e) => e.userId === MOCK_USER_ID && e.kitId === input.kitId)
 }
 
 // === Mutations (in-memory; Phase C では DB INSERT/UPDATE/DELETE) ===
@@ -245,9 +228,7 @@ export async function addKitEvent(input: {
   }
 
   // kit_stock を探すまたは作成
-  let stock = kitStocks.find(
-    (s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId,
-  )
+  let stock = kitStocks.find((s) => s.userId === MOCK_USER_ID && s.kitId === input.kitId)
   if (!stock) {
     stock = { userId: MOCK_USER_ID, kitId: input.kitId, count: 0 }
     kitStocks.push(stock)

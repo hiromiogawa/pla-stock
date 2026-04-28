@@ -6,7 +6,7 @@ import { KitFilterBar, INITIAL_FILTERS, type KitFilters } from './KitFilterBar'
 import { KitTable } from './KitTable'
 import { KitCardList } from './KitCardList'
 
-export interface KitListViewProps {
+interface KitListViewProps {
   /** count > 0 の kit_stock のみ渡す (ローダー側で絞り込み済み) */
   stocks: KitStock[]
   kits: Kit[]

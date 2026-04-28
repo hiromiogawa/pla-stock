@@ -2,7 +2,7 @@ import type { Paint } from '~/entities/paint'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 
-export interface PaintMasterCandidateProps {
+interface PaintMasterCandidateProps {
   paint: Paint
   onSelect: () => void
 }

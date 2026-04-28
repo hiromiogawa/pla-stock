@@ -1,7 +1,7 @@
 import type { Kit, KitStock } from '~/entities/kit'
 import { KitCard } from '~/widgets/KitCard'
 
-export interface KitCardListProps {
+interface KitCardListProps {
   rows: Array<{ stock: KitStock; kit: Kit }>
 }
 

@@ -2,7 +2,7 @@
  * 認証済みエリアの主要ナビ項目。モバイル BottomTabBar / デスクトップ Sidebar 共通で使う。
  * Settings は Issue #22 (Story) で実装後に enable する。
  */
-export type NavItem = {
+type NavItem = {
   key: string
   label: string
   to: string

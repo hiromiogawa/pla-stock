@@ -1,7 +1,7 @@
 import type { Paint, PaintStock } from '~/entities/paint'
 import { PaintSwatchCard } from '~/widgets/PaintSwatchCard'
 
-export interface PaintCardListProps {
+interface PaintCardListProps {
   rows: Array<{ stock: PaintStock; paint: Paint }>
 }
 

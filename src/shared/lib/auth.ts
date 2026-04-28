@@ -13,9 +13,7 @@ import { auth } from '@clerk/tanstack-react-start/server'
  * 必ず server-side で、クライアントからは fetch RPC で値を受け取る
  * 形になり安全。
  */
-export const fetchClerkAuth = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    const { userId } = await auth()
-    return { userId }
-  },
-)
+export const fetchClerkAuth = createServerFn({ method: 'GET' }).handler(async () => {
+  const { userId } = await auth()
+  return { userId }
+})

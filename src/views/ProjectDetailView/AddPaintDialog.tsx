@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '~/shared/ui/dialog'
 
-export interface AddPaintDialogProps {
+interface AddPaintDialogProps {
   open: boolean
   candidates: Paint[]
   onOpenChange: (open: boolean) => void

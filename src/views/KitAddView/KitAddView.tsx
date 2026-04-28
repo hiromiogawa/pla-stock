@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { Kit } from '~/entities/kit'
-import { addKitEvent } from '~/shared/api/mock/kits'
-import type { StockInput } from '~/features/kit-stock-add'
+import { addKitEvent } from '~/entities/kit'
+import type { PurchaseEventInput } from '~/features/kit-stock-add'
 import { Button } from '~/shared/ui/button'
 import { KitSearchPhase } from './KitSearchPhase'
 import { KitStockForm } from './KitStockForm'
 
-type Phase =
-  | { kind: 'search' }
-  | { kind: 'add-stock'; kit: Kit }
+type Phase = { kind: 'search' } | { kind: 'add-stock'; kit: Kit }
 
-export interface KitAddViewProps {
+interface KitAddViewProps {
   kits: Kit[]
   userId: string
 }
@@ -20,7 +18,7 @@ export function KitAddView({ kits, userId }: KitAddViewProps) {
   const navigate = useNavigate()
   const [phase, setPhase] = useState<Phase>({ kind: 'search' })
 
-  const handleStockSubmit = async (kitId: string, values: StockInput) => {
+  const handleStockSubmit = async (kitId: string, values: PurchaseEventInput) => {
     // 購入イベント (+1) を作成 → kit_stock.count += 1 (自動作成あり)
     await addKitEvent({
       userId,

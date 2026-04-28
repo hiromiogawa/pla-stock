@@ -5,7 +5,7 @@ import { Button } from '~/shared/ui/button'
 import { Badge } from '~/shared/ui/badge'
 import { AddPaintDialog } from './AddPaintDialog'
 
-export interface ProjectPaintUsesProps {
+interface ProjectPaintUsesProps {
   paints: Paint[]
   allPaints: Paint[]
   onAdd: (paintId: string) => void | Promise<void>

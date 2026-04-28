@@ -9,7 +9,7 @@ const STATUS_LABEL: Record<Project['status'], string> = {
   abandoned: '頓挫',
 }
 
-export interface LinkedProjectsProps {
+interface LinkedProjectsProps {
   projects: Project[]
 }
 

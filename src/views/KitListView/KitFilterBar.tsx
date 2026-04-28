@@ -1,12 +1,6 @@
 import type { Grade, Scale } from '~/entities/kit'
 import { Input } from '~/shared/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 export interface KitFilters {
   search: string
@@ -25,7 +19,7 @@ export const INITIAL_FILTERS: KitFilters = {
 const GRADES: Array<Grade | 'all'> = ['all', 'HG', 'RG', 'EG', 'MG', 'PG', 'other']
 const SCALES: Array<Scale | 'all'> = ['all', '1/144', '1/100', '1/60', '1/48', 'other']
 
-export interface KitFilterBarProps {
+interface KitFilterBarProps {
   filters: KitFilters
   makers: string[] // 一覧から動的に集めた候補
   onChange: (next: KitFilters) => void
@@ -71,10 +65,7 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
           ))}
         </SelectContent>
       </Select>
-      <Select
-        value={filters.maker}
-        onValueChange={(v) => onChange({ ...filters, maker: v })}
-      >
+      <Select value={filters.maker} onValueChange={(v) => onChange({ ...filters, maker: v })}>
         <SelectTrigger>
           <SelectValue placeholder="ブランド" />
         </SelectTrigger>

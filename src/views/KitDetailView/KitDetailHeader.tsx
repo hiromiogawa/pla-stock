@@ -2,7 +2,7 @@ import type { Kit, KitStock } from '~/entities/kit'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 
-export interface KitDetailHeaderProps {
+interface KitDetailHeaderProps {
   kit: Kit
   stock: KitStock
   onPurchase: () => void

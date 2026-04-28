@@ -2,19 +2,14 @@ import type { Paint, PaintStock } from '~/entities/paint'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 
-export interface PaintDetailHeaderProps {
+interface PaintDetailHeaderProps {
   paint: Paint
   stock: PaintStock
   onPurchase: () => void
   onRelease: () => void
 }
 
-export function PaintDetailHeader({
-  paint,
-  stock,
-  onPurchase,
-  onRelease,
-}: PaintDetailHeaderProps) {
+export function PaintDetailHeader({ paint, stock, onPurchase, onRelease }: PaintDetailHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
       <div className="space-y-1">
