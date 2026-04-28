@@ -16,7 +16,7 @@ const STATUS_VARIANT: Record<Project['status'], 'default' | 'secondary' | 'outli
   abandoned: 'outline',
 }
 
-export interface ProjectDetailHeaderProps {
+interface ProjectDetailHeaderProps {
   project: Project
   editing: boolean
   onEdit: () => void
@@ -36,9 +36,7 @@ export function ProjectDetailHeader({
       <div className="space-y-1">
         <h1 className="text-2xl font-bold tracking-tight">{project.name}</h1>
         <div className="flex flex-wrap items-center gap-1.5">
-          <Badge variant={STATUS_VARIANT[project.status]}>
-            {STATUS_LABEL[project.status]}
-          </Badge>
+          <Badge variant={STATUS_VARIANT[project.status]}>{STATUS_LABEL[project.status]}</Badge>
         </div>
       </div>
       <div className="flex gap-2 shrink-0">

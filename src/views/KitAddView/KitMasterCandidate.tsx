@@ -2,7 +2,7 @@ import type { Kit } from '~/entities/kit'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 
-export interface KitMasterCandidateProps {
+interface KitMasterCandidateProps {
   kit: Kit
   onSelect: () => void
 }
@@ -13,7 +13,9 @@ export function KitMasterCandidate({ kit, onSelect }: KitMasterCandidateProps) {
       <div className="min-w-0 flex-1">
         <div className="text-sm font-medium truncate">{kit.name}</div>
         <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
-          <Badge variant="outline" className="text-xs">{kit.grade}</Badge>
+          <Badge variant="outline" className="text-xs">
+            {kit.grade}
+          </Badge>
           <span>·</span>
           <span>{kit.scale}</span>
           <span>·</span>

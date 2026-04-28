@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { Paint } from '~/entities/paint'
-import { addPaintEvent } from '~/shared/api/mock/paints'
-import type { PaintStockInput } from '~/features/paint-stock-add'
+import { addPaintEvent } from '~/entities/paint'
+import type { PaintPurchaseEventInput } from '~/features/paint-stock-add'
 import { Button } from '~/shared/ui/button'
 import { PaintSearchPhase } from './PaintSearchPhase'
 import { PaintStockForm } from './PaintStockForm'
 
-type Phase =
-  | { kind: 'search' }
-  | { kind: 'add-stock'; paint: Paint }
+type Phase = { kind: 'search' } | { kind: 'add-stock'; paint: Paint }
 
-export interface PaintAddViewProps {
+interface PaintAddViewProps {
   paints: Paint[]
   userId: string
 }
@@ -20,7 +18,7 @@ export function PaintAddView({ paints, userId }: PaintAddViewProps) {
   const navigate = useNavigate()
   const [phase, setPhase] = useState<Phase>({ kind: 'search' })
 
-  const handleStockSubmit = async (paintId: string, values: PaintStockInput) => {
+  const handleStockSubmit = async (paintId: string, values: PaintPurchaseEventInput) => {
     await addPaintEvent({
       userId,
       paintId,

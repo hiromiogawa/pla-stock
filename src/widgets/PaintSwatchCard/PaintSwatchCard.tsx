@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import type { Paint, PaintStock } from '~/entities/paint'
 
-export interface PaintSwatchCardProps {
+interface PaintSwatchCardProps {
   stock: PaintStock
   paint: Paint
 }

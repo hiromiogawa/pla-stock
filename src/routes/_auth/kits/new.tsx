@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getKits } from '~/shared/api/mock/kits'
+import { getKits } from '~/entities/kit'
 import { KitAddView } from '~/views/KitAddView'
 
 export const Route = createFileRoute('/_auth/kits/new')({

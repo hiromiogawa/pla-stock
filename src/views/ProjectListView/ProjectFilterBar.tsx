@@ -1,12 +1,6 @@
 import type { ProjectStatus } from '~/entities/project'
 import { Input } from '~/shared/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 export interface ProjectFilters {
   search: string
@@ -34,7 +28,7 @@ const STATUS_LABEL: Record<ProjectStatus | 'all', string> = {
   abandoned: '頓挫',
 }
 
-export interface ProjectFilterBarProps {
+interface ProjectFilterBarProps {
   filters: ProjectFilters
   onChange: (next: ProjectFilters) => void
 }
@@ -51,9 +45,7 @@ export function ProjectFilterBar({ filters, onChange }: ProjectFilterBarProps) {
       />
       <Select
         value={filters.status}
-        onValueChange={(v) =>
-          onChange({ ...filters, status: v as ProjectFilters['status'] })
-        }
+        onValueChange={(v) => onChange({ ...filters, status: v as ProjectFilters['status'] })}
       >
         <SelectTrigger>
           <SelectValue placeholder="ステータス" />

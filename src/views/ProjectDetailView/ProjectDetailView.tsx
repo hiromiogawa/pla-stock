@@ -12,7 +12,7 @@ import {
   removeProjectPaintUse,
   addProjectPhoto,
   deleteProjectPhoto,
-} from '~/shared/api/mock/projects'
+} from '~/entities/project'
 import { Button } from '~/shared/ui/button'
 import { ProjectDetailHeader } from './ProjectDetailHeader'
 import { ProjectDetailFields } from './ProjectDetailFields'
@@ -23,7 +23,7 @@ import { ProjectPaintUses } from './ProjectPaintUses'
 import { ProjectPhotos } from './ProjectPhotos'
 import type { AddPhotoInput } from './AddPhotoDialog'
 
-export interface ProjectDetailViewProps {
+interface ProjectDetailViewProps {
   project: Project | null
   kit: Kit | null
   paintsForProject: Paint[]
@@ -50,9 +50,7 @@ export function ProjectDetailView({
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 md:px-8 text-center space-y-4">
         <h1 className="text-2xl font-bold">プロジェクトが見つかりません</h1>
-        <Button onClick={() => navigate({ to: '/projects' })}>
-          プロジェクト一覧へ戻る
-        </Button>
+        <Button onClick={() => navigate({ to: '/projects' })}>プロジェクト一覧へ戻る</Button>
       </div>
     )
   }
@@ -135,11 +133,7 @@ export function ProjectDetailView({
         onAdd={handleAddPaint}
         onRemove={handleRemovePaint}
       />
-      <ProjectPhotos
-        photos={currentPhotos}
-        onAdd={handleAddPhoto}
-        onRemove={handleRemovePhoto}
-      />
+      <ProjectPhotos photos={currentPhotos} onAdd={handleAddPhoto} onRemove={handleRemovePhoto} />
       <ProjectDeleteDialog
         open={showDeleteDialog}
         projectName={currentProject.name}

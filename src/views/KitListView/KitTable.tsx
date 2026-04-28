@@ -10,7 +10,7 @@ import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import type { Kit, KitStock } from '~/entities/kit'
 
-export interface KitTableRow {
+interface KitTableRow {
   stock: KitStock
   kit: Kit
 }
@@ -41,13 +41,11 @@ const columns: ColumnDef<KitTableRow>[] = [
     id: 'count',
     accessorFn: (row) => row.stock.count,
     header: '在庫数',
-    cell: ({ getValue }) => (
-      <span className="font-medium">{getValue() as number} 個</span>
-    ),
+    cell: ({ getValue }) => <span className="font-medium">{getValue() as number} 個</span>,
   },
 ]
 
-export interface KitTableProps {
+interface KitTableProps {
   rows: KitTableRow[]
 }
 

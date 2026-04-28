@@ -18,7 +18,7 @@ const REASON_LABEL: Record<KitEvent['reason'], string> = {
   other: 'その他',
 }
 
-export interface KitDetailFieldsProps {
+interface KitDetailFieldsProps {
   stock: KitStock
   kit: Kit
   events: KitEvent[]
@@ -75,9 +75,7 @@ export function KitDetailFields({ stock, kit, events }: KitDetailFieldsProps) {
                   {ev.purchaseLocation && (
                     <span className="ml-2 text-muted-foreground">@ {ev.purchaseLocation}</span>
                   )}
-                  {ev.note && (
-                    <p className="text-xs text-muted-foreground mt-0.5">{ev.note}</p>
-                  )}
+                  {ev.note && <p className="text-xs text-muted-foreground mt-0.5">{ev.note}</p>}
                 </div>
                 <span className="shrink-0 text-xs text-muted-foreground">
                   {ev.purchasedAt ?? ev.createdAt.slice(0, 10)}

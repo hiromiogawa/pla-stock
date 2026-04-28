@@ -1,0 +1,13 @@
+{
+  "$schema": "https://unpkg.com/knip@6.7.0/schema.json",
+  "entry": ["src/router.tsx", "src/start.ts", "src/routes/**/*.{ts,tsx}"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": ["src/routeTree.gen.ts", "worker-configuration.d.ts", "vite.config.ts"],
+  "ignoreBinaries": ["wrangler"],
+  "ignoreDependencies": [
+    "vite",
+    "@vitejs/plugin-react",
+    "@cloudflare/vite-plugin",
+    "@tailwindcss/vite"
+  ]
+}

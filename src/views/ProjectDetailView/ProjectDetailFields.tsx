@@ -16,7 +16,7 @@ function FieldRow({ label, value }: { label: string; value: string | null | unde
   )
 }
 
-export interface ProjectDetailFieldsProps {
+interface ProjectDetailFieldsProps {
   project: Project
 }
 

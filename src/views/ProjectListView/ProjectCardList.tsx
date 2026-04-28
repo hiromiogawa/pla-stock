@@ -1,12 +1,12 @@
 import type { Project } from '~/entities/project'
 import { ProjectCard } from '~/widgets/ProjectCard'
 
-export interface ProjectCardListRow {
+interface ProjectCardListRow {
   project: Project
   linkedKitName: string | null
 }
 
-export interface ProjectCardListProps {
+interface ProjectCardListProps {
   rows: ProjectCardListRow[]
 }
 

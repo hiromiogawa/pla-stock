@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@clerk/tanstack-react-start'
 import type { Paint, PaintStock, PaintEvent } from '~/entities/paint'
 import type { Project } from '~/entities/project'
-import { addPaintEvent } from '~/shared/api/mock/paints'
+import { addPaintEvent } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
 import { PaintDetailHeader } from './PaintDetailHeader'
 import { PaintDetailFields } from './PaintDetailFields'
@@ -11,14 +11,19 @@ import { PaintPurchaseDialog, type PaintPurchaseValues } from './PaintPurchaseDi
 import { PaintReleaseDialog, type PaintReleaseValues } from './PaintReleaseDialog'
 import { LinkedProjectsForPaint } from './LinkedProjectsForPaint'
 
-export interface PaintDetailViewProps {
+interface PaintDetailViewProps {
   stock: PaintStock | null
   paint: Paint | null
   events: PaintEvent[]
   linkedProjects: Project[]
 }
 
-export function PaintDetailView({ stock: initialStock, paint, events: initialEvents, linkedProjects }: PaintDetailViewProps) {
+export function PaintDetailView({
+  stock: initialStock,
+  paint,
+  events: initialEvents,
+  linkedProjects,
+}: PaintDetailViewProps) {
   const navigate = useNavigate()
   const { userId } = useAuth()
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)

@@ -10,13 +10,7 @@ import {
   DialogTitle,
 } from '~/shared/ui/dialog'
 import { Label } from '~/shared/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 import { Textarea } from '~/shared/ui/textarea'
 
 type ReleaseReason = Exclude<KitEventReason, 'purchase' | 'project'>
@@ -33,7 +27,7 @@ export interface KitReleaseValues {
   note: string | null
 }
 
-export interface KitReleaseDialogProps {
+interface KitReleaseDialogProps {
   open: boolean
   kitName: string
   onOpenChange: (open: boolean) => void
@@ -62,9 +56,7 @@ export function KitReleaseDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>手放し記録を追加</DialogTitle>
-          <DialogDescription>
-            「{kitName}」を 1 個手放します。在庫が 1 減ります。
-          </DialogDescription>
+          <DialogDescription>「{kitName}」を 1 個手放します。在庫が 1 減ります。</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">

@@ -37,13 +37,7 @@ export interface KitStock {
 }
 
 /** キット入出庫の理由 */
-export type KitEventReason =
-  | 'purchase'
-  | 'project'
-  | 'gift'
-  | 'sell'
-  | 'discard'
-  | 'other'
+export type KitEventReason = 'purchase' | 'project' | 'gift' | 'sell' | 'discard' | 'other'
 
 /**
  * キット入出庫イベント (audit ledger)。

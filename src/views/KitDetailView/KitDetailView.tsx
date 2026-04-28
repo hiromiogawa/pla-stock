@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useAuth } from '@clerk/tanstack-react-start'
 import type { Kit, KitStock, KitEvent } from '~/entities/kit'
 import type { Project } from '~/entities/project'
-import { addKitEvent } from '~/shared/api/mock/kits'
+import { addKitEvent } from '~/entities/kit'
 import { Button } from '~/shared/ui/button'
 import { KitDetailHeader } from './KitDetailHeader'
 import { KitDetailFields } from './KitDetailFields'
@@ -11,14 +11,19 @@ import { KitPurchaseDialog, type KitPurchaseValues } from './KitPurchaseDialog'
 import { KitReleaseDialog, type KitReleaseValues } from './KitReleaseDialog'
 import { LinkedProjects } from './LinkedProjects'
 
-export interface KitDetailViewProps {
+interface KitDetailViewProps {
   stock: KitStock | null
   kit: Kit | null
   events: KitEvent[]
   linkedProjects: Project[]
 }
 
-export function KitDetailView({ stock: initialStock, kit, events: initialEvents, linkedProjects }: KitDetailViewProps) {
+export function KitDetailView({
+  stock: initialStock,
+  kit,
+  events: initialEvents,
+  linkedProjects,
+}: KitDetailViewProps) {
   const navigate = useNavigate()
   const { userId } = useAuth()
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)

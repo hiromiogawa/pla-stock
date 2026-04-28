@@ -4,13 +4,7 @@ import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
 import { Textarea } from '~/shared/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 export interface ProjectEditValues {
   name: string
@@ -20,7 +14,7 @@ export interface ProjectEditValues {
   completedAt: string | null
 }
 
-export interface ProjectEditFormProps {
+interface ProjectEditFormProps {
   project: Project
   onSave: (values: ProjectEditValues) => void | Promise<void>
   onCancel: () => void
@@ -71,12 +65,7 @@ export function ProjectEditForm({ project, onSave, onCancel }: ProjectEditFormPr
       <h2 className="text-sm font-semibold">プロジェクトを編集</h2>
       <div className="space-y-2">
         <Label htmlFor="edit-name">名前 *</Label>
-        <Input
-          id="edit-name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <Input id="edit-name" value={name} onChange={(e) => setName(e.target.value)} required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="edit-description">説明</Label>

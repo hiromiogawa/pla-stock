@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getPaint, getPaintStock, getPaintEvents } from '~/shared/api/mock/paints'
-import { getProjects, getProjectPaintIds } from '~/shared/api/mock/projects'
+import { getPaint, getPaintStock, getPaintEvents } from '~/entities/paint'
+import { getProjects, getProjectPaintIds } from '~/entities/project'
 import { PaintDetailView } from '~/views/PaintDetailView'
 
 export const Route = createFileRoute('/_auth/paints/$paintId')({
@@ -20,13 +20,10 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
     }
 
     // project_paint_use で paintId が使われているプロジェクトを逆引き
-    const linkedProjects = []
-    for (const p of projects) {
-      const paintIds = await getProjectPaintIds({ projectId: p.id })
-      if (paintIds.includes(paintId)) {
-        linkedProjects.push(p)
-      }
-    }
+    const projectPaintIdsList = await Promise.all(
+      projects.map((p) => getProjectPaintIds({ projectId: p.id })),
+    )
+    const linkedProjects = projects.filter((_, i) => projectPaintIdsList[i].includes(paintId))
 
     return { stock, paint, events, linkedProjects }
   },

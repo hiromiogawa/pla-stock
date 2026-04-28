@@ -10,13 +10,7 @@ import {
   DialogTitle,
 } from '~/shared/ui/dialog'
 import { Label } from '~/shared/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 import { Textarea } from '~/shared/ui/textarea'
 
 type ReleaseReason = Exclude<PaintEventReason, 'purchase'>
@@ -34,7 +28,7 @@ export interface PaintReleaseValues {
   note: string | null
 }
 
-export interface PaintReleaseDialogProps {
+interface PaintReleaseDialogProps {
   open: boolean
   paintLabel: string
   onOpenChange: (open: boolean) => void

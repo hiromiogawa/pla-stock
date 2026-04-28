@@ -11,9 +11,3 @@ export const paintPurchaseEventSchema = z.object({
 })
 
 export type PaintPurchaseEventInput = z.infer<typeof paintPurchaseEventSchema>
-
-/** @deprecated paintPurchaseEventSchema を使用してください */
-export const paintStockSchema = paintPurchaseEventSchema
-
-/** @deprecated PaintPurchaseEventInput を使用してください */
-export type PaintStockInput = PaintPurchaseEventInput

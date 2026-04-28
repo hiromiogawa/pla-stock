@@ -11,7 +11,7 @@ import { useNavigate } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 
-export interface ProjectTableRow {
+interface ProjectTableRow {
   project: Project
   linkedKitName: string | null
 }
@@ -45,7 +45,11 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     header: 'ステータス',
     cell: ({ getValue }) => {
       const status = getValue() as Project['status']
-      return <Badge variant="outline" className="text-xs">{STATUS_LABEL[status]}</Badge>
+      return (
+        <Badge variant="outline" className="text-xs">
+          {STATUS_LABEL[status]}
+        </Badge>
+      )
     },
   },
   {
@@ -77,7 +81,7 @@ const columns: ColumnDef<ProjectTableRow>[] = [
   },
 ]
 
-export interface ProjectTableProps {
+interface ProjectTableProps {
   rows: ProjectTableRow[]
 }
 

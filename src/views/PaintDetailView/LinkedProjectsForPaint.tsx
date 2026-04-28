@@ -13,7 +13,7 @@ const STATUS_LABEL: Record<Project['status'], string> = {
   abandoned: '頓挫',
 }
 
-export interface LinkedProjectsForPaintProps {
+interface LinkedProjectsForPaintProps {
   projects: Project[]
 }
 

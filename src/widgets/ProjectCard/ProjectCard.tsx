@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 
-export interface ProjectCardProps {
+interface ProjectCardProps {
   project: Project
   /** 紐付きキット名 (kit_stock_id 経由で resolve 済み)。null なら未紐付き。 */
   linkedKitName: string | null
@@ -15,10 +15,7 @@ const STATUS_LABEL: Record<Project['status'], string> = {
   abandoned: '頓挫',
 }
 
-const STATUS_VARIANT: Record<
-  Project['status'],
-  'default' | 'secondary' | 'outline'
-> = {
+const STATUS_VARIANT: Record<Project['status'], 'default' | 'secondary' | 'outline'> = {
   planning: 'outline',
   building: 'secondary',
   completed: 'default',

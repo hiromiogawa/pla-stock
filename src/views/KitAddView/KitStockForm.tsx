@@ -1,14 +1,14 @@
 import { useForm } from '@tanstack/react-form'
 import type { Kit } from '~/entities/kit'
-import { purchaseEventSchema, type StockInput } from '~/features/kit-stock-add'
+import { purchaseEventSchema, type PurchaseEventInput } from '~/features/kit-stock-add'
 import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
 import { Textarea } from '~/shared/ui/textarea'
 
-export interface KitStockFormProps {
+interface KitStockFormProps {
   kit: Kit
-  onSubmit: (values: StockInput) => void | Promise<void>
+  onSubmit: (values: PurchaseEventInput) => void | Promise<void>
   onCancel: () => void
 }
 

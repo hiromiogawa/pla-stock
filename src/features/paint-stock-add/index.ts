@@ -1,6 +1,1 @@
-export {
-  paintPurchaseEventSchema,
-  paintStockSchema,
-  type PaintPurchaseEventInput,
-  type PaintStockInput,
-} from './schemas'
+export { paintPurchaseEventSchema, type PaintPurchaseEventInput } from './schemas'

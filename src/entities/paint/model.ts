@@ -66,13 +66,7 @@ export interface PaintStock {
  * 塗料入出庫の理由。
  * 注: 'project' はない — project_paint_use は count に影響しない M:N 関係。
  */
-export type PaintEventReason =
-  | 'purchase'
-  | 'gift'
-  | 'sell'
-  | 'discard'
-  | 'lost'
-  | 'other'
+export type PaintEventReason = 'purchase' | 'gift' | 'sell' | 'discard' | 'lost' | 'other'
 
 /**
  * 塗料入出庫イベント (audit ledger)。

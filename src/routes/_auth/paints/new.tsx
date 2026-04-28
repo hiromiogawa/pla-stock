@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getPaints } from '~/shared/api/mock/paints'
+import { getPaints } from '~/entities/paint'
 import { PaintAddView } from '~/views/PaintAddView'
 
 export const Route = createFileRoute('/_auth/paints/new')({

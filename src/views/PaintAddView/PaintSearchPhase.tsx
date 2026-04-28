@@ -3,15 +3,12 @@ import type { Paint } from '~/entities/paint'
 import { Input } from '~/shared/ui/input'
 import { PaintMasterCandidate } from './PaintMasterCandidate'
 
-export interface PaintSearchPhaseProps {
+interface PaintSearchPhaseProps {
   paints: Paint[]
   onSelectMaster: (paint: Paint) => void
 }
 
-export function PaintSearchPhase({
-  paints,
-  onSelectMaster,
-}: PaintSearchPhaseProps) {
+export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhaseProps) {
   const [query, setQuery] = useState('')
 
   const candidates = useMemo(() => {
@@ -44,7 +41,8 @@ export function PaintSearchPhase({
           </p>
         ) : candidates.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            「{query}」に一致する塗料が見つかりませんでした。マスターに無い塗料は admin に申請してください (Phase E 以降の機能)。
+            「{query}」に一致する塗料が見つかりませんでした。マスターに無い塗料は admin
+            に申請してください (Phase E 以降の機能)。
           </p>
         ) : (
           <ul className="space-y-2">

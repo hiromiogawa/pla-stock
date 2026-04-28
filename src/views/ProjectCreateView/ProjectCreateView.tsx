@@ -1,12 +1,12 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import type { Kit } from '~/entities/kit'
 import type { ProjectAddInput } from '~/features/project-add'
-import { addProject } from '~/shared/api/mock/projects'
-import { getKitStock } from '~/shared/api/mock/kits'
+import { addProject } from '~/entities/project'
+import { getKitStock } from '~/entities/kit'
 import { Button } from '~/shared/ui/button'
 import { ProjectCreateForm } from './ProjectCreateForm'
 
-export interface ProjectCreateViewProps {
+interface ProjectCreateViewProps {
   /** count > 0 の自分の在庫キットだけ */
   selectableKits: Kit[]
   /** kitId → 在庫数 (selectableKits に対応) */
@@ -62,9 +62,7 @@ export function ProjectCreateView({
 
       {selectableKits.length === 0 ? (
         <div className="rounded-lg border border-border bg-card p-6 space-y-3">
-          <p className="text-sm">
-            在庫キットがありません。先にキットを追加してください。
-          </p>
+          <p className="text-sm">在庫キットがありません。先にキットを追加してください。</p>
           <div className="flex gap-2">
             <Button asChild>
               <Link to="/kits/new">+ キットを追加</Link>

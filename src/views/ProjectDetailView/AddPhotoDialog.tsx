@@ -17,7 +17,7 @@ export interface AddPhotoInput {
   takenAt?: string
 }
 
-export interface AddPhotoDialogProps {
+interface AddPhotoDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSubmit: (input: AddPhotoInput) => void | Promise<void>
@@ -34,7 +34,8 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
         <DialogHeader>
           <DialogTitle>写真を追加</DialogTitle>
           <DialogDescription>
-            Phase A-2 は URL 文字列を直接入力する mock 実装です。Phase D で R2 アップロードに置換予定。
+            Phase A-2 は URL 文字列を直接入力する mock 実装です。Phase D で R2
+            アップロードに置換予定。
           </DialogDescription>
         </DialogHeader>
         <form

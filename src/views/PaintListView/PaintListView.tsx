@@ -6,7 +6,7 @@ import { PaintFilterBar, INITIAL_FILTERS, type PaintFilters } from './PaintFilte
 import { PaintTable } from './PaintTable'
 import { PaintCardList } from './PaintCardList'
 
-export interface PaintListViewProps {
+interface PaintListViewProps {
   /** count > 0 の paint_stock のみ渡す (ローダー側で絞り込み済み) */
   stocks: PaintStock[]
   paints: Paint[]

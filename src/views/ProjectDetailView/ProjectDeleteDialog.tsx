@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from '~/shared/ui/dialog'
 
-export interface ProjectDeleteDialogProps {
+interface ProjectDeleteDialogProps {
   open: boolean
   projectName: string
   projectStatus: ProjectStatus

@@ -5,15 +5,9 @@ import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
 import { Textarea } from '~/shared/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
-export interface ProjectCreateFormProps {
+interface ProjectCreateFormProps {
   /** count > 0 の自分の在庫キットだけを渡す (空配列なら view 側で empty state を出す前提) */
   selectableKits: Kit[]
   /** kitId → 在庫数 (UI 表示用) */
@@ -64,18 +58,14 @@ export function ProjectCreateForm({
         {(field) => (
           <div className="space-y-2">
             <Label htmlFor={field.name}>キット *</Label>
-            <Select
-              value={field.state.value}
-              onValueChange={(v) => field.handleChange(v)}
-            >
+            <Select value={field.state.value} onValueChange={(v) => field.handleChange(v)}>
               <SelectTrigger id={field.name}>
                 <SelectValue placeholder="在庫キットから選択" />
               </SelectTrigger>
               <SelectContent>
                 {selectableKits.map((kit) => (
                   <SelectItem key={kit.id} value={kit.id}>
-                    {kit.name}（{kit.grade} · {kit.scale}） 在庫:{' '}
-                    {stockCountByKitId[kit.id] ?? 0}
+                    {kit.name}（{kit.grade} · {kit.scale}） 在庫: {stockCountByKitId[kit.id] ?? 0}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -128,18 +118,10 @@ export function ProjectCreateForm({
       >
         {({ name, kitId, isSubmitting }) => (
           <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
               キャンセル
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || !name.trim() || !kitId}
-            >
+            <Button type="submit" disabled={isSubmitting || !name.trim() || !kitId}>
               {isSubmitting ? '作成中…' : '作成'}
             </Button>
           </div>

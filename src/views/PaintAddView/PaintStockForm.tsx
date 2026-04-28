@@ -1,14 +1,14 @@
 import { useForm } from '@tanstack/react-form'
 import type { Paint } from '~/entities/paint'
-import { paintPurchaseEventSchema, type PaintStockInput } from '~/features/paint-stock-add'
+import { paintPurchaseEventSchema, type PaintPurchaseEventInput } from '~/features/paint-stock-add'
 import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
 import { Textarea } from '~/shared/ui/textarea'
 
-export interface PaintStockFormProps {
+interface PaintStockFormProps {
   paint: Paint
-  onSubmit: (values: PaintStockInput) => void | Promise<void>
+  onSubmit: (values: PaintPurchaseEventInput) => void | Promise<void>
   onCancel: () => void
 }
 

@@ -19,7 +19,7 @@ export interface PaintPurchaseValues {
   note: string | null
 }
 
-export interface PaintPurchaseDialogProps {
+interface PaintPurchaseDialogProps {
   open: boolean
   paintLabel: string
   onOpenChange: (open: boolean) => void
@@ -50,9 +50,7 @@ export function PaintPurchaseDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>購入記録を追加</DialogTitle>
-          <DialogDescription>
-            「{paintLabel}」を 1 本購入して在庫に追加します。
-          </DialogDescription>
+          <DialogDescription>「{paintLabel}」を 1 本購入して在庫に追加します。</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
@@ -84,9 +82,7 @@ export function PaintPurchaseDialog({
             <Input
               id="purchaseLocation"
               value={values.purchaseLocation ?? ''}
-              onChange={(e) =>
-                setValues({ ...values, purchaseLocation: e.target.value || null })
-              }
+              onChange={(e) => setValues({ ...values, purchaseLocation: e.target.value || null })}
               placeholder="ヨドバシ梅田 / Amazon など"
             />
           </div>

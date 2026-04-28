@@ -1,1 +1,1 @@
-export { KitCard, type KitCardProps } from './KitCard'
+export { KitCard } from './KitCard'

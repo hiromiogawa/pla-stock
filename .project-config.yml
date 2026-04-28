@@ -17,9 +17,21 @@ scopes:
   # Domain features (MVP)
   - kit              # プラモデル（キット）管理
   - paint            # 塗料管理
+  - project          # 製作プロジェクト
+  - stock            # 在庫モデル（共通）
+  # FSD layer (アーキテクチャ層への変更)
+  - shared
+  - entities
+  - features
+  - widgets
+  - views
+  - routes
   # Cross-cutting
+  - auth             # Clerk 認証
+  - nav              # ナビゲーション
   - ui               # shared/ui コンポーネント
   - infra            # Cloudflare Workers / Neon / Drizzle / env
   - deps             # dependency add/upgrade
   - ci               # GitHub Actions
   - docs             # documentation
+  - tooling          # lint/format/commit hook 等の開発ツール

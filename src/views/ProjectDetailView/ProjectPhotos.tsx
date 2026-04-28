@@ -3,7 +3,7 @@ import type { ProjectPhoto } from '~/entities/project'
 import { Button } from '~/shared/ui/button'
 import { AddPhotoDialog, type AddPhotoInput } from './AddPhotoDialog'
 
-export interface ProjectPhotosProps {
+interface ProjectPhotosProps {
   photos: ProjectPhoto[]
   onAdd: (input: AddPhotoInput) => void | Promise<void>
   onRemove: (photoId: string) => void | Promise<void>

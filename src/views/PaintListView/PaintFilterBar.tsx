@@ -1,13 +1,7 @@
 import type { ColorFamily, FinishType } from '~/entities/paint'
 import { COLOR_FAMILY_VALUES, FINISH_TYPE_VALUES } from '~/entities/paint'
 import { Input } from '~/shared/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/shared/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 export interface PaintFilters {
   search: string
@@ -26,7 +20,7 @@ export const INITIAL_FILTERS: PaintFilters = {
 const COLOR_FAMILIES: Array<ColorFamily | 'all'> = ['all', ...COLOR_FAMILY_VALUES]
 const FINISH_TYPES: Array<FinishType | 'all'> = ['all', ...FINISH_TYPE_VALUES]
 
-export interface PaintFilterBarProps {
+interface PaintFilterBarProps {
   filters: PaintFilters
   brands: string[]
   onChange: (next: PaintFilters) => void
@@ -42,10 +36,7 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
         placeholder="名前 / コードで検索"
         className="md:col-span-3"
       />
-      <Select
-        value={filters.brand}
-        onValueChange={(v) => onChange({ ...filters, brand: v })}
-      >
+      <Select value={filters.brand} onValueChange={(v) => onChange({ ...filters, brand: v })}>
         <SelectTrigger>
           <SelectValue placeholder="ブランド" />
         </SelectTrigger>
@@ -77,9 +68,7 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
       </Select>
       <Select
         value={filters.finishType}
-        onValueChange={(v) =>
-          onChange({ ...filters, finishType: v as PaintFilters['finishType'] })
-        }
+        onValueChange={(v) => onChange({ ...filters, finishType: v as PaintFilters['finishType'] })}
       >
         <SelectTrigger>
           <SelectValue placeholder="フィニッシュ" />

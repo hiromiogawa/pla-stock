@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getKit, getKitStock, getKitEvents } from '~/shared/api/mock/kits'
-import { getProjects } from '~/shared/api/mock/projects'
+import { getKit, getKitStock, getKitEvents } from '~/entities/kit'
+import { getProjects } from '~/entities/project'
 import { KitDetailView } from '~/views/KitDetailView'
 
 export const Route = createFileRoute('/_auth/kits/$kitId')({

@@ -112,9 +112,31 @@ Phase 2 で以下を整備予定：
 | `pnpm deploy` | Cloudflare Workers にデプロイ (`wrangler deploy`) |
 | `pnpm cf-typegen` | Cloudflare バインディングの型生成 (`wrangler types`) |
 | `pnpm install` | 依存インストール（postinstall で cf-typegen 自動実行） |
+| `pnpm lint` | oxlint で静的解析 |
+| `pnpm lint:fix` | oxlint の自動修正 |
+| `pnpm format` | biome で format チェック (no-write) |
+| `pnpm format:write` | biome で全ファイル整形 |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm depcruise` | dependency-cruiser で FSD レイヤー違反/循環依存を検出 |
+| `pnpm knip` | knip strict で未使用 export/file を検出 |
+| `pnpm check:parallel` | typecheck + depcruise + knip を並列実行 (pre-commit 用) |
+| `pnpm check` | lint → format → typecheck → depcruise → knip を直列実行 (CI 用) |
 
 Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta pin` で `.nvmrc` に追従。
 
 ## Git Hooks
 
-**未導入、ツール選定後に追加**（Phase 2: husky + lint-staged もしくは lefthook）。
+**husky v9 + lint-staged + commitlint で導入済**（ADR-0001 参照）。
+
+| Hook | 内容 |
+|---|---|
+| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip) |
+| `commit-msg` | `commitlint --edit` で Conventional Commits 検証（scope は `.project-config.yml` と同期） |
+
+設定ファイル:
+- `.oxlintrc.json` — oxlint
+- `biome.json` — Biome (formatter only)
+- `.dependency-cruiser.cjs` — FSD レイヤールール
+- `knip.json` — dead code 検出
+- `.lintstagedrc.json` — staged ファイル処理
+- `commitlint.config.cjs` — commit message 規約
