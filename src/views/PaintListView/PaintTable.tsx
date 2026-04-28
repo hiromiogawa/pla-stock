@@ -7,7 +7,7 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import type { Paint, PaintStock } from '~/entities/paint'
 
 export interface PaintTableRow {
@@ -30,17 +30,6 @@ const columns: ColumnDef<PaintTableRow>[] = [
     id: 'name',
     accessorFn: (row) => row.paint.name,
     header: '名前',
-    cell: ({ row }) => (
-      <div className="flex items-center gap-1">
-        <Link
-          to="/paints/$paintId"
-          params={{ paintId: row.original.paint.id }}
-          className="hover:underline"
-        >
-          {row.original.paint.name}
-        </Link>
-      </div>
-    ),
   },
   {
     id: 'colorFamily',
@@ -67,6 +56,7 @@ export interface PaintTableProps {
 }
 
 export function PaintTable({ rows }: PaintTableProps) {
+  const navigate = useNavigate()
   const [sorting, setSorting] = useState<SortingState>([])
   const table = useReactTable({
     data: rows,
@@ -107,7 +97,13 @@ export function PaintTable({ rows }: PaintTableProps) {
             </tr>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-t border-border hover:bg-muted/30 transition-colors">
+              <tr
+                key={row.id}
+                className="border-t border-border cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() =>
+                  void navigate({ to: '/paints/$paintId', params: { paintId: row.original.paint.id } })
+                }
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-3 py-2">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

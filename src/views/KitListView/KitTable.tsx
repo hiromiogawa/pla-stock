@@ -7,7 +7,7 @@ import {
   type SortingState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
 import type { Kit, KitStock } from '~/entities/kit'
 
 export interface KitTableRow {
@@ -20,17 +20,7 @@ const columns: ColumnDef<KitTableRow>[] = [
     id: 'name',
     accessorFn: (row) => row.kit.name,
     header: '名前',
-    cell: ({ row }) => (
-      <div>
-        <Link
-          to="/kits/$kitId"
-          params={{ kitId: row.original.kit.id }}
-          className="font-medium hover:underline"
-        >
-          {row.original.kit.name}
-        </Link>
-      </div>
-    ),
+    cell: ({ row }) => <span className="font-medium">{row.original.kit.name}</span>,
   },
   {
     id: 'grade',
@@ -62,6 +52,7 @@ export interface KitTableProps {
 }
 
 export function KitTable({ rows }: KitTableProps) {
+  const navigate = useNavigate()
   const [sorting, setSorting] = useState<SortingState>([])
   const table = useReactTable({
     data: rows,
@@ -102,7 +93,13 @@ export function KitTable({ rows }: KitTableProps) {
             </tr>
           ) : (
             table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="border-t border-border hover:bg-muted/30 transition-colors">
+              <tr
+                key={row.id}
+                className="border-t border-border cursor-pointer hover:bg-accent/50 transition-colors"
+                onClick={() =>
+                  void navigate({ to: '/kits/$kitId', params: { kitId: row.original.kit.id } })
+                }
+              >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-3 py-2">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
