@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getPaint, getPaintStock, getPaintEvents } from '~/entities/paint'
 import { getProjects, getProjectPaintIds } from '~/entities/project'
 import { PaintDetailView } from '~/views/PaintDetailView'
+import { usePaintDetail } from '~/views/PaintDetailView/usePaintDetail'
 
 export const Route = createFileRoute('/_auth/paints/$paintId')({
   loader: async ({ params, context }) => {
@@ -16,7 +17,7 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
     ])
 
     if (!paint) {
-      return { stock: null, paint: null, events: [], linkedProjects: [] }
+      return { stock: null, paint: null, events: [], linkedProjects: [], userId }
     }
 
     // project_paint_use で paintId が使われているプロジェクトを逆引き
@@ -25,12 +26,13 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
     )
     const linkedProjects = projects.filter((_, i) => projectPaintIdsList[i].includes(paintId))
 
-    return { stock, paint, events, linkedProjects }
+    return { stock, paint, events, linkedProjects, userId }
   },
   component: PaintDetailRoute,
 })
 
 function PaintDetailRoute() {
-  const data = Route.useLoaderData()
-  return <PaintDetailView {...data} />
+  const { userId, ...data } = Route.useLoaderData()
+  const hookProps = usePaintDetail({ paint: data.paint, stock: data.stock, userId })
+  return <PaintDetailView {...data} {...hookProps} />
 }
