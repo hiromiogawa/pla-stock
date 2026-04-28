@@ -201,6 +201,11 @@ export async function getKitEvents(input: { userId: string; kitId: string }): Pr
   return kitEvents.filter((e) => e.userId === MOCK_USER_ID && e.kitId === input.kitId)
 }
 
+/** user の全 kit_event を返す (Dashboard 集計用) */
+export async function getKitEventsAll(_input: { userId: string }): Promise<KitEvent[]> {
+  return kitEvents.filter((e) => e.userId === MOCK_USER_ID)
+}
+
 // === Mutations (in-memory; Phase C では DB INSERT/UPDATE/DELETE) ===
 
 let kitEventIdCounter = kitEvents.length + 1

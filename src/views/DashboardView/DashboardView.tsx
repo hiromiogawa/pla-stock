@@ -1,39 +1,41 @@
 import { useUser } from '@clerk/tanstack-react-start'
 
-/**
- * Phase A-2 の Dashboard。
- * 統計は全部スタブ (0 固定)。Issue #12 で新 schema (count + event) から実数が入る。
- *
- * 新 schema で計算する値:
- *   在庫キット = SUM(kit_stocks.count)
- *   在庫塗料 = SUM(paint_stocks.count)
- *   製作中 = COUNT(projects WHERE status='building')
- *   完成済 = COUNT(projects WHERE status='completed')
- *   累計購入額 = SUM(priceYen FROM kit_events + paint_events WHERE reason='purchase')
- *   今月の購入額 = 上記を current month で filter
- */
-const STUB_STATS = [
-  { label: '在庫キット', value: 0, unit: '個' },
-  { label: '在庫塗料', value: 0, unit: '本' },
-  { label: '製作中プロジェクト', value: 0, unit: '件' },
-  { label: '完成済プロジェクト', value: 0, unit: '件' },
-  { label: '累計購入額', value: 0, unit: '円' },
-] as const
+interface DashboardStats {
+  kitCount: number
+  paintCount: number
+  buildingCount: number
+  completedCount: number
+  purchaseTotalYen: number
+}
 
-export function DashboardView() {
+interface DashboardViewProps {
+  stats: DashboardStats
+}
+
+const yenFormatter = new Intl.NumberFormat('ja-JP')
+
+export function DashboardView({ stats }: DashboardViewProps) {
   const { user } = useUser()
   const userName = user?.firstName ?? user?.username ?? 'ゲスト'
+
+  const cards = [
+    { label: '在庫キット', value: stats.kitCount, unit: '個' },
+    { label: '在庫塗料', value: stats.paintCount, unit: '本' },
+    { label: '製作中プロジェクト', value: stats.buildingCount, unit: '件' },
+    { label: '完成済プロジェクト', value: stats.completedCount, unit: '件' },
+    { label: '累計購入額', value: yenFormatter.format(stats.purchaseTotalYen), unit: '円' },
+  ] as const
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">こんにちは、{userName} さん</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Dashboard (統計は Issue #12 で実装予定。現在はスタブ値)
+          現在の在庫とプロジェクト状況をまとめて表示します。
         </p>
       </div>
       <section className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
-        {STUB_STATS.map((s) => (
+        {cards.map((s) => (
           <div
             key={s.label}
             className="rounded-lg border border-border bg-card p-4 flex flex-col gap-1"

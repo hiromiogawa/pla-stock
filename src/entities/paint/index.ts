@@ -13,5 +13,6 @@ export {
   getPaintStock,
   getPaintStocksWithStock,
   getPaintEvents,
+  getPaintEventsAll,
   addPaintEvent,
 } from './api/mock/paints'

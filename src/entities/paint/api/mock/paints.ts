@@ -307,6 +307,11 @@ export async function getPaintEvents(input: {
   return paintEvents.filter((e) => e.userId === MOCK_USER_ID && e.paintId === input.paintId)
 }
 
+/** user の全 paint_event を返す (Dashboard 集計用) */
+export async function getPaintEventsAll(_input: { userId: string }): Promise<PaintEvent[]> {
+  return paintEvents.filter((e) => e.userId === MOCK_USER_ID)
+}
+
 // === Mutations ===
 
 let paintEventIdCounter = paintEvents.length + 1

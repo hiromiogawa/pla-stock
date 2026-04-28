@@ -5,5 +5,6 @@ export {
   getKitStock,
   getKitStocksWithStock,
   getKitEvents,
+  getKitEventsAll,
   addKitEvent,
 } from './api/mock/kits'
