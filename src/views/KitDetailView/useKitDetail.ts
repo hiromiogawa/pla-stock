@@ -32,6 +32,7 @@ export interface UseKitDetailReturn {
  * - mutation 後は router.invalidate() で loader 再実行 → 最新 stock/events を再取得
  * - 一覧へ戻る navigation
  * - mutation 失敗時は Snackbar (notistack) で error 通知
+ * - mutation 成功時は Snackbar (notistack) で success 通知
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用は持たない (#43 ルール)。
@@ -61,6 +62,7 @@ export function useKitDetail(input: UseKitDetailInput): UseKitDetailReturn {
         })
         setShowPurchaseDialog(false)
         await router.invalidate()
+        enqueueSnackbar('キットの購入記録を追加しました', { variant: 'success' })
       } catch (err) {
         enqueueSnackbar(
           `キットの購入記録に失敗しました: ${err instanceof Error ? err.message : String(err)}`,
@@ -84,6 +86,7 @@ export function useKitDetail(input: UseKitDetailInput): UseKitDetailReturn {
         })
         setShowReleaseDialog(false)
         await router.invalidate()
+        enqueueSnackbar('キットの出庫記録を追加しました', { variant: 'success' })
       } catch (err) {
         enqueueSnackbar(
           `キットの出庫記録に失敗しました: ${err instanceof Error ? err.message : String(err)}`,

@@ -184,6 +184,20 @@ UI は **MUI v7 + Emotion** を採用。判断ルールは **Material Design 3**
 2. MUI docs (具体 API)
 3. `src/theme/tokens.ts` (M3 準拠の token 実体)
 
+### Toast 通知
+
+mutation 成功 / 失敗、検証エラー等は **notistack の Snackbar** で通知する。
+
+- React コンポーネント内: `const { enqueueSnackbar } = useSnackbar()`
+- 非 React 文脈 (loader / route handler): `import { enqueueSnackbar } from 'notistack'`
+- variant: `'success' | 'error' | 'warning' | 'info' | 'default'`
+- `window.alert` / `console.warn` を user-facing 通知に使わない (debug 用は OK)
+
+### Loading 表示
+
+route 遷移中の loader 待機は **TanStack Router の `pendingComponent`** で画面上部に MUI `<LinearProgress>` を表示。
+mutation 中の button は `disabled + <CircularProgress size={16} />` パターン (既存実装のまま継続)。
+
 ### Emotion 隔離方針 (#43-style 機械強制)
 
 MUI v7 は内部 engine に Emotion を使うが、**user code は MUI 抽象しか触らない**。将来 Pigment CSS 等への engine 切替時に user code 書換を最小化するため。

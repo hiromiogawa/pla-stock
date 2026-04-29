@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useSnackbar } from 'notistack'
 import type { Paint } from '~/entities/paint'
 import { addPaintEvent } from '~/entities/paint'
 import type { PaintPurchaseEventInput } from '~/features/paint-stock-add'
@@ -25,7 +26,7 @@ export interface UsePaintAddReturn {
  * - 検索フェーズへ戻る (goToSearch)
  * - master paint 選択 (selectPaint) → 'add-stock' phase へ遷移
  * - 購入記録: addPaintEvent({ delta: +1, reason: 'purchase' }) → paint_stock.count += 1
- * - 成功時は /paints/:paintId (詳細) へ navigation
+ * - 成功時は Snackbar (notistack) で success 通知 + /paints/:paintId (詳細) へ navigation
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用は持たない (#43 ルール)。
@@ -33,6 +34,7 @@ export interface UsePaintAddReturn {
 export function usePaintAdd(input: UsePaintAddInput): UsePaintAddReturn {
   const { userId } = input
   const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
   const [phase, setPhase] = useState<Phase>({ kind: 'search' })
 
   const goToSearch = useCallback(() => {
@@ -55,12 +57,13 @@ export function usePaintAdd(input: UsePaintAddInput): UsePaintAddReturn {
         purchaseLocation: values.purchaseLocation ?? null,
         note: values.note ?? null,
       })
+      enqueueSnackbar('塗料を在庫に追加しました', { variant: 'success' })
       void navigate({
         to: '/paints/$paintId',
         params: { paintId },
       })
     },
-    [userId, navigate],
+    [userId, navigate, enqueueSnackbar],
   )
 
   return {

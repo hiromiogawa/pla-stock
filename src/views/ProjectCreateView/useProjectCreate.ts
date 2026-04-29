@@ -23,6 +23,7 @@ export interface UseProjectCreateReturn {
  * - 作成: addProject (内部で addKitEvent({ delta: -1, reason: 'project' }) 自動発火 → kit_stock.count -= 1)
  * - 成功時は /projects/:newId (詳細) へ navigation
  * - 在庫不足 / 失敗時は Snackbar (notistack) で通知 (Phase β-3d で window.alert から移行)
+ * - 成功時にも Snackbar success を表示
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用 / mutation 呼び出しは持たない (#43 ルール)。
@@ -49,6 +50,7 @@ export function useProjectCreate(input: UseProjectCreateInput): UseProjectCreate
           name: values.name,
           description: values.description ?? null,
         })
+        enqueueSnackbar('プロジェクトを作成しました', { variant: 'success' })
         void navigate({
           to: '/projects/$id',
           params: { id: newProject.id },
