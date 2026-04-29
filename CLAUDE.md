@@ -213,3 +213,11 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
   - 真にやむを得ない箇所は `// oxlint-disable-next-line consistent-type-assertions -- 理由` で 1 行ずつ disable し、必ず理由コメントを付ける
 - **三項演算子のネスト禁止** (`no-nested-ternary`)
   - 代替: if/return 早期 return、ヘルパ関数化、map lookup
+
+### 1 文字変数禁止 (PR #56 レビュー由来)
+
+`id-length: { min: 2, exceptions: ['_'] }` で機械強制。
+
+- `e` (event), `p` (paint/project/part), `o` (option) 等の単文字省略は禁止
+- 文脈に応じて意味のある名前を付ける (`event` / `paint` / `option` 等)
+- 例外は `_` (意図的未使用の destructured 変数) のみ

@@ -9,11 +9,11 @@ export const Route = createFileRoute('/_auth/projects/')({
     const [projects, kits] = await Promise.all([getProjects({ userId }), getKits({ userId })])
 
     // project.kitId → kit master → kit.name の map を構築 (kit_stocks 経由不要)
-    const kitById = new Map(kits.map((k) => [k.id, k]))
+    const kitById = new Map(kits.map((kit) => [kit.id, kit]))
     const kitNameByProjectId: Record<string, string | null> = {}
-    for (const p of projects) {
-      const kit = kitById.get(p.kitId)
-      kitNameByProjectId[p.id] = kit?.name ?? null
+    for (const project of projects) {
+      const kit = kitById.get(project.kitId)
+      kitNameByProjectId[project.id] = kit?.name ?? null
     }
 
     return { projects, kitNameByProjectId }

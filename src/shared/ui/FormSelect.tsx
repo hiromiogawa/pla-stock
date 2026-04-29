@@ -49,12 +49,12 @@ export function FormSelect({ field, label, options, helperText, ...rest }: FormS
         name={field.name}
         label={label}
         value={value}
-        onChange={(e) => field.handleChange(e.target.value)}
+        onChange={(event) => field.handleChange(event.target.value)}
         onBlur={field.handleBlur}
       >
-        {options.map((o) => (
-          <MenuItem key={o.value} value={o.value}>
-            {o.label}
+        {options.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
           </MenuItem>
         ))}
       </Select>

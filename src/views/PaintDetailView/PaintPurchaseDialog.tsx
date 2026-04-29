@@ -54,7 +54,9 @@ export function PaintPurchaseDialog({
               id="purchasedAt"
               type="date"
               value={values.purchasedAt ?? ''}
-              onChange={(e) => setValues({ ...values, purchasedAt: e.target.value || null })}
+              onChange={(event) =>
+                setValues({ ...values, purchasedAt: event.target.value || null })
+              }
             />
           </div>
           <div className="space-y-2">
@@ -64,10 +66,10 @@ export function PaintPurchaseDialog({
               type="number"
               inputMode="numeric"
               value={values.priceYen ?? ''}
-              onChange={(e) =>
+              onChange={(event) =>
                 setValues({
                   ...values,
-                  priceYen: e.target.value === '' ? null : Number(e.target.value),
+                  priceYen: event.target.value === '' ? null : Number(event.target.value),
                 })
               }
             />
@@ -77,7 +79,9 @@ export function PaintPurchaseDialog({
             <Input
               id="purchaseLocation"
               value={values.purchaseLocation ?? ''}
-              onChange={(e) => setValues({ ...values, purchaseLocation: e.target.value || null })}
+              onChange={(event) =>
+                setValues({ ...values, purchaseLocation: event.target.value || null })
+              }
               placeholder="ヨドバシ梅田 / Amazon など"
             />
           </div>
@@ -87,7 +91,7 @@ export function PaintPurchaseDialog({
               id="note"
               rows={2}
               value={values.note ?? ''}
-              onChange={(e) => setValues({ ...values, note: e.target.value || null })}
+              onChange={(event) => setValues({ ...values, note: event.target.value || null })}
             />
           </div>
         </div>

@@ -31,9 +31,9 @@ const STATUS_LABEL: Record<ProjectStatus | 'all', string> = {
 }
 
 /** runtime narrowing: 想定外の値が来たら 'all' に fallback */
-function toStatus(v: string): ProjectFilters['status'] {
-  for (const s of STATUSES) {
-    if (s === v) return s
+function toStatus(value: string): ProjectFilters['status'] {
+  for (const status of STATUSES) {
+    if (status === value) return status
   }
   return 'all'
 }
@@ -49,18 +49,20 @@ export function ProjectFilterBar({ filters, onChange }: ProjectFilterBarProps) {
       <Input
         type="search"
         value={filters.search}
-        onChange={(e) => onChange({ ...filters, search: e.target.value })}
+        onChange={(event) => onChange({ ...filters, search: event.target.value })}
         placeholder="プロジェクト名で検索"
         className="md:col-span-2"
       />
       <FormControl fullWidth size="small">
         <Select<ProjectFilters['status']>
           value={filters.status}
-          onChange={(e) => onChange({ ...filters, status: toStatus(String(e.target.value)) })}
+          onChange={(event) =>
+            onChange({ ...filters, status: toStatus(String(event.target.value)) })
+          }
         >
-          {STATUSES.map((s) => (
-            <MenuItem key={s} value={s}>
-              {STATUS_LABEL[s]}
+          {STATUSES.map((status) => (
+            <MenuItem key={status} value={status}>
+              {STATUS_LABEL[status]}
             </MenuItem>
           ))}
         </Select>

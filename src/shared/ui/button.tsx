@@ -97,17 +97,17 @@ function mapSizeToMui(size: Exclude<ButtonSize, 'icon'>): MuiButtonProps['size']
 
 /** sx を array に正規化することで複数 sx を安全に合成 */
 function composeSx(...parts: Array<SxProps<Theme> | undefined>): SxProps<Theme> {
-  const result: Array<SxProps<Theme>> = []
-  for (const p of parts) {
-    if (p === undefined) continue
-    if (Array.isArray(p)) {
+  const flattened: Array<SxProps<Theme>> = []
+  for (const part of parts) {
+    if (part === undefined) continue
+    if (Array.isArray(part)) {
       // SxProps は readonly array も含むため spread で平坦化。
-      // p の各要素は SxProps<Theme> 互換のため push 時に narrow する。
-      for (const item of p) {
-        if (item !== undefined) result.push(item)
+      // part の各要素は SxProps<Theme> 互換のため push 時に narrow する。
+      for (const inner of part) {
+        if (inner !== undefined) flattened.push(inner)
       }
     } else {
-      result.push(p)
+      flattened.push(part)
     }
   }
   // MUI Theme の SxProps は ReadonlyArray<...> を受け付ける形を含むが、
@@ -115,7 +115,7 @@ function composeSx(...parts: Array<SxProps<Theme> | undefined>): SxProps<Theme> 
   // 1 箇所だけ disable して return する。代替策 (個別 element に sx を分配) は
   // forwardRef との互換性が崩れるため採れない。
   // oxlint-disable-next-line consistent-type-assertions -- MUI SxProps array shape: 配列を SxProps として返却するための narrowing
-  return result as SxProps<Theme>
+  return flattened as SxProps<Theme>
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps | IconButtonAsButtonProps>(

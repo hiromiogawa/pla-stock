@@ -22,9 +22,9 @@ const REASON_OPTIONS: Array<{ value: ReleaseReason; label: string }> = [
 ]
 
 /** runtime narrowing: 想定外の値が来たら 'sell' に fallback */
-function toReleaseReason(v: string): ReleaseReason {
-  for (const o of REASON_OPTIONS) {
-    if (o.value === v) return o.value
+function toReleaseReason(value: string): ReleaseReason {
+  for (const option of REASON_OPTIONS) {
+    if (option.value === value) return option.value
   }
   return 'sell'
 }
@@ -70,13 +70,13 @@ export function KitReleaseDialog({
               <Select<ReleaseReason>
                 id="reason"
                 value={values.reason}
-                onChange={(e) =>
-                  setValues({ ...values, reason: toReleaseReason(String(e.target.value)) })
+                onChange={(event) =>
+                  setValues({ ...values, reason: toReleaseReason(String(event.target.value)) })
                 }
               >
-                {REASON_OPTIONS.map((o) => (
-                  <MenuItem key={o.value} value={o.value}>
-                    {o.label}
+                {REASON_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
                   </MenuItem>
                 ))}
               </Select>
@@ -88,7 +88,7 @@ export function KitReleaseDialog({
               id="note"
               rows={2}
               value={values.note ?? ''}
-              onChange={(e) => setValues({ ...values, note: e.target.value || null })}
+              onChange={(event) => setValues({ ...values, note: event.target.value || null })}
             />
           </div>
         </div>

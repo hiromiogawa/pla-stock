@@ -47,7 +47,12 @@
     // `assertionStyle: "never"` 設定下でも `as const` は TS の特殊形として例外扱いされる。
     // やむを得ない箇所は `// oxlint-disable-next-line consistent-type-assertions -- 理由`
     // で 1 行ずつ disable し、必ず理由コメントを付ける。
-    "consistent-type-assertions": ["error", { "assertionStyle": "never" }]
+    "consistent-type-assertions": ["error", { "assertionStyle": "never" }],
+
+    // 1 文字変数禁止 (PR #56 追加レビュー指摘 / button.tsx:106 の `p` / `i` 等)。
+    // 代替: 文脈に応じた意味のある名前 (`event` / `paint` / `option` 等)。
+    // 例外: `_` (意図的に未使用な destructured 変数: `const [_unused, x] = ...`)。
+    "id-length": ["error", { "min": 2, "exceptions": ["_"] }]
   },
 
   // lint 対象から外すパス。

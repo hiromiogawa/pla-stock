@@ -56,8 +56,12 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     accessorFn: (row) => row.linkedKitName ?? '',
     header: '使用キット',
     cell: ({ row }) => {
-      const v = row.original.linkedKitName
-      return v === null || v === '' ? <span className="text-muted-foreground">未紐付き</span> : v
+      const value = row.original.linkedKitName
+      return value === null || value === '' ? (
+        <span className="text-muted-foreground">未紐付き</span>
+      ) : (
+        value
+      )
     },
   },
   {
@@ -65,8 +69,8 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     accessorFn: (row) => row.project.startedAt ?? '',
     header: '開始日',
     cell: ({ row }) => {
-      const v = row.original.project.startedAt
-      return v === null || v === '' ? '—' : v
+      const value = row.original.project.startedAt
+      return value === null || value === '' ? '—' : value
     },
   },
   {
@@ -74,8 +78,8 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     accessorFn: (row) => row.project.completedAt ?? '',
     header: '完成日',
     cell: ({ row }) => {
-      const v = row.original.project.completedAt
-      return v === null || v === '' ? '—' : v
+      const value = row.original.project.completedAt
+      return value === null || value === '' ? '—' : value
     },
   },
 ]

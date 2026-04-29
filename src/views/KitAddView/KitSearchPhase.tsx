@@ -12,9 +12,9 @@ export function KitSearchPhase({ kits, onSelectMaster }: KitSearchPhaseProps) {
   const [query, setQuery] = useState('')
 
   const candidates = useMemo<Kit[]>(() => {
-    const q = query.trim().toLowerCase()
-    if (q === '') return []
-    return kits.filter((k) => k.name.toLowerCase().includes(q)).slice(0, 20)
+    const normalized = query.trim().toLowerCase()
+    if (normalized === '') return []
+    return kits.filter((kit) => kit.name.toLowerCase().includes(normalized)).slice(0, 20)
   }, [kits, query])
 
   function renderResults() {
@@ -50,7 +50,7 @@ export function KitSearchPhase({ kits, onSelectMaster }: KitSearchPhaseProps) {
         <Input
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder="キット名で検索 (例: RX-78-2, Sazabi)"
           autoFocus
         />

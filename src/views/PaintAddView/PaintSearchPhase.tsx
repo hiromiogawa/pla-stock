@@ -12,14 +12,14 @@ export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhasePro
   const [query, setQuery] = useState('')
 
   const candidates = useMemo<Paint[]>(() => {
-    const q = query.trim().toLowerCase()
-    if (q === '') return []
+    const normalized = query.trim().toLowerCase()
+    if (normalized === '') return []
     return paints
-      .filter((p) => {
+      .filter((paint) => {
         return (
-          p.name.toLowerCase().includes(q) ||
-          p.code.toLowerCase().includes(q) ||
-          p.brand.toLowerCase().includes(q)
+          paint.name.toLowerCase().includes(normalized) ||
+          paint.code.toLowerCase().includes(normalized) ||
+          paint.brand.toLowerCase().includes(normalized)
         )
       })
       .slice(0, 30)
@@ -58,7 +58,7 @@ export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhasePro
         <Input
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder="ブランド / コード / 名前で検索 (例: Mr.Color, C1, ホワイト)"
           autoFocus
         />

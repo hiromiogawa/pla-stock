@@ -44,9 +44,9 @@ export function ProjectCreateForm({
   return (
     <form
       className="rounded-lg border border-border bg-card p-4 space-y-4"
-      onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
+      onSubmit={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
         void form.handleSubmit()
       }}
     >

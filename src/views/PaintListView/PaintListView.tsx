@@ -15,7 +15,7 @@ interface PaintListViewProps {
 export function PaintListView({ stocks, paints }: PaintListViewProps) {
   const [filters, setFilters] = useState<PaintFilters>(INITIAL_FILTERS)
 
-  const paintById = useMemo(() => new Map(paints.map((p) => [p.id, p])), [paints])
+  const paintById = useMemo(() => new Map(paints.map((paint) => [paint.id, paint])), [paints])
 
   const rows = useMemo(() => {
     return stocks
@@ -27,9 +27,10 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
       .filter((row): row is { stock: PaintStock; paint: Paint } => row !== null)
       .filter(({ paint }) => {
         if (filters.search) {
-          const q = filters.search.toLowerCase()
+          const normalized = filters.search.toLowerCase()
           const matches =
-            paint.name.toLowerCase().includes(q) || paint.code.toLowerCase().includes(q)
+            paint.name.toLowerCase().includes(normalized) ||
+            paint.code.toLowerCase().includes(normalized)
           if (!matches) return false
         }
         if (filters.brand !== 'all' && paint.brand !== filters.brand) return false
@@ -44,7 +45,7 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
   }, [stocks, paintById, filters])
 
   const brands = useMemo(() => {
-    return Array.from(new Set(paints.map((p) => p.brand))).sort()
+    return Array.from(new Set(paints.map((paint) => paint.brand))).sort()
   }, [paints])
 
   return (

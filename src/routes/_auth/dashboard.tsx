@@ -15,13 +15,17 @@ export const Route = createFileRoute('/_auth/dashboard')({
       getPaintEventsAll({ userId }),
     ])
 
-    const kitCount = kitStocks.reduce((s, ks) => s + ks.count, 0)
-    const paintCount = paintStocks.reduce((s, ps) => s + ps.count, 0)
-    const buildingCount = projects.filter((p) => p.status === 'building').length
-    const completedCount = projects.filter((p) => p.status === 'completed').length
+    const kitCount = kitStocks.reduce((sum, stock) => sum + stock.count, 0)
+    const paintCount = paintStocks.reduce((sum, stock) => sum + stock.count, 0)
+    const buildingCount = projects.filter((project) => project.status === 'building').length
+    const completedCount = projects.filter((project) => project.status === 'completed').length
     const purchaseTotalYen =
-      kitEvents.filter((e) => e.reason === 'purchase').reduce((s, e) => s + (e.priceYen ?? 0), 0) +
-      paintEvents.filter((e) => e.reason === 'purchase').reduce((s, e) => s + (e.priceYen ?? 0), 0)
+      kitEvents
+        .filter((event) => event.reason === 'purchase')
+        .reduce((sum, event) => sum + (event.priceYen ?? 0), 0) +
+      paintEvents
+        .filter((event) => event.reason === 'purchase')
+        .reduce((sum, event) => sum + (event.priceYen ?? 0), 0)
 
     return {
       stats: {

@@ -39,7 +39,7 @@ export function FormTextField({ field, helperText, ...rest }: FormTextFieldProps
       {...rest}
       name={field.name}
       value={value}
-      onChange={(e) => field.handleChange(e.target.value)}
+      onChange={(event) => field.handleChange(event.target.value)}
       onBlur={field.handleBlur}
       error={errors.length > 0}
       helperText={errors.length > 0 ? errorText : helperText}

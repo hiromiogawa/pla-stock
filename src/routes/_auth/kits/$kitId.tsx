@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_auth/kits/$kitId')({
     }
 
     // stock が null (未登録) でも kit は返す — 購入ボタンで追加できる
-    const linkedProjects = projects.filter((p) => p.kitId === kitId)
+    const linkedProjects = projects.filter((project) => project.kitId === kitId)
 
     return { stock, kit, events, linkedProjects, userId }
   },

@@ -22,16 +22,16 @@ const GRADES: Array<Grade | 'all'> = ['all', 'HG', 'RG', 'EG', 'MG', 'PG', 'othe
 const SCALES: Array<Scale | 'all'> = ['all', '1/144', '1/100', '1/60', '1/48', 'other']
 
 /** runtime narrowing: 想定外の値が来たら 'all' に fallback */
-function toGrade(v: string): KitFilters['grade'] {
-  for (const g of GRADES) {
-    if (g === v) return g
+function toGrade(value: string): KitFilters['grade'] {
+  for (const grade of GRADES) {
+    if (grade === value) return grade
   }
   return 'all'
 }
 
-function toScale(v: string): KitFilters['scale'] {
-  for (const s of SCALES) {
-    if (s === v) return s
+function toScale(value: string): KitFilters['scale'] {
+  for (const scale of SCALES) {
+    if (scale === value) return scale
   }
   return 'all'
 }
@@ -48,18 +48,18 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
       <Input
         type="search"
         value={filters.search}
-        onChange={(e) => onChange({ ...filters, search: e.target.value })}
+        onChange={(event) => onChange({ ...filters, search: event.target.value })}
         placeholder="名前で検索"
         className="md:col-span-3"
       />
       <FormControl fullWidth size="small">
         <Select<KitFilters['grade']>
           value={filters.grade}
-          onChange={(e) => onChange({ ...filters, grade: toGrade(String(e.target.value)) })}
+          onChange={(event) => onChange({ ...filters, grade: toGrade(String(event.target.value)) })}
         >
-          {GRADES.map((g) => (
-            <MenuItem key={g} value={g}>
-              {g === 'all' ? 'すべてのグレード' : g}
+          {GRADES.map((grade) => (
+            <MenuItem key={grade} value={grade}>
+              {grade === 'all' ? 'すべてのグレード' : grade}
             </MenuItem>
           ))}
         </Select>
@@ -67,11 +67,11 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
       <FormControl fullWidth size="small">
         <Select<KitFilters['scale']>
           value={filters.scale}
-          onChange={(e) => onChange({ ...filters, scale: toScale(String(e.target.value)) })}
+          onChange={(event) => onChange({ ...filters, scale: toScale(String(event.target.value)) })}
         >
-          {SCALES.map((s) => (
-            <MenuItem key={s} value={s}>
-              {s === 'all' ? 'すべてのスケール' : s}
+          {SCALES.map((scale) => (
+            <MenuItem key={scale} value={scale}>
+              {scale === 'all' ? 'すべてのスケール' : scale}
             </MenuItem>
           ))}
         </Select>
@@ -79,12 +79,12 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
       <FormControl fullWidth size="small">
         <Select<string>
           value={filters.maker}
-          onChange={(e) => onChange({ ...filters, maker: String(e.target.value) })}
+          onChange={(event) => onChange({ ...filters, maker: String(event.target.value) })}
         >
           <MenuItem value="all">すべてのブランド</MenuItem>
-          {makers.map((m) => (
-            <MenuItem key={m} value={m}>
-              {m}
+          {makers.map((maker) => (
+            <MenuItem key={maker} value={maker}>
+              {maker}
             </MenuItem>
           ))}
         </Select>
