@@ -16,5 +16,86 @@
     ".wrangler",
     ".tanstack",
     "node_modules"
+  ],
+  "overrides": [
+    {
+      "files": ["src/views/**/*ListView.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "~/entities/kit",
+                "importNames": ["addKitEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43 ルール)"
+              },
+              {
+                "name": "~/entities/paint",
+                "importNames": ["addPaintEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43 ルール)"
+              },
+              {
+                "name": "~/entities/project",
+                "importNames": [
+                  "addProject",
+                  "updateProject",
+                  "deleteProject",
+                  "addProjectPaintUse",
+                  "removeProjectPaintUse",
+                  "addProjectPhoto",
+                  "deleteProjectPhoto"
+                ],
+                "message": "mutation は useXxx hook 経由にすること (#43 ルール)"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/views/**/*DetailView.tsx",
+        "src/views/**/*AddView.tsx",
+        "src/views/**/*CreateView.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react",
+                "importNames": ["useState", "useEffect", "useReducer"],
+                "message": "View は pure Presenter にすること。state / 副作用は useXxx hook に抽出 (#43 ルール)"
+              },
+              {
+                "name": "~/entities/kit",
+                "importNames": ["addKitEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43 ルール)"
+              },
+              {
+                "name": "~/entities/paint",
+                "importNames": ["addPaintEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43 ルール)"
+              },
+              {
+                "name": "~/entities/project",
+                "importNames": [
+                  "addProject",
+                  "updateProject",
+                  "deleteProject",
+                  "addProjectPaintUse",
+                  "removeProjectPaintUse",
+                  "addProjectPhoto",
+                  "deleteProjectPhoto"
+                ],
+                "message": "mutation は useXxx hook 経由にすること (#43 ルール)"
+              }
+            ]
+          }
+        ]
+      }
+    }
   ]
 }

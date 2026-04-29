@@ -140,3 +140,33 @@ Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta p
 - `knip.json` — dead code 検出
 - `.lintstagedrc.json` — staged ファイル処理
 - `commitlint.config.cjs` — commit message 規約
+
+## コード規約
+
+### Container/Hook/Presenter (#43)
+
+mutation や 3 個以上の useState、async handler を持つ view は **Container (route file) / Hook (`useXxx.ts`) / Presenter (`XxxView.tsx`)** に分離する。
+
+- View は **pure Presenter**: props in / JSX out のみ。useState / useEffect / mutation 直呼び禁止
+- Hook (`useXxx.ts`) が state + handler を担う、`router.invalidate()` で loader 再取得
+- Route file が Container 役: `Route.useLoaderData()` → `useXxx(input)` → `<XxxView {...data} {...hookProps} />`
+
+oxlint で機械強制（`*DetailView.tsx` / `*AddView.tsx` / `*CreateView.tsx` で `useState` / `useEffect` / `useReducer` の import 禁止、全 `*View.tsx` で entity mutation の import 禁止）。**List view (filter state のみ) は inline 維持 OK**。
+
+### JSDoc 必須対象
+
+以下の export には JSDoc コメント必須（lint で機械強制はしないが、レビューで確認する）。
+
+- **Custom hook** (`use*` プレフィックス): 担当する state / 副作用 / mutation / navigation を簡潔に記載
+- **Entity API** (`src/entities/*/api/**`): 何を返すか、引数の意味、副作用 (mutation の場合)、Phase C で server fn 化時の note があれば
+
+```ts
+/**
+ * KitDetailView 用の Hook。
+ * 担当する state / 副作用:
+ * - 購入ダイアログの表示状態 (useState)
+ * - addKitEvent({ delta: +1, reason: 'purchase' }) の呼び出し
+ * - mutation 後は router.invalidate() で loader 再実行
+ */
+export function useKitDetail(input: ...): ... { ... }
+```
