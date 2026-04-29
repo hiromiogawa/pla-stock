@@ -8,6 +8,7 @@
     "vite",
     "@vitejs/plugin-react",
     "@cloudflare/vite-plugin",
-    "@tailwindcss/vite"
+    "@tailwindcss/vite",
+    "@radix-ui/react-slot"
   ]
 }

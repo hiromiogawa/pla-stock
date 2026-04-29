@@ -40,8 +40,8 @@ export function ProjectListView({ projects, kitNameByProjectId }: ProjectListVie
             {projects.length} 件中 {rows.length} 件を表示
           </p>
         </div>
-        <Button asChild>
-          <Link to="/projects/new">+ 作成</Link>
+        <Button component={Link} to="/projects/new">
+          + 作成
         </Button>
       </div>
       <ProjectFilterBar filters={filters} onChange={setFilters} />
