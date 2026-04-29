@@ -9,6 +9,8 @@
     "@vitejs/plugin-react",
     "@cloudflare/vite-plugin",
     "@tailwindcss/vite",
-    "@radix-ui/react-slot"
+    "@radix-ui/react-slot",
+    "@radix-ui/react-label",
+    "class-variance-authority"
   ]
 }

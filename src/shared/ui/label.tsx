@@ -1,21 +1,22 @@
-'use client'
+/**
+ * Label primitive (MUI v7 + Emotion 隔離方針)。
+ *
+ * native `<label>` を MUI の `styled('label')` (from @mui/material/styles) で
+ * 包む。MUI InputLabel は TextField 前提の floating label のため、
+ * 独立した Label として使う本プロジェクトの流儀には合わない。
+ *
+ * 関連: ADR-0002, CLAUDE.md `## デザイン規約 > Emotion 隔離方針`
+ */
+import { styled } from '@mui/material/styles'
 
-import * as React from 'react'
-import * as LabelPrimitive from '@radix-ui/react-label'
-import { cva, type VariantProps } from 'class-variance-authority'
-
-import { cn } from '~/shared/lib/utils'
-
-const labelVariants = cva(
-  'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-)
-
-const Label = React.forwardRef<
-  React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants>
->(({ className, ...props }, ref) => (
-  <LabelPrimitive.Root ref={ref} className={cn(labelVariants(), className)} {...props} />
-))
-Label.displayName = LabelPrimitive.Root.displayName
-
-export { Label }
+export const Label = styled('label')(({ theme }) => ({
+  display: 'inline-block',
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  lineHeight: 1,
+  color: theme.palette.text.primary,
+  '&[data-disabled="true"]': {
+    cursor: 'not-allowed',
+    opacity: 0.7,
+  },
+}))
