@@ -3,7 +3,10 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
 import { ClerkProvider } from '@clerk/tanstack-react-start'
+import Box from '@mui/material/Box'
+import LinearProgress from '@mui/material/LinearProgress'
 import { ThemeProvider } from '@mui/material/styles'
+import { SnackbarProvider } from 'notistack'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
 import appCss from '~/styles/app.css?url'
@@ -51,8 +54,25 @@ export const Route = createRootRoute({
   }),
   errorComponent: DefaultCatchBoundary,
   notFoundComponent: () => <NotFound />,
+  pendingComponent: RoutePending,
   shellComponent: RootDocument,
 })
+
+/**
+ * Route 遷移中の loader 待機表示。
+ *
+ * TanStack Router の `pendingComponent` として登録され、loader が
+ * `defaultPendingMs` (1000ms) を超えたタイミングで画面上部に MUI
+ * `<LinearProgress>` を出す。Phase C で server fn が遅延した際に
+ * 体感 UX を担保する基盤。mock の現状ではほぼ表示されない。
+ */
+function RoutePending() {
+  return (
+    <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1300 }}>
+      <LinearProgress />
+    </Box>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -63,8 +83,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <ClerkProvider>
           <ThemeProvider theme={theme}>
-            {children}
-            <TanStackRouterDevtools position="bottom-right" />
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              autoHideDuration={3000}
+            >
+              {children}
+              <TanStackRouterDevtools position="bottom-right" />
+            </SnackbarProvider>
           </ThemeProvider>
         </ClerkProvider>
         <Scripts />

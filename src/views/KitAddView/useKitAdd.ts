@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useSnackbar } from 'notistack'
 import type { Kit } from '~/entities/kit'
 import { addKitEvent } from '~/entities/kit'
 import type { PurchaseEventInput } from '~/features/kit-stock-add'
@@ -25,7 +26,7 @@ export interface UseKitAddReturn {
  * - 検索フェーズへ戻る (goToSearch)
  * - master kit 選択 (selectKit) → 'add-stock' phase へ遷移
  * - 購入記録: addKitEvent({ delta: +1, reason: 'purchase' }) → kit_stock.count += 1
- * - 成功時は /kits/:kitId (詳細) へ navigation
+ * - 成功時は Snackbar (notistack) で success 通知 + /kits/:kitId (詳細) へ navigation
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用は持たない (#43 ルール)。
@@ -33,6 +34,7 @@ export interface UseKitAddReturn {
 export function useKitAdd(input: UseKitAddInput): UseKitAddReturn {
   const { userId } = input
   const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
   const [phase, setPhase] = useState<Phase>({ kind: 'search' })
 
   const goToSearch = useCallback(() => {
@@ -56,12 +58,13 @@ export function useKitAdd(input: UseKitAddInput): UseKitAddReturn {
         purchaseLocation: values.purchaseLocation ?? null,
         note: values.note ?? null,
       })
+      enqueueSnackbar('キットを在庫に追加しました', { variant: 'success' })
       void navigate({
         to: '/kits/$kitId',
         params: { kitId },
       })
     },
-    [userId, navigate],
+    [userId, navigate, enqueueSnackbar],
   )
 
   return {
