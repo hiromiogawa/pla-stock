@@ -1,43 +1,90 @@
-import { Link } from '@tanstack/react-router'
 import { UserButton } from '@clerk/tanstack-react-start'
+import Box from '@mui/material/Box'
+import ListItemButton from '@mui/material/ListItemButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { Link } from '@tanstack/react-router'
 import { APP_NAV_ITEMS } from '~/shared/config/nav'
-import { cn } from '~/shared/lib/utils'
 
+/**
+ * Sidebar (md+ で表示)。
+ *
+ * Tailwind w-56 = 14rem = 224px。MUI theme.spacing(56) は 56 * 4 = 224px なので一致する。
+ * (本プロジェクトは theme.spacing.unit = 4 の M3 4dp grid)
+ *
+ * active state:
+ *   TanStack Router の Link は active 時に自動で `className="active"` を付与する。
+ *   `activeProps` の型は host component (TComp) の React props に固定されるため
+ *   ListItemButton の `selected` prop を直接 activeProps から指定することは型エラー。
+ *   代替として sx の `&.active` セレクタで MUI の `Mui-selected` 相当の styling
+ *   (theme.palette.action.selected) を当てる。
+ */
 export function Sidebar() {
   return (
-    <aside className="hidden md:flex md:w-56 md:flex-col md:border-r md:border-border md:bg-card">
-      <div className="px-4 py-5 border-b border-border">
-        <span className="text-lg font-semibold tracking-tight">pla-stock</span>
-      </div>
-      <nav className="flex-1 px-2 py-3 space-y-1">
+    <Box
+      component="aside"
+      sx={{
+        display: { xs: 'none', md: 'flex' },
+        width: 56,
+        flexDirection: 'column',
+        borderRight: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Box sx={{ px: 4, py: 5, borderBottom: 1, borderColor: 'divider' }}>
+        <Typography
+          variant="h5"
+          component="span"
+          sx={{ fontWeight: 600, letterSpacing: '-0.025em' }}
+        >
+          pla-stock
+        </Typography>
+      </Box>
+      <Stack component="nav" spacing={1} sx={{ flex: 1, px: 2, py: 3 }}>
         {APP_NAV_ITEMS.map((item) =>
           item.disabled ? (
-            <span
+            <Box
               key={item.key}
               role="link"
               aria-disabled="true"
-              className="block px-3 py-2 text-sm text-muted-foreground/60 cursor-not-allowed"
               title="Phase A-2 以降で実装"
+              sx={{
+                display: 'block',
+                px: 3,
+                py: 2,
+                fontSize: 'body2.fontSize',
+                color: 'text.disabled',
+                cursor: 'not-allowed',
+              }}
             >
               {item.label}
-            </span>
+            </Box>
           ) : (
-            <Link
+            <ListItemButton
               key={item.key}
+              component={Link}
               to={item.to}
-              activeProps={{ className: 'bg-accent text-accent-foreground' }}
-              className={cn(
-                'block px-3 py-2 rounded-md text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground',
-              )}
+              sx={(theme) => ({
+                borderRadius: 1,
+                px: 3,
+                py: 2,
+                fontSize: theme.typography.body2.fontSize,
+                fontWeight: 500,
+                '&.active': {
+                  backgroundColor: theme.palette.action.selected,
+                  fontWeight: 600,
+                },
+              })}
             >
               {item.label}
-            </Link>
+            </ListItemButton>
           ),
         )}
-      </nav>
-      <div className="p-4 border-t border-border">
+      </Stack>
+      <Box sx={{ padding: 4, borderTop: 1, borderColor: 'divider' }}>
         <UserButton />
-      </div>
-    </aside>
+      </Box>
+    </Box>
   )
 }
