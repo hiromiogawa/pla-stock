@@ -18,6 +18,7 @@ import MenuItem from '@mui/material/MenuItem'
 import Select, { type SelectProps } from '@mui/material/Select'
 import type { AnyFieldApi } from '@tanstack/react-form'
 import type { ReactNode } from 'react'
+import { extractFieldErrorMessage } from '~/shared/lib/form-error'
 
 export interface FormSelectOption {
   value: string
@@ -33,14 +34,10 @@ interface FormSelectProps
 }
 
 export function FormSelect({ field, label, options, helperText, ...rest }: FormSelectProps) {
-  const errors = field.state.meta.errors as Array<unknown>
-  const first = errors[0]
-  const errorText =
-    typeof first === 'object' && first !== null && 'message' in first
-      ? String((first as { message: unknown }).message)
-      : first != null
-        ? String(first)
-        : undefined
+  const errors = field.state.meta.errors
+  const errorText = errors.length > 0 ? extractFieldErrorMessage(errors[0]) : undefined
+  const rawValue = field.state.value
+  const value = typeof rawValue === 'string' ? rawValue : ''
   const id = `form-select-${field.name}`
   return (
     <FormControl fullWidth size="small" error={errors.length > 0}>
@@ -51,7 +48,7 @@ export function FormSelect({ field, label, options, helperText, ...rest }: FormS
         id={id}
         name={field.name}
         label={label}
-        value={(field.state.value ?? '') as string}
+        value={value}
         onChange={(e) => field.handleChange(e.target.value)}
         onBlur={field.handleBlur}
       >

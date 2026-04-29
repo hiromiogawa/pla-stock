@@ -20,6 +20,7 @@
  */
 import TextField, { type TextFieldProps } from '@mui/material/TextField'
 import type { AnyFieldApi } from '@tanstack/react-form'
+import { extractFieldErrorMessage } from '~/shared/lib/form-error'
 
 interface FormTextFieldProps
   extends Omit<TextFieldProps, 'value' | 'onChange' | 'onBlur' | 'error' | 'helperText' | 'name'> {
@@ -29,19 +30,15 @@ interface FormTextFieldProps
 }
 
 export function FormTextField({ field, helperText, ...rest }: FormTextFieldProps) {
-  const errors = field.state.meta.errors as Array<unknown>
-  const first = errors[0]
-  const errorText =
-    typeof first === 'object' && first !== null && 'message' in first
-      ? String((first as { message: unknown }).message)
-      : first != null
-        ? String(first)
-        : undefined
+  const errors = field.state.meta.errors
+  const errorText = errors.length > 0 ? extractFieldErrorMessage(errors[0]) : undefined
+  const rawValue = field.state.value
+  const value = typeof rawValue === 'string' ? rawValue : ''
   return (
     <TextField
       {...rest}
       name={field.name}
-      value={field.state.value ?? ''}
+      value={value}
       onChange={(e) => field.handleChange(e.target.value)}
       onBlur={field.handleBlur}
       error={errors.length > 0}
