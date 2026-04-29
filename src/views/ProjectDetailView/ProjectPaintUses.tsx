@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
+import { Plus, X } from 'lucide-react'
+import { useState } from 'react'
 import type { Paint } from '~/entities/paint'
-import { Button } from '~/shared/ui/button'
 import { Badge } from '~/shared/ui/badge'
 import { AddPaintDialog } from './AddPaintDialog'
 
@@ -19,31 +23,80 @@ export function ProjectPaintUses({ paints, allPaints, onAdd, onRemove }: Project
   const candidates = allPaints.filter((paint) => !paints.some((current) => current.id === paint.id))
 
   return (
-    <section className="rounded-lg border border-border bg-card p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">使用塗料</h2>
-        <Button size="sm" variant="outline" onClick={() => setShowAddDialog(true)}>
-          + 塗料を追加
-        </Button>
-      </div>
+    <Box
+      component="section"
+      sx={{
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        padding: 2,
+      }}
+    >
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          使用塗料
+        </Typography>
+        <IconButton
+          size="small"
+          aria-label="塗料を追加"
+          onClick={() => setShowAddDialog(true)}
+          sx={{ color: 'text.secondary' }}
+        >
+          <Plus size={16} strokeWidth={1.75} />
+        </IconButton>
+      </Stack>
       {paints.length === 0 ? (
-        <p className="text-xs text-muted-foreground">まだ塗料が追加されていません</p>
+        <Typography variant="caption" color="text.secondary">
+          まだ塗料が追加されていません
+        </Typography>
       ) : (
-        <ul className="space-y-2">
+        <Box
+          component="ul"
+          sx={{
+            margin: 0,
+            padding: 0,
+            listStyle: 'none',
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+            gap: 1,
+            // 塗料数が増えた時 (20+) でも他 section を圧迫しないよう max-height + scroll
+            maxHeight: 320,
+            overflowY: 'auto',
+          }}
+        >
           {paints.map((paint) => (
-            <li
+            <Stack
               key={paint.id}
-              className="flex items-center justify-between gap-3 rounded-md border border-border p-3"
+              component="li"
+              direction="row"
+              alignItems="center"
+              spacing={1.5}
+              sx={{
+                borderRadius: 1,
+                border: 1,
+                borderColor: 'divider',
+                padding: 1.5,
+              }}
             >
-              <div className="min-w-0 flex-1">
+              <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Link
                   to="/paints/$paintId"
                   params={{ paintId: paint.id }}
-                  className="text-sm font-medium hover:underline truncate block"
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: 'inherit',
+                    textDecoration: 'none',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
                 >
                   {paint.brand} {paint.code} {paint.name}
                 </Link>
-                <div className="text-xs text-muted-foreground mt-0.5 flex gap-1.5 items-center">
+                <Stack direction="row" spacing={0.75} sx={{ mt: 0.5 }}>
                   {paint.colorFamily && (
                     <Badge variant="outline" className="text-xs">
                       {paint.colorFamily}
@@ -54,14 +107,19 @@ export function ProjectPaintUses({ paints, allPaints, onAdd, onRemove }: Project
                       {paint.finishType}
                     </Badge>
                   )}
-                </div>
-              </div>
-              <Button size="sm" variant="ghost" onClick={() => void onRemove(paint.id)}>
-                外す
-              </Button>
-            </li>
+                </Stack>
+              </Box>
+              <IconButton
+                size="small"
+                aria-label={`${paint.name} を外す`}
+                onClick={() => void onRemove(paint.id)}
+                sx={{ color: 'text.secondary', flexShrink: 0 }}
+              >
+                <X size={16} strokeWidth={1.75} />
+              </IconButton>
+            </Stack>
           ))}
-        </ul>
+        </Box>
       )}
       <AddPaintDialog
         open={showAddDialog}
@@ -72,6 +130,6 @@ export function ProjectPaintUses({ paints, allPaints, onAdd, onRemove }: Project
           setShowAddDialog(false)
         }}
       />
-    </section>
+    </Box>
   )
 }

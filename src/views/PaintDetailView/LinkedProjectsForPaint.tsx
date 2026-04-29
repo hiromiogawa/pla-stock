@@ -1,7 +1,6 @@
-// Phase A-2: Kit 版 LinkedProjects (src/views/KitDetailView/LinkedProjects.tsx) の
-// Paint 用コピー。section heading と prop 名のみ異なる。
-// Phase B で汎用 LinkedProjectsList に統合予定。
-
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
@@ -18,28 +17,71 @@ interface LinkedProjectsForPaintProps {
 }
 
 export function LinkedProjectsForPaint({ projects }: LinkedProjectsForPaintProps) {
-  if (projects.length === 0) return null
   return (
-    <section className="rounded-lg border border-border bg-card p-4">
-      <h2 className="text-sm font-semibold mb-3">この塗料を使うプロジェクト</h2>
-      <ul className="space-y-2">
-        {projects.map((project) => (
-          <li key={project.id} className="flex items-center justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <Link
-                // @ts-expect-error /projects/:id route is registered in Issue #20
-                to={`/projects/${project.id}`}
-                className="text-sm font-medium hover:underline truncate block"
-              >
-                {project.name}
-              </Link>
-            </div>
-            <Badge variant="outline" className="text-xs shrink-0">
-              {STATUS_LABEL[project.status]}
-            </Badge>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Box
+      component="section"
+      sx={{
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        padding: 2,
+      }}
+    >
+      <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1.25 }}>
+        この塗料を使うプロジェクト
+      </Typography>
+      {projects.length === 0 ? (
+        <Typography variant="caption" color="text.secondary">
+          この塗料を使うプロジェクトはまだありません
+        </Typography>
+      ) : (
+        <Stack
+          component="ul"
+          spacing={1}
+          sx={{
+            margin: 0,
+            padding: 0,
+            listStyle: 'none',
+            // 紐付き project が増えた時 (20+) でも他 section を圧迫しないよう max-height + scroll
+            maxHeight: 320,
+            overflowY: 'auto',
+          }}
+        >
+          {projects.map((project) => (
+            <Stack
+              key={project.id}
+              component="li"
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              spacing={1.5}
+            >
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Link
+                  to="/projects/$id"
+                  params={{ id: project.id }}
+                  style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: 'inherit',
+                    textDecoration: 'none',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {project.name}
+                </Link>
+              </Box>
+              <Badge variant="outline" className="text-xs">
+                {STATUS_LABEL[project.status]}
+              </Badge>
+            </Stack>
+          ))}
+        </Stack>
+      )}
+    </Box>
   )
 }
