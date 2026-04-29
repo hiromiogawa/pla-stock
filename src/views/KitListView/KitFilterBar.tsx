@@ -8,14 +8,12 @@ export interface KitFilters {
   search: string
   grade: Grade | 'all'
   scale: Scale | 'all'
-  maker: string | 'all'
 }
 
 export const INITIAL_FILTERS: KitFilters = {
   search: '',
   grade: 'all',
   scale: 'all',
-  maker: 'all',
 }
 
 const GRADES: Array<Grade | 'all'> = ['all', 'HG', 'RG', 'EG', 'MG', 'PG', 'other']
@@ -38,19 +36,18 @@ function toScale(value: string): KitFilters['scale'] {
 
 interface KitFilterBarProps {
   filters: KitFilters
-  makers: string[] // 一覧から動的に集めた候補
   onChange: (next: KitFilters) => void
 }
 
-export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
+export function KitFilterBar({ filters, onChange }: KitFilterBarProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 rounded-lg border border-border bg-card">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 rounded-lg border border-border bg-card">
       <Input
         type="search"
         value={filters.search}
         onChange={(event) => onChange({ ...filters, search: event.target.value })}
         placeholder="名前で検索"
-        className="md:col-span-3"
+        className="md:col-span-2"
       />
       <FormControl fullWidth size="small">
         <Select<KitFilters['grade']>
@@ -72,19 +69,6 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
           {SCALES.map((scale) => (
             <MenuItem key={scale} value={scale}>
               {scale === 'all' ? 'すべてのスケール' : scale}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth size="small">
-        <Select<string>
-          value={filters.maker}
-          onChange={(event) => onChange({ ...filters, maker: String(event.target.value) })}
-        >
-          <MenuItem value="all">すべてのブランド</MenuItem>
-          {makers.map((maker) => (
-            <MenuItem key={maker} value={maker}>
-              {maker}
             </MenuItem>
           ))}
         </Select>

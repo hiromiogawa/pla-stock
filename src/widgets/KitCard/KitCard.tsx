@@ -24,7 +24,7 @@ export function KitCard({ stock, kit }: KitCardProps) {
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold truncate">{kit.name}</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            {kit.grade} · {kit.scale} · {kit.maker}
+            {kit.grade} · {kit.scale}
           </p>
           <div className="mt-2 flex gap-1.5 items-center">
             <span className="text-xs font-medium">在庫: {stock.count} 個</span>

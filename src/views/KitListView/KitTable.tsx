@@ -35,11 +35,6 @@ const columns: ColumnDef<KitTableRow>[] = [
     header: 'スケール',
   },
   {
-    id: 'maker',
-    accessorFn: (row) => row.kit.maker,
-    header: 'ブランド',
-  },
-  {
     id: 'count',
     accessorFn: (row) => row.stock.count,
     header: '在庫数',
