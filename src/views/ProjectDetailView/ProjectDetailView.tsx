@@ -8,7 +8,6 @@ import type { Paint } from '~/entities/paint'
 import type { Project, ProjectPhoto } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
-import { LinkedKit } from './LinkedKit'
 import { ProjectDeleteDialog } from './ProjectDeleteDialog'
 import { ProjectDetailFields } from './ProjectDetailFields'
 import { ProjectEditForm } from './ProjectEditForm'
@@ -127,15 +126,12 @@ export function ProjectDetailView({
         )}
       </Stack>
 
-      {/* プロジェクト情報 (or edit form) */}
+      {/* プロジェクト情報 (or edit form) — kit info も同居 */}
       {editing ? (
         <ProjectEditForm project={project} onSave={handleSave} onCancel={() => setEditing(false)} />
       ) : (
-        <ProjectDetailFields project={project} />
+        <ProjectDetailFields project={project} kit={kit} />
       )}
-
-      {/* 使用キット */}
-      <LinkedKit kit={kit} />
 
       {/* 使用塗料 (section action: 追加) */}
       <ProjectPaintUses
