@@ -1,15 +1,12 @@
 import { useMemo, useState } from 'react'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import type { Paint } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '~/shared/ui/dialog'
 
 interface AddPaintDialogProps {
   open: boolean
@@ -34,14 +31,18 @@ export function AddPaintDialog({ open, candidates, onOpenChange, onSelect }: Add
   }, [candidates, query])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>塗料を追加</DialogTitle>
-          <DialogDescription>
-            このプロジェクトで使う塗料を選択してください。在庫の count は変化しません。
-          </DialogDescription>
-        </DialogHeader>
+    <Dialog
+      open={open}
+      onClose={() => onOpenChange(false)}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{ sx: { maxHeight: '80vh' } }}
+    >
+      <DialogTitle>塗料を追加</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          このプロジェクトで使う塗料を選択してください。在庫の count は変化しません。
+        </DialogContentText>
         <Input
           type="search"
           value={query}
@@ -70,12 +71,12 @@ export function AddPaintDialog({ open, candidates, onOpenChange, onSelect }: Add
             ))
           )}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            キャンセル
-          </Button>
-        </DialogFooter>
       </DialogContent>
+      <DialogActions>
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          キャンセル
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }
