@@ -1,7 +1,10 @@
-import type { Kit, KitStock, KitEvent } from '~/entities/kit'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { ArrowLeft } from 'lucide-react'
+import type { Kit, KitEvent, KitStock } from '~/entities/kit'
 import type { Project } from '~/entities/project'
 import { Button } from '~/shared/ui/button'
-import { KitDetailHeader } from './KitDetailHeader'
 import { KitDetailFields } from './KitDetailFields'
 import { KitPurchaseDialog } from './KitPurchaseDialog'
 import { KitReleaseDialog } from './KitReleaseDialog'
@@ -30,25 +33,76 @@ export function KitDetailView({
 }: KitDetailViewProps) {
   if (!stock || !kit) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 md:px-8 text-center space-y-4">
-        <h1 className="text-2xl font-bold">キットが見つかりません</h1>
-        <p className="text-sm text-muted-foreground">
+      <Stack
+        spacing={2}
+        sx={{
+          maxWidth: '768px',
+          mx: 'auto',
+          px: { xs: 2, md: 4 },
+          py: { xs: 5, md: 10 },
+          textAlign: 'center',
+        }}
+      >
+        <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
+          キットが見つかりません
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
           指定された kitId のキットは存在しないか、在庫がありません。
-        </p>
-        <Button onClick={handleBackToList}>キット一覧へ戻る</Button>
-      </div>
+        </Typography>
+        <Box>
+          <Button onClick={handleBackToList}>キット一覧へ戻る</Button>
+        </Box>
+      </Stack>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
-      <KitDetailHeader
-        kit={kit}
+    <Stack
+      spacing={3}
+      sx={{
+        maxWidth: '768px',
+        mx: 'auto',
+        px: { xs: 2, md: 4 },
+        py: { xs: 3, md: 5 },
+      }}
+    >
+      {/* Navigation tier: back to list */}
+      <Box>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBackToList}
+          sx={{
+            color: 'text.secondary',
+            paddingInlineStart: 0.5,
+            paddingInlineEnd: 1,
+            minWidth: 'unset',
+            gap: 0.75,
+            '&:hover': { color: 'text.primary' },
+          }}
+        >
+          <ArrowLeft size={16} strokeWidth={1.75} />
+          キット一覧へ
+        </Button>
+      </Box>
+
+      {/* Identification */}
+      <Stack spacing={1}>
+        <Typography variant="h5" component="h1" sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}>
+          {kit.name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {kit.grade} · {kit.scale} · {kit.maker}
+        </Typography>
+      </Stack>
+
+      <KitDetailFields
         stock={stock}
+        kit={kit}
+        events={events}
         onPurchase={() => setShowPurchaseDialog(true)}
         onRelease={() => setShowReleaseDialog(true)}
       />
-      <KitDetailFields stock={stock} kit={kit} events={events} />
       <LinkedProjects projects={linkedProjects} />
       <KitPurchaseDialog
         open={showPurchaseDialog}
@@ -62,6 +116,6 @@ export function KitDetailView({
         onOpenChange={setShowReleaseDialog}
         onConfirm={handleRelease}
       />
-    </div>
+    </Stack>
   )
 }
