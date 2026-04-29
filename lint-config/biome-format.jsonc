@@ -1,0 +1,74 @@
+// ============================================================================
+// biome-format.jsonc — Biome formatter ルール
+// ----------------------------------------------------------------------------
+// 役割:
+//   コードの「見た目」を統一する formatter 設定。
+//   Biome の lint 機能は使用せず、formatter 専用で運用 (lint は oxlint に任せる)。
+//
+// 採用方針:
+//   - JS/TS/JSON は format 対象、CSS は除外 (Tailwind v4 の @apply / @theme を
+//     Biome がパース不可のため)
+//   - 既存 codebase に合わせたスタイル: single quote / 末尾セミコロン無し /
+//     trailing comma all / 100 列改行
+//
+// 関連:
+//   - ADR-0001 (Phase B Tooling 採用)
+//   - PR #49 (Biome 導入)
+// ============================================================================
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+
+  // format / lint 対象から除外するパス。
+  // - routeTree.gen.ts / worker-configuration.d.ts : auto-generated
+  // - dist / .wrangler / .tanstack / node_modules : 出力ディレクトリ
+  // - pnpm-lock.yaml : pnpm 管理
+  // - **/*.css : Tailwind v4 @apply / @theme 構文を Biome がパース不可
+  "files": {
+    "includes": [
+      "**",
+      "!src/routeTree.gen.ts",
+      "!worker-configuration.d.ts",
+      "!dist",
+      "!.wrangler",
+      "!.tanstack",
+      "!node_modules",
+      "!pnpm-lock.yaml",
+      "!**/*.css"
+    ]
+  },
+
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    // 100 列までは 1 行に。改行スタイルが既存 codebase に合致。
+    "lineWidth": 100,
+    // git diff 安定 + macOS/Linux 統一のため lf 固定。
+    "lineEnding": "lf"
+  },
+
+  "javascript": {
+    "formatter": {
+      // 既存 TS/TSX が single quote 中心のため統一。
+      "quoteStyle": "single",
+      // ASI (Automatic Semicolon Insertion) 任せ。短い行で見やすい。
+      "semicolons": "asNeeded",
+      // 末尾カンマ全部入り。git diff が 1 行で済む。
+      "trailingCommas": "all",
+      // arrow 関数の引数 1 個でも括弧付ける。`(x) => x * 2`。
+      "arrowParentheses": "always"
+    }
+  },
+
+  "json": {
+    "formatter": { "enabled": true }
+  },
+
+  // CSS は format 対象外 (Tailwind v4 構文非対応のため上記 includes でも除外済み)。
+  "css": {
+    "formatter": { "enabled": false }
+  },
+
+  // lint 機能は oxlint に任せるため明示的に無効化。役割分担 = Biome は format 専門。
+  "linter": { "enabled": false }
+}
