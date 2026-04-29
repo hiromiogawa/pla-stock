@@ -19,6 +19,23 @@ const SORT_INDICATOR: Record<'asc' | 'desc', string> = { asc: ' ↑', desc: ' �
 
 const columns: ColumnDef<KitTableRow>[] = [
   {
+    id: 'image',
+    header: '',
+    enableSorting: false,
+    cell: ({ row }) => {
+      const { boxArtUrl, name } = row.original.kit
+      return (
+        <div className="w-12 h-12 shrink-0 rounded border border-border bg-muted/40 overflow-hidden flex items-center justify-center text-[10px] text-muted-foreground">
+          {boxArtUrl ? (
+            <img src={boxArtUrl} alt={name} className="w-full h-full object-cover" />
+          ) : (
+            'No Image'
+          )}
+        </div>
+      )
+    },
+  },
+  {
     id: 'name',
     accessorFn: (row) => row.kit.name,
     header: '名前',

@@ -5,12 +5,11 @@ import * as React from 'react'
 import { ClerkProvider } from '@clerk/tanstack-react-start'
 import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress'
-import { ThemeProvider } from '@mui/material/styles'
 import { SnackbarProvider } from 'notistack'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
 import appCss from '~/styles/app.css?url'
-import { theme } from '~/theme'
+import { ThemeModeProvider } from '~/theme/ThemeModeProvider'
 import { seo } from '~/utils/seo'
 
 export const Route = createRootRoute({
@@ -82,7 +81,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ClerkProvider>
-          <ThemeProvider theme={theme}>
+          <ThemeModeProvider>
             <SnackbarProvider
               maxSnack={3}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
@@ -91,7 +90,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               {children}
               <TanStackRouterDevtools position="bottom-right" />
             </SnackbarProvider>
-          </ThemeProvider>
+          </ThemeModeProvider>
         </ClerkProvider>
         <Scripts />
       </body>

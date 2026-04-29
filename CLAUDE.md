@@ -239,11 +239,24 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 
 ## AI 運用ルール
 
-物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は機械化できない判断系のみ:
+物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は **機械強制できない判断系 + 半機械強制 (hook で run を強制) の規律**:
 
-- **UI を変更する PR は controller 自身が Playwright で screenshot 検証する** (subagent の DONE 報告だけで PR 作成しない)
+- **UI 変更の push は機械強制で `pnpm verify:ui` 必須** (`.husky/pre-push` が `src/views|widgets|theme|styles|components/` 配下の変更を検出時、`.playwright-snapshots/` の鮮度をチェックして reject)
+  - 撮った screenshot を **controller 自身が必ず目視確認** (run しただけで OK は禁止、それは harness の趣旨に反する)
 - **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
 - **新規ライブラリ採用は ADR 起票必須** (`docs/adr/`)
 - **UI コード変更前 (`.tsx` の styling / sx prop / 新規 component) は必ず `frontend-design` skill を invoke する**
   - 特に「**見た目に対する feedback**」(例: 「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず**、まず skill で Design Thinking (Tone / Differentiation / Constraints) を再適用する
   - spec (`docs/specs/2026-04-29-design-direction.md`) は方針、skill は **その実装局面での craft 適用ガイド**。両方必須
+
+### `verify:ui` 運用
+
+```sh
+pnpm dev               # 別 terminal で dev server 起動
+pnpm verify:ui         # screenshot 撮影 → .playwright-snapshots/ に保存
+```
+
+初回のみ chromium インストール: `pnpm exec playwright install chromium`
+
+**重要な制約**: 現状 verify:ui は **LandingView (`/`) のみ対象**。Clerk 認証 gate 配下 (`/dashboard` 等) は screenshot 不可。  
+**= verify:ui の OK = 「全画面 OK」ではない。** 認証 gate 内の dark mode / レイアウト / Action 配置は **controller がブラウザで目視確認** するか **ユーザーの screenshot を待つ** こと。LandingView だけで OK 判定するのは 2026-04-29 の失敗 (ai-failures.md 参照) と同じ過ち。

@@ -14,6 +14,7 @@ import { Badge } from '~/shared/ui/badge'
 interface ProjectTableRow {
   project: Project
   linkedKitName: string | null
+  linkedKitBoxArtUrl: string | null
 }
 
 const STATUS_LABEL: Record<Project['status'], string> = {
@@ -26,6 +27,28 @@ const STATUS_LABEL: Record<Project['status'], string> = {
 const SORT_INDICATOR: Record<'asc' | 'desc', string> = { asc: ' ↑', desc: ' ↓' }
 
 const columns: ColumnDef<ProjectTableRow>[] = [
+  {
+    id: 'image',
+    header: '',
+    enableSorting: false,
+    cell: ({ row }) => {
+      const { linkedKitBoxArtUrl } = row.original
+      const projectName = row.original.project.name
+      return (
+        <div className="w-12 h-12 shrink-0 rounded border border-border bg-muted/40 overflow-hidden flex items-center justify-center text-[10px] text-muted-foreground">
+          {linkedKitBoxArtUrl ? (
+            <img
+              src={linkedKitBoxArtUrl}
+              alt={projectName}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            'No Image'
+          )}
+        </div>
+      )
+    },
+  },
   {
     id: 'name',
     accessorFn: (row) => row.project.name,
