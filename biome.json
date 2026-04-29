@@ -1,44 +1,4 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
-  "files": {
-    "includes": [
-      "**",
-      "!src/routeTree.gen.ts",
-      "!worker-configuration.d.ts",
-      "!dist",
-      "!.wrangler",
-      "!.tanstack",
-      "!node_modules",
-      "!pnpm-lock.yaml",
-      "!**/*.css"
-    ]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100,
-    "lineEnding": "lf"
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "semicolons": "asNeeded",
-      "trailingCommas": "all",
-      "arrowParentheses": "always"
-    }
-  },
-  "json": {
-    "formatter": {
-      "enabled": true
-    }
-  },
-  "css": {
-    "formatter": {
-      "enabled": false
-    }
-  },
-  "linter": {
-    "enabled": false
-  }
+  "extends": ["./lint-config/biome-format.jsonc"]
 }

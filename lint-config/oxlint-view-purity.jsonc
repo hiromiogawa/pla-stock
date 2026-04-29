@@ -1,0 +1,121 @@
+// ============================================================================
+// oxlint-view-purity.jsonc — View 純粋性ルール (#43 Container/Hook/Presenter)
+// ----------------------------------------------------------------------------
+// 役割:
+//   View (Presenter) が pure (props in / JSX out) であることを機械強制する。
+//   state / 副作用 / mutation は useXxx hook に隔離。
+//
+// 採用方針:
+//   - mutation 持ち view 群 (*DetailView / *AddView / *CreateView):
+//       react の useState/useEffect/useReducer + entity mutation の import 全禁止
+//   - List view 群 (*ListView):
+//       filter 用 useState は inline OK、entity mutation のみ禁止
+//
+// 機械強制方法:
+//   oxlint の `no-restricted-imports` rule + overrides (glob ごとの上書き)。
+//   `no-restricted-syntax` が oxlint 1.61 未対応のため import 段階で block。
+//
+// 関連:
+//   - Issue #43 (Container/Hook/Presenter リファクタ)
+//   - PR #51 (リファクタ実装)、PR #52 (本ルール導入)
+//   - CLAUDE.md `## コード規約 > Container/Hook/Presenter`
+// ============================================================================
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+
+  "overrides": [
+    // ------------------------------------------------------------------------
+    // List view: filter 用 useState は inline OK、mutation のみ禁止
+    // ------------------------------------------------------------------------
+    {
+      "files": ["src/views/**/*ListView.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                // List view から在庫追加・削除等を直接呼ぶケースは無いはず。
+                // 万一 quick action を List に置きたくなったら useXxxList hook 経由に。
+                "name": "~/entities/kit",
+                "importNames": ["addKitEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43)"
+              },
+              {
+                "name": "~/entities/paint",
+                "importNames": ["addPaintEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43)"
+              },
+              {
+                "name": "~/entities/project",
+                "importNames": [
+                  "addProject",
+                  "updateProject",
+                  "deleteProject",
+                  "addProjectPaintUse",
+                  "removeProjectPaintUse",
+                  "addProjectPhoto",
+                  "deleteProjectPhoto"
+                ],
+                "message": "mutation は useXxx hook 経由にすること (#43)"
+              }
+            ]
+          }
+        ]
+      }
+    },
+
+    // ------------------------------------------------------------------------
+    // Detail / Add / Create view: state hook + mutation 全部禁止
+    // ------------------------------------------------------------------------
+    {
+      "files": [
+        "src/views/**/*DetailView.tsx",
+        "src/views/**/*AddView.tsx",
+        "src/views/**/*CreateView.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                // useState / useEffect / useReducer は state ロジックを Presenter に
+                // 漏らす入口。useXxx に集約することで renderHook で単体テスト可能。
+                // useMemo / useRef は計算 / DOM 参照に限るため許容 (現状)。
+                "name": "react",
+                "importNames": ["useState", "useEffect", "useReducer"],
+                "message": "View は pure Presenter にすること。state / 副作用は useXxx hook に抽出 (#43)"
+              },
+              // ----- 以下は List view と同じ entity mutation 禁止 -----
+              // (oxlint の override は paths 配列を replace するため重複定義が必要)
+              {
+                "name": "~/entities/kit",
+                "importNames": ["addKitEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43)"
+              },
+              {
+                "name": "~/entities/paint",
+                "importNames": ["addPaintEvent"],
+                "message": "mutation は useXxx hook 経由にすること (#43)"
+              },
+              {
+                "name": "~/entities/project",
+                "importNames": [
+                  "addProject",
+                  "updateProject",
+                  "deleteProject",
+                  "addProjectPaintUse",
+                  "removeProjectPaintUse",
+                  "addProjectPhoto",
+                  "deleteProjectPhoto"
+                ],
+                "message": "mutation は useXxx hook 経由にすること (#43)"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

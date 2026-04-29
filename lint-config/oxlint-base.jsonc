@@ -1,0 +1,54 @@
+// ============================================================================
+// oxlint-base.jsonc — oxlint の基本設定 (categories / plugins / 共通 rules)
+// ----------------------------------------------------------------------------
+// 役割:
+//   pla-stock 全体に共通して適用する oxlint のベース設定。
+//   個別ルール (View 純粋性等) は別ファイルで extends 経由で合成する。
+//
+// 適用範囲:
+//   全 src/**, scripts/**, vite.config.ts, etc.
+//
+// 関連:
+//   - ADR-0001 (Phase B Tooling 採用)
+//   - lint-config/README.md
+// ============================================================================
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+
+  // 使用する plugin。pla-stock は React + TypeScript + import 解析のみ必要。
+  // jsdoc / unicorn / promise 等は現状未採用 (将来的に require-jsdoc 等が安定したら追加検討)。
+  //
+  // ⚠ NOTE: extends 経由でこのファイルを読み込む場合、ルートの .oxlintrc.json でも
+  // 同じ `plugins` 配列を指定しないと unicorn 等が auto-enable される (oxlint extends の
+  // plugin merge 仕様)。ルートの entry でも plugins を明示すること。
+  "plugins": ["react", "typescript", "import"],
+
+  // カテゴリ単位で重要度を設定 (oxlint 独自の概念)。
+  // - correctness: 明らかなバグ / 誤用 → error
+  // - suspicious:  怪しいパターン (型強制, 暗黙比較等) → error
+  // - perf:        パフォーマンス問題 → warn (CI を即落としはしない)
+  // それ以外 (style, pedantic, restriction) は明示的に有効化しない方針。
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "warn"
+  },
+
+  "rules": {
+    // 新 JSX 変換 (React 17+) では `import React from 'react'` が不要なため off。
+    "react/react-in-jsx-scope": "off"
+  },
+
+  // lint 対象から外すパス。
+  // - routeTree.gen.ts : TanStack Start auto-generated
+  // - worker-configuration.d.ts : wrangler types auto-generated
+  // - dist / .wrangler / .tanstack / node_modules : 出力ディレクトリ
+  "ignorePatterns": [
+    "src/routeTree.gen.ts",
+    "worker-configuration.d.ts",
+    "dist",
+    ".wrangler",
+    ".tanstack",
+    "node_modules"
+  ]
+}
