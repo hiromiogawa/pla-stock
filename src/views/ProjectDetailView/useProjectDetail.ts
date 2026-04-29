@@ -31,6 +31,20 @@ export interface UseProjectDetailReturn {
   handleBackToList: () => void
 }
 
+/**
+ * ProjectDetailView 用の Hook (Container/Hook/Presenter パターン)。
+ *
+ * 担当する state / 副作用:
+ * - 編集モード / 削除確認ダイアログの表示状態 (useState ×2)
+ * - プロジェクト編集 (updateProject) / 削除 (deleteProject、planning なら kit 在庫戻し)
+ * - 紐付け塗料の追加・削除 (addProjectPaintUse / removeProjectPaintUse、count 変化なし)
+ * - 写真の追加・削除 (addProjectPhoto / deleteProjectPhoto)
+ * - mutation 後は router.invalidate() で loader 再実行 → 最新 paints/photos を再取得
+ * - 削除成功時は一覧へ navigation
+ *
+ * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
+ * useState / 副作用は持たない (#43 ルール)。
+ */
 export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetailReturn {
   const navigate = useNavigate()
   const router = useRouter()

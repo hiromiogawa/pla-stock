@@ -17,6 +17,19 @@ export interface UsePaintAddReturn {
   handleStockSubmit: (paintId: string, values: PaintPurchaseEventInput) => Promise<void>
 }
 
+/**
+ * PaintAddView 用の Hook (Container/Hook/Presenter パターン)。
+ *
+ * 担当する state / 副作用:
+ * - Phase state: 'search' (paint master 検索中) / 'add-stock' (paint 選択後、購入記録入力中)
+ * - 検索フェーズへ戻る (goToSearch)
+ * - master paint 選択 (selectPaint) → 'add-stock' phase へ遷移
+ * - 購入記録: addPaintEvent({ delta: +1, reason: 'purchase' }) → paint_stock.count += 1
+ * - 成功時は /paints/:paintId (詳細) へ navigation
+ *
+ * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
+ * useState / 副作用は持たない (#43 ルール)。
+ */
 export function usePaintAdd(input: UsePaintAddInput): UsePaintAddReturn {
   const { userId } = input
   const navigate = useNavigate()

@@ -21,6 +21,19 @@ export interface UseKitDetailReturn {
   handleBackToList: () => void
 }
 
+/**
+ * KitDetailView 用の Hook (Container/Hook/Presenter パターン)。
+ *
+ * 担当する state / 副作用:
+ * - 購入ダイアログ / 出庫ダイアログの表示状態 (useState ×2)
+ * - 購入記録: addKitEvent({ delta: +1, reason: 'purchase' })
+ * - 出庫記録: addKitEvent({ delta: -1, reason: <release reason> })
+ * - mutation 後は router.invalidate() で loader 再実行 → 最新 stock/events を再取得
+ * - 一覧へ戻る navigation
+ *
+ * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
+ * useState / 副作用は持たない (#43 ルール)。
+ */
 export function useKitDetail(input: UseKitDetailInput): UseKitDetailReturn {
   const navigate = useNavigate()
   const router = useRouter()
