@@ -24,7 +24,7 @@ export function LandingView() {
       <Box component="header" sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Box
           sx={{
-            maxWidth: '768px',
+            maxWidth: '896px',
             mx: 'auto',
             px: 6,
             py: 4,
@@ -83,7 +83,7 @@ export function LandingView() {
       <Box component="footer" sx={{ borderTop: 1, borderColor: 'divider' }}>
         <Box
           sx={{
-            maxWidth: '768px',
+            maxWidth: '896px',
             mx: 'auto',
             px: 6,
             py: 4,
