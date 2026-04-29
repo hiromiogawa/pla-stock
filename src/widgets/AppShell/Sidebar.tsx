@@ -3,21 +3,30 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
-import { APP_NAV_ITEMS } from '~/shared/config/nav'
+import { FolderKanban, Home, type LucideIcon, Package, Palette, Settings } from 'lucide-react'
+import { APP_NAV_ITEMS, type NavItem } from '~/shared/config/nav'
 
 /**
  * Sidebar (md+ で表示)。
  *
- * MUI sx の `width` は number → px 解釈のため、Tailwind w-56 (14rem = 224px) は
- * `width: '14rem'` で表現する (theme.spacing は適用されない)。
+ * デザイン方針: Refined Minimalism (Linear / Notion / Vercel 風)。
+ * 詳細は docs/specs/2026-04-29-design-direction.md。
  *
- * active state:
- *   TanStack Router の Link は active 時に自動で `className="active"` を付与する。
- *   `activeProps` の型は host component (TComp) の React props に固定されるため
- *   ListItemButton の `selected` prop を直接 activeProps から指定することは型エラー。
- *   代替として sx の `&.active` セレクタで MUI の `Mui-selected` 相当の styling
- *   (theme.palette.action.selected) を当てる。
+ * - 14px medium body / weight contrast で hierarchy
+ * - lucide icon 16px stroke 1.75 (default の 2 より craft 感)
+ * - hover/active で bg + color + weight を多軸変化
+ * - hairline divider で構造を区切る
+ * - active state は TanStack Router の自動 className "active" を sx の `&.active` で pickup
  */
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  dashboard: Home,
+  kits: Package,
+  paints: Palette,
+  projects: FolderKanban,
+  settings: Settings,
+}
+
 export function Sidebar() {
   return (
     <Box
@@ -31,69 +40,113 @@ export function Sidebar() {
         bgcolor: 'background.paper',
       }}
     >
-      <Box sx={{ px: 4, py: 5, borderBottom: 1, borderColor: 'divider' }}>
+      {/* Brand */}
+      <Box
+        sx={{
+          px: 3,
+          py: 2.5,
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
+      >
         <Typography
-          variant="h5"
           component="span"
-          sx={{ fontWeight: 600, letterSpacing: '-0.025em' }}
+          sx={{
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+            color: 'text.primary',
+          }}
         >
           pla-stock
         </Typography>
       </Box>
-      <Stack component="nav" spacing={0} sx={{ flex: 1, px: 1, py: 1 }}>
-        {APP_NAV_ITEMS.map((item) =>
-          item.disabled ? (
-            <Box
-              key={item.key}
-              role="link"
-              aria-disabled="true"
-              title="Phase A-2 以降で実装"
-              sx={{
-                display: 'block',
-                px: 1.5,
-                py: 0.75,
-                fontSize: '0.875rem',
-                color: 'text.disabled',
-                cursor: 'not-allowed',
-              }}
-            >
-              {item.label}
-            </Box>
-          ) : (
-            <Box
-              key={item.key}
-              component={Link}
-              to={item.to}
-              sx={{
-                display: 'block',
-                px: 1.5,
-                py: 0.75,
-                borderRadius: 0.75,
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                color: 'text.secondary',
-                textDecoration: 'none',
-                cursor: 'pointer',
-                transition: 'background-color 120ms, color 120ms',
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                  color: 'text.primary',
-                },
-                '&.active': {
-                  backgroundColor: 'action.selected',
-                  color: 'text.primary',
-                  fontWeight: 600,
-                },
-              }}
-            >
-              {item.label}
-            </Box>
-          ),
-        )}
+
+      {/* Nav */}
+      <Stack component="nav" spacing={0.25} sx={{ flex: 1, px: 1.5, pt: 1 }}>
+        {APP_NAV_ITEMS.map((item) => (
+          <SidebarItem key={item.key} item={item} />
+        ))}
       </Stack>
-      <Box sx={{ padding: 4, borderTop: 1, borderColor: 'divider' }}>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          px: 2,
+          py: 2,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
         <UserButton />
       </Box>
+    </Box>
+  )
+}
+
+interface SidebarItemProps {
+  item: NavItem
+}
+
+function SidebarItem({ item }: SidebarItemProps) {
+  const Icon = ICON_MAP[item.key] ?? Home
+
+  if (item.disabled) {
+    return (
+      <Box
+        role="link"
+        aria-disabled="true"
+        title="Phase A-2 以降で実装"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          px: 1.5,
+          py: 1,
+          fontSize: '0.875rem',
+          fontWeight: 500,
+          color: 'text.disabled',
+          cursor: 'not-allowed',
+        }}
+      >
+        <Icon size={16} strokeWidth={1.75} />
+        {item.label}
+      </Box>
+    )
+  }
+
+  return (
+    <Box
+      component={Link}
+      to={item.to}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: 1.5,
+        py: 1,
+        borderRadius: 0.75,
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        color: 'text.secondary',
+        textDecoration: 'none',
+        cursor: 'pointer',
+        transition: 'background-color 120ms ease, color 120ms ease',
+        '&:hover': {
+          backgroundColor: 'action.hover',
+          color: 'text.primary',
+        },
+        '&.active': {
+          backgroundColor: 'action.selected',
+          color: 'text.primary',
+          fontWeight: 600,
+        },
+      }}
+    >
+      <Icon size={16} strokeWidth={1.75} />
+      {item.label}
     </Box>
   )
 }
