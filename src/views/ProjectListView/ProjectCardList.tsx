@@ -4,6 +4,7 @@ import { ProjectCard } from '~/widgets/ProjectCard'
 interface ProjectCardListRow {
   project: Project
   linkedKitName: string | null
+  linkedKitBoxArtUrl: string | null
 }
 
 interface ProjectCardListProps {
@@ -20,8 +21,13 @@ export function ProjectCardList({ rows }: ProjectCardListProps) {
   }
   return (
     <div className="space-y-3">
-      {rows.map(({ project, linkedKitName }) => (
-        <ProjectCard key={project.id} project={project} linkedKitName={linkedKitName} />
+      {rows.map(({ project, linkedKitName, linkedKitBoxArtUrl }) => (
+        <ProjectCard
+          key={project.id}
+          project={project}
+          linkedKitName={linkedKitName}
+          linkedKitBoxArtUrl={linkedKitBoxArtUrl}
+        />
       ))}
     </div>
   )

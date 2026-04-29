@@ -10,9 +10,15 @@ interface ProjectListViewProps {
   projects: Project[]
   /** project.id → 紐付きキット名 (未紐付き or 解決失敗時は null) の map */
   kitNameByProjectId: Record<string, string | null>
+  /** project.id → 紐付きキットの box art URL (未紐付き / 画像なし時は null) の map */
+  kitBoxArtByProjectId: Record<string, string | null>
 }
 
-export function ProjectListView({ projects, kitNameByProjectId }: ProjectListViewProps) {
+export function ProjectListView({
+  projects,
+  kitNameByProjectId,
+  kitBoxArtByProjectId,
+}: ProjectListViewProps) {
   const [filters, setFilters] = useState<ProjectFilters>(INITIAL_FILTERS)
 
   const rows = useMemo(() => {
@@ -20,6 +26,7 @@ export function ProjectListView({ projects, kitNameByProjectId }: ProjectListVie
       .map((project) => ({
         project,
         linkedKitName: kitNameByProjectId[project.id] ?? null,
+        linkedKitBoxArtUrl: kitBoxArtByProjectId[project.id] ?? null,
       }))
       .filter(({ project }) => {
         if (filters.search) {
@@ -29,7 +36,7 @@ export function ProjectListView({ projects, kitNameByProjectId }: ProjectListVie
         if (filters.status !== 'all' && project.status !== filters.status) return false
         return true
       })
-  }, [projects, kitNameByProjectId, filters])
+  }, [projects, kitNameByProjectId, kitBoxArtByProjectId, filters])
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">

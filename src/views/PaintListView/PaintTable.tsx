@@ -19,6 +19,23 @@ const SORT_INDICATOR: Record<'asc' | 'desc', string> = { asc: ' ↑', desc: ' �
 
 const columns: ColumnDef<PaintTableRow>[] = [
   {
+    id: 'image',
+    header: '',
+    enableSorting: false,
+    cell: ({ row }) => {
+      const { swatchUrl, name } = row.original.paint
+      return (
+        <div className="w-12 h-12 shrink-0 rounded border border-border bg-muted/40 overflow-hidden flex items-center justify-center text-[10px] text-muted-foreground">
+          {swatchUrl ? (
+            <img src={swatchUrl} alt={name} className="w-full h-full object-cover" />
+          ) : (
+            'No Swatch'
+          )}
+        </div>
+      )
+    },
+  },
+  {
     id: 'brand',
     accessorFn: (row) => row.paint.brand,
     header: 'ブランド',
