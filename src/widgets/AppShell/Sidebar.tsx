@@ -1,10 +1,21 @@
 import { UserButton } from '@clerk/tanstack-react-start'
 import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
-import { FolderKanban, Home, type LucideIcon, Package, Palette, Settings } from 'lucide-react'
+import {
+  FolderKanban,
+  Home,
+  type LucideIcon,
+  Moon,
+  Package,
+  Palette,
+  Settings,
+  Sun,
+} from 'lucide-react'
 import { APP_NAV_ITEMS, type NavItem } from '~/shared/config/nav'
+import { useThemeMode } from '~/theme/ThemeModeProvider'
 
 /**
  * Sidebar (md+ で表示)。
@@ -78,11 +89,33 @@ export function Sidebar() {
           borderColor: 'divider',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <UserButton />
+        <ThemeToggle />
       </Box>
     </Box>
+  )
+}
+
+/**
+ * light <-> dark の手動切替トグル。
+ * Sidebar footer の右端に配置 (UserButton の隣)、refined minimalism として
+ * 16px lucide icon + ghost IconButton で控えめに。
+ */
+function ThemeToggle() {
+  const { mode, toggleMode } = useThemeMode()
+  const isDark = mode === 'dark'
+  return (
+    <IconButton
+      size="small"
+      onClick={toggleMode}
+      aria-label={isDark ? 'ライトモードに切替' : 'ダークモードに切替'}
+      sx={{ color: 'text.secondary' }}
+    >
+      {isDark ? <Sun size={16} strokeWidth={1.75} /> : <Moon size={16} strokeWidth={1.75} />}
+    </IconButton>
   )
 }
 
