@@ -1,0 +1,36 @@
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate bash --shims)" 2>/dev/null || true
+fi
+
+# UI 変更検出: src/views, src/widgets, src/theme, src/styles, src/components が変更された commit が含まれているか
+ui_changed=$(git diff origin/main...HEAD --name-only 2>/dev/null | grep -E '^src/(views|widgets|theme|styles|components)/' | head -1)
+
+if [ -z "$ui_changed" ]; then
+  exit 0
+fi
+
+# UI 変更あり → snapshot artifact が必要
+if [ ! -d ".playwright-snapshots" ] || [ -z "$(ls -A .playwright-snapshots 2>/dev/null)" ]; then
+  echo "❌ UI 変更が検出されたが .playwright-snapshots が空 or 存在しない"
+  echo "   先に dev server を起動 (\`pnpm dev\`) してから \`pnpm verify:ui\` を実行してください"
+  echo "   詳細: CLAUDE.md \`## AI 運用ルール\`"
+  exit 1
+fi
+
+# snapshot 鮮度チェック: 最新 snapshot が最終 commit 時刻より新しいか
+last_commit_ts=$(git log -1 --format=%ct HEAD)
+newest_snapshot=$(ls -t .playwright-snapshots/*.png 2>/dev/null | head -1)
+if [ -z "$newest_snapshot" ]; then
+  echo "❌ snapshot ファイルが見つかりません"
+  exit 1
+fi
+
+# stat: macOS は -f %m, Linux は -c %Y
+newest_ts=$(stat -f %m "$newest_snapshot" 2>/dev/null || stat -c %Y "$newest_snapshot" 2>/dev/null)
+if [ -z "$newest_ts" ] || [ "$newest_ts" -lt "$last_commit_ts" ]; then
+  echo "❌ UI 変更後の screenshot が古い (最終 commit より前のタイムスタンプ)"
+  echo "   再度 \`pnpm verify:ui\` を実行してください"
+  exit 1
+fi
+
+echo "✅ UI 変更 + verify:ui 実行確認 OK"
