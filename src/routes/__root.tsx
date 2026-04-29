@@ -3,9 +3,11 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
 import { ClerkProvider } from '@clerk/tanstack-react-start'
+import { ThemeProvider } from '@mui/material/styles'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
 import appCss from '~/styles/app.css?url'
+import { theme } from '~/theme'
 import { seo } from '~/utils/seo'
 
 export const Route = createRootRoute({
@@ -60,8 +62,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ClerkProvider>
-          {children}
-          <TanStackRouterDevtools position="bottom-right" />
+          <ThemeProvider theme={theme}>
+            {children}
+            <TanStackRouterDevtools position="bottom-right" />
+          </ThemeProvider>
         </ClerkProvider>
         <Scripts />
       </body>
