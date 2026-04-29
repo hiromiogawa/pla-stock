@@ -56,21 +56,14 @@ function KitRow({ kit }: KitRowProps) {
         <Link
           to="/kits/$kitId"
           params={{ kitId: kit.id }}
-          style={{
-            textDecoration: 'none',
-            color: 'inherit',
-            fontSize: '0.875rem',
-            transition: 'opacity 120ms ease',
-          }}
+          style={{ textDecoration: 'none', color: 'inherit' }}
         >
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.5}
-            sx={{ '&:hover': { opacity: 0.7 } }}
+          <Typography
+            variant="body2"
+            sx={{ transition: 'opacity 120ms ease', '&:hover': { opacity: 0.7 } }}
           >
-            <Typography variant="body2">{kit.name}</Typography>
-          </Stack>
+            {kit.name}
+          </Typography>
         </Link>
       </Box>
     </Box>
