@@ -257,3 +257,6 @@ pnpm verify:ui         # screenshot 撮影 → .playwright-snapshots/ に保存
 ```
 
 初回のみ chromium インストール: `pnpm exec playwright install chromium`
+
+**重要な制約**: 現状 verify:ui は **LandingView (`/`) のみ対象**。Clerk 認証 gate 配下 (`/dashboard` 等) は screenshot 不可。  
+**= verify:ui の OK = 「全画面 OK」ではない。** 認証 gate 内の dark mode / レイアウト / Action 配置は **controller がブラウザで目視確認** するか **ユーザーの screenshot を待つ** こと。LandingView だけで OK 判定するのは 2026-04-29 の失敗 (ai-failures.md 参照) と同じ過ち。

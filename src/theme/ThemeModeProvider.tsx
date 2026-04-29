@@ -79,6 +79,14 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
     return () => mediaQuery.removeEventListener('change', handler)
   }, [])
 
+  // mode 変更時に <html> の class を切替: shadcn / Tailwind の CSS 変数 (.dark)
+  // を活性化させ、MUI theme と並行で Tailwind 系も dark に追従させる。
+  // (Phase γ で Tailwind 完全撤去できたら本処理は不要)
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    document.documentElement.classList.toggle('dark', mode === 'dark')
+  }, [mode])
+
   const setMode = useCallback((next: ThemeMode) => {
     setModeState(next)
     if (typeof window !== 'undefined') {
