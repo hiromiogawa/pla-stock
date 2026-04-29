@@ -1,33 +1,65 @@
+/**
+ * Badge primitive (MUI v7 + Emotion 隔離方針)。
+ *
+ * shadcn 由来の API (variant prop, className 受領) を維持しつつ、
+ * 内部実装は MUI の `styled('span')` (from @mui/material/styles) で書換え。
+ *
+ * 関連: ADR-0002, CLAUDE.md `## デザイン規約 > Emotion 隔離方針`
+ */
 import * as React from 'react'
-import { cva, type VariantProps } from 'class-variance-authority'
+import { styled } from '@mui/material/styles'
 
-import { cn } from '~/shared/lib/utils'
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
 
-const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-  {
-    variants: {
-      variant: {
-        default: 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
-        secondary:
-          'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        destructive:
-          'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
-        outline: 'text-foreground',
-      },
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: BadgeVariant
+}
+
+const BadgeRoot = styled('span', {
+  shouldForwardProp: (prop) => prop !== 'variant',
+})<{ variant: BadgeVariant }>(({ theme, variant }) => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  borderRadius: 9999,
+  borderWidth: 1,
+  borderStyle: 'solid',
+  borderColor: 'transparent',
+  paddingInline: theme.spacing(2.5),
+  paddingBlock: theme.spacing(0.5),
+  fontSize: '0.75rem',
+  fontWeight: 600,
+  lineHeight: 1.4,
+  transition: theme.transitions.create(['background-color', 'color', 'border-color']),
+  ...(variant === 'default' && {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    '&:hover': {
+      backgroundColor: theme.palette.primary.dark,
     },
-    defaultVariants: {
-      variant: 'default',
+  }),
+  ...(variant === 'secondary' && {
+    backgroundColor: theme.palette.grey[200],
+    color: theme.palette.text.primary,
+    '&:hover': {
+      backgroundColor: theme.palette.grey[300],
     },
-  },
-)
+  }),
+  ...(variant === 'destructive' && {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+    '&:hover': {
+      backgroundColor: theme.palette.error.dark,
+    },
+  }),
+  ...(variant === 'outline' && {
+    backgroundColor: 'transparent',
+    color: theme.palette.text.primary,
+    borderColor: theme.palette.divider,
+  }),
+}))
 
-interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant }), className)} {...props} />
+function Badge({ variant = 'default', ...props }: BadgeProps) {
+  return <BadgeRoot variant={variant} {...props} />
 }
 
 export { Badge }
