@@ -1,13 +1,10 @@
 import { useState } from 'react'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 import { Button } from '~/shared/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '~/shared/ui/dialog'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
 import { Textarea } from '~/shared/ui/textarea'
@@ -46,12 +43,10 @@ export function PaintPurchaseDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onClose={() => onOpenChange(false)} fullWidth maxWidth="sm">
+      <DialogTitle>購入記録を追加</DialogTitle>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>購入記録を追加</DialogTitle>
-          <DialogDescription>「{paintLabel}」を 1 本購入して在庫に追加します。</DialogDescription>
-        </DialogHeader>
+        <DialogContentText>「{paintLabel}」を 1 本購入して在庫に追加します。</DialogContentText>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label htmlFor="purchasedAt">購入日</Label>
@@ -96,13 +91,13 @@ export function PaintPurchaseDialog({
             />
           </div>
         </div>
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            キャンセル
-          </Button>
-          <Button onClick={handleConfirm}>購入記録を追加</Button>
-        </DialogFooter>
       </DialogContent>
+      <DialogActions>
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          キャンセル
+        </Button>
+        <Button onClick={handleConfirm}>購入記録を追加</Button>
+      </DialogActions>
     </Dialog>
   )
 }

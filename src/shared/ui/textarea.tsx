@@ -1,21 +1,40 @@
-import * as React from 'react'
+/**
+ * Textarea primitive (MUI v7 + Emotion 隔離方針)。
+ *
+ * native `<textarea>` を MUI の `styled('textarea')` (from @mui/material/styles)
+ * で包んで theme token を適用する。
+ *
+ * 関連: ADR-0002, CLAUDE.md `## デザイン規約 > Emotion 隔離方針`
+ */
+import { styled } from '@mui/material/styles'
 
-import { cn } from '~/shared/lib/utils'
-
-const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'textarea'>>(
-  ({ className, ...props }, ref) => {
-    return (
-      <textarea
-        className={cn(
-          'flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-          className,
-        )}
-        ref={ref}
-        {...props}
-      />
-    )
+export const Textarea = styled('textarea')(({ theme }) => ({
+  display: 'flex',
+  minHeight: 80,
+  width: '100%',
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.text.primary,
+  paddingInline: theme.spacing(3),
+  paddingBlock: theme.spacing(2),
+  fontFamily: 'inherit',
+  fontSize: '0.875rem',
+  lineHeight: 1.5,
+  outline: 'none',
+  resize: 'vertical',
+  transition: theme.transitions.create(['border-color', 'box-shadow'], {
+    duration: theme.transitions.duration.shorter,
+  }),
+  '&:focus-visible': {
+    borderColor: theme.palette.primary.main,
+    boxShadow: `0 0 0 2px ${theme.palette.primary.main}33`,
   },
-)
-Textarea.displayName = 'Textarea'
-
-export { Textarea }
+  '&:disabled': {
+    cursor: 'not-allowed',
+    opacity: 0.5,
+  },
+  '&::placeholder': {
+    color: theme.palette.text.disabled,
+  },
+}))

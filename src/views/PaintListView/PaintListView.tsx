@@ -56,8 +56,8 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
             在庫塗料 {stocks.length} 件中 {rows.length} 件を表示 (count = 0 は非表示)
           </p>
         </div>
-        <Button asChild>
-          <Link to="/paints/new">+ 追加</Link>
+        <Button component={Link} to="/paints/new">
+          + 追加
         </Button>
       </div>
       <PaintFilterBar filters={filters} brands={brands} onChange={setFilters} />

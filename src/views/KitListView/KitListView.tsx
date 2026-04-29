@@ -49,8 +49,8 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
             在庫キット {stocks.length} 件中 {rows.length} 件を表示 (count = 0 は非表示)
           </p>
         </div>
-        <Button asChild>
-          <Link to="/kits/new">+ 在庫を追加</Link>
+        <Button component={Link} to="/kits/new">
+          + 在庫を追加
         </Button>
       </div>
       <KitFilterBar filters={filters} makers={makers} onChange={setFilters} />

@@ -8,6 +8,12 @@
     "vite",
     "@vitejs/plugin-react",
     "@cloudflare/vite-plugin",
-    "@tailwindcss/vite"
+    "@tailwindcss/vite",
+    "@radix-ui/react-slot",
+    "@radix-ui/react-label",
+    "@radix-ui/react-dialog",
+    "@radix-ui/react-select",
+    "class-variance-authority",
+    "lucide-react"
   ]
 }

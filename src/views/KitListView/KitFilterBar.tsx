@@ -1,6 +1,8 @@
+import FormControl from '@mui/material/FormControl'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 import type { Grade, Scale } from '~/entities/kit'
 import { Input } from '~/shared/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 export interface KitFilters {
   search: string
@@ -35,49 +37,43 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
         placeholder="名前で検索"
         className="md:col-span-3"
       />
-      <Select
-        value={filters.grade}
-        onValueChange={(v) => onChange({ ...filters, grade: v as KitFilters['grade'] })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="グレード" />
-        </SelectTrigger>
-        <SelectContent>
+      <FormControl fullWidth size="small">
+        <Select
+          value={filters.grade}
+          onChange={(e) => onChange({ ...filters, grade: e.target.value as KitFilters['grade'] })}
+        >
           {GRADES.map((g) => (
-            <SelectItem key={g} value={g}>
+            <MenuItem key={g} value={g}>
               {g === 'all' ? 'すべてのグレード' : g}
-            </SelectItem>
+            </MenuItem>
           ))}
-        </SelectContent>
-      </Select>
-      <Select
-        value={filters.scale}
-        onValueChange={(v) => onChange({ ...filters, scale: v as KitFilters['scale'] })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="スケール" />
-        </SelectTrigger>
-        <SelectContent>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <Select
+          value={filters.scale}
+          onChange={(e) => onChange({ ...filters, scale: e.target.value as KitFilters['scale'] })}
+        >
           {SCALES.map((s) => (
-            <SelectItem key={s} value={s}>
+            <MenuItem key={s} value={s}>
               {s === 'all' ? 'すべてのスケール' : s}
-            </SelectItem>
+            </MenuItem>
           ))}
-        </SelectContent>
-      </Select>
-      <Select value={filters.maker} onValueChange={(v) => onChange({ ...filters, maker: v })}>
-        <SelectTrigger>
-          <SelectValue placeholder="ブランド" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">すべてのブランド</SelectItem>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <Select
+          value={filters.maker}
+          onChange={(e) => onChange({ ...filters, maker: e.target.value as string })}
+        >
+          <MenuItem value="all">すべてのブランド</MenuItem>
           {makers.map((m) => (
-            <SelectItem key={m} value={m}>
+            <MenuItem key={m} value={m}>
               {m}
-            </SelectItem>
+            </MenuItem>
           ))}
-        </SelectContent>
-      </Select>
+        </Select>
+      </FormControl>
     </div>
   )
 }

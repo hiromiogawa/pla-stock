@@ -1,16 +1,15 @@
 import { useState } from 'react'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import FormControl from '@mui/material/FormControl'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 import type { PaintEventReason } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '~/shared/ui/dialog'
 import { Label } from '~/shared/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 import { Textarea } from '~/shared/ui/textarea'
 
 type ReleaseReason = Exclude<PaintEventReason, 'purchase'>
@@ -53,32 +52,28 @@ export function PaintReleaseDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onClose={() => onOpenChange(false)} fullWidth maxWidth="sm">
+      <DialogTitle>手放し記録を追加</DialogTitle>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>手放し記録を追加</DialogTitle>
-          <DialogDescription>
-            「{paintLabel}」を 1 本手放します。在庫が 1 減ります。
-          </DialogDescription>
-        </DialogHeader>
+        <DialogContentText>
+          「{paintLabel}」を 1 本手放します。在庫が 1 減ります。
+        </DialogContentText>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
             <Label htmlFor="reason">理由</Label>
-            <Select
-              value={values.reason}
-              onValueChange={(v) => setValues({ ...values, reason: v as ReleaseReason })}
-            >
-              <SelectTrigger id="reason">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
+            <FormControl fullWidth size="small">
+              <Select
+                id="reason"
+                value={values.reason}
+                onChange={(e) => setValues({ ...values, reason: e.target.value as ReleaseReason })}
+              >
                 {REASON_OPTIONS.map((o) => (
-                  <SelectItem key={o.value} value={o.value}>
+                  <MenuItem key={o.value} value={o.value}>
                     {o.label}
-                  </SelectItem>
+                  </MenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </Select>
+            </FormControl>
           </div>
           <div className="space-y-2">
             <Label htmlFor="note">メモ</Label>
@@ -90,15 +85,15 @@ export function PaintReleaseDialog({
             />
           </div>
         </div>
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            キャンセル
-          </Button>
-          <Button variant="destructive" onClick={handleConfirm}>
-            手放しを記録
-          </Button>
-        </DialogFooter>
       </DialogContent>
+      <DialogActions>
+        <Button variant="outline" onClick={() => onOpenChange(false)}>
+          キャンセル
+        </Button>
+        <Button variant="destructive" onClick={handleConfirm}>
+          手放しを記録
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }

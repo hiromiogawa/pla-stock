@@ -1,5 +1,4 @@
 import { SignInButton, SignUpButton } from '@clerk/tanstack-react-start'
-import MuiButton from '@mui/material/Button'
 import { Button } from '~/shared/ui/button'
 
 export function LandingView() {
@@ -22,13 +21,9 @@ export function LandingView() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <SignInButton mode="modal">
-              {/* Phase α spike: MUI Button (theme.palette.primary 適用確認用) */}
-              <MuiButton variant="contained" sx={{ minWidth: 120 }}>
-                ログイン
-              </MuiButton>
+              <Button sx={{ minWidth: 120 }}>ログイン</Button>
             </SignInButton>
             <SignUpButton mode="modal">
-              {/* shadcn Button (比較用、Phase β で置換予定) */}
               <Button variant="outline">サインアップ</Button>
             </SignUpButton>
           </div>

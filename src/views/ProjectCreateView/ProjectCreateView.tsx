@@ -30,11 +30,11 @@ export function ProjectCreateView({
         <div className="rounded-lg border border-border bg-card p-6 space-y-3">
           <p className="text-sm">在庫キットがありません。先にキットを追加してください。</p>
           <div className="flex gap-2">
-            <Button asChild>
-              <Link to="/kits/new">+ キットを追加</Link>
+            <Button component={Link} to="/kits/new">
+              + キットを追加
             </Button>
-            <Button variant="outline" asChild>
-              <Link to="/projects">プロジェクト一覧へ</Link>
+            <Button variant="outline" component={Link} to="/projects">
+              プロジェクト一覧へ
             </Button>
           </div>
         </div>
