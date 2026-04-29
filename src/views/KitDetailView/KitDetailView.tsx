@@ -92,7 +92,7 @@ export function KitDetailView({
           {kit.name}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {kit.grade} · {kit.scale} · {kit.maker}
+          {kit.grade} · {kit.scale}
         </Typography>
       </Stack>
 

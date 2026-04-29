@@ -22,9 +22,7 @@ const kits: Kit[] = [
     name: 'RX-78-2 Gundam',
     grade: 'HG',
     scale: '1/144',
-    maker: 'Bandai',
     retailPriceYen: 1100,
-    janCode: '4573102607317',
     boxArtUrl: null,
   },
   {
@@ -32,9 +30,7 @@ const kits: Kit[] = [
     name: "Char's Zaku II",
     grade: 'RG',
     scale: '1/144',
-    maker: 'Bandai',
     retailPriceYen: 2750,
-    janCode: '4573102612922',
     boxArtUrl: null,
   },
   {
@@ -42,9 +38,7 @@ const kits: Kit[] = [
     name: 'Sazabi Ver.Ka',
     grade: 'MG',
     scale: '1/100',
-    maker: 'Bandai',
     retailPriceYen: 11000,
-    janCode: '4573102609205',
     boxArtUrl: null,
   },
   {
@@ -52,9 +46,7 @@ const kits: Kit[] = [
     name: 'Unleashed RX-78-2 Gundam',
     grade: 'PG',
     scale: '1/60',
-    maker: 'Bandai',
     retailPriceYen: 27500,
-    janCode: '4573102624550',
     boxArtUrl: null,
   },
   {
@@ -62,9 +54,7 @@ const kits: Kit[] = [
     name: 'Strike Gundam',
     grade: 'EG',
     scale: '1/144',
-    maker: 'Bandai',
     retailPriceYen: 770,
-    janCode: '4573102591470',
     boxArtUrl: null,
   },
 ]

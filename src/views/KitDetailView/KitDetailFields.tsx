@@ -114,12 +114,10 @@ export function KitDetailFields({
             <FieldRow label="名前" value={kit.name} />
             <FieldRow label="グレード" value={kit.grade} />
             <FieldRow label="スケール" value={kit.scale} />
-            <FieldRow label="メーカー" value={kit.maker} />
             <FieldRow
               label="定価"
               value={kit.retailPriceYen != null ? `¥${kit.retailPriceYen.toLocaleString()}` : null}
             />
-            <FieldRow label="JAN コード" value={kit.janCode} />
           </Box>
         </Stack>
       </Section>

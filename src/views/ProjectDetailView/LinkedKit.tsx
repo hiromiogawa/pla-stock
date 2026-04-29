@@ -8,7 +8,7 @@ export function LinkedKit({ kit }: { kit: Kit }) {
       <Link to="/kits/$kitId" params={{ kitId: kit.id }} className="block hover:underline">
         <div className="text-sm font-medium">{kit.name}</div>
         <div className="text-xs text-muted-foreground mt-0.5">
-          {kit.grade} · {kit.scale} · {kit.maker}
+          {kit.grade} · {kit.scale}
         </div>
       </Link>
     </section>

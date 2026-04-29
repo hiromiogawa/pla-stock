@@ -31,14 +31,9 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
         }
         if (filters.grade !== 'all' && kit.grade !== filters.grade) return false
         if (filters.scale !== 'all' && kit.scale !== filters.scale) return false
-        if (filters.maker !== 'all' && kit.maker !== filters.maker) return false
         return true
       })
   }, [stocks, kitById, filters])
-
-  const makers = useMemo(() => {
-    return Array.from(new Set(kits.map((kit) => kit.maker))).sort()
-  }, [kits])
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
@@ -53,7 +48,7 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
           + 在庫を追加
         </Button>
       </div>
-      <KitFilterBar filters={filters} makers={makers} onChange={setFilters} />
+      <KitFilterBar filters={filters} onChange={setFilters} />
       <div className="md:hidden">
         <KitCardList rows={rows} />
       </div>

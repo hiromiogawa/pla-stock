@@ -12,15 +12,20 @@ export type Grade = 'HG' | 'RG' | 'EG' | 'MG' | 'PG' | 'other'
 
 export type Scale = '1/144' | '1/100' | '1/60' | '1/48' | 'other'
 
-/** Admin curated 公開カタログ master のキット定義 */
+/**
+ * Admin curated 公開カタログ master のキット定義。
+ *
+ * pla-stock のスコープは「ガンプラ (Bandai 製プラモ)」に限定するため、
+ * `maker` フィールドは削除 (常に Bandai と仮定)。
+ * バーコードスキャンも MVP では使わないため `janCode` も削除済。
+ * 将来 ことぶきや等他社プラモへ拡張する場合は再追加検討 (Issue #62 参照)。
+ */
 export interface Kit {
   id: string
   name: string
   grade: Grade
   scale: Scale
-  maker: string
   retailPriceYen: number | null
-  janCode: string | null
   boxArtUrl: string | null
 }
 

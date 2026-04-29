@@ -18,8 +18,6 @@ export function KitMasterCandidate({ kit, onSelect }: KitMasterCandidateProps) {
           </Badge>
           <span>·</span>
           <span>{kit.scale}</span>
-          <span>·</span>
-          <span>{kit.maker}</span>
         </div>
       </div>
       <Button onClick={onSelect}>在庫に追加</Button>
