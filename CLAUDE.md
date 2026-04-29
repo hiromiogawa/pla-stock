@@ -171,13 +171,14 @@ oxlint で機械強制（`*DetailView.tsx` / `*AddView.tsx` / `*CreateView.tsx` 
 export function useKitDetail(input: ...): ... { ... }
 ```
 
-### デザインシステム (ADR-0002)
+### デザインシステム (ADR-0002 / `docs/specs/2026-04-29-design-direction.md`)
 
 UI は **MUI v7 + Emotion** を採用。判断ルールは **Material Design 3** ガイドラインを参照する。
 
 - 公式 docs: https://m3.material.io/ (色 / typography / spacing / elevation / state layer の規約)
 - MUI docs: https://mui.com/material-ui/ (component の API / sx prop の書き方)
-- pla-stock のトーン: **道具感 (Linear / Notion 風)** = neutral / monochrome バリアント、彩度低め
+- pla-stock の方向性 (Tone / Differentiation 等) は **`docs/specs/2026-04-29-design-direction.md`** に確定 (Refined Minimalism + 塗料 color swatch 差別化、primary は M3 green)
+- UI 変更時は **`frontend-design` skill を invoke** して spec 方針との整合性確認
 
 判断時の優先順:
 1. M3 ガイドライン (色の意味論、コンポーネント階層)
