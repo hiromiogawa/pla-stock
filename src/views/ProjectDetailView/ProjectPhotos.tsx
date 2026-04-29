@@ -1,6 +1,10 @@
+import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { Plus, X } from 'lucide-react'
 import { useState } from 'react'
 import type { ProjectPhoto } from '~/entities/project'
-import { Button } from '~/shared/ui/button'
 import { AddPhotoDialog, type AddPhotoInput } from './AddPhotoDialog'
 
 interface ProjectPhotosProps {
@@ -13,37 +17,96 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
   const [showAddDialog, setShowAddDialog] = useState(false)
 
   return (
-    <section className="rounded-lg border border-border bg-card p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold">写真</h2>
-        <Button size="sm" variant="outline" onClick={() => setShowAddDialog(true)}>
-          + 写真を追加
-        </Button>
-      </div>
+    <Box
+      component="section"
+      sx={{
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        padding: 2,
+      }}
+    >
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.25 }}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          写真
+        </Typography>
+        <IconButton
+          size="small"
+          aria-label="写真を追加"
+          onClick={() => setShowAddDialog(true)}
+          sx={{ color: 'text.secondary' }}
+        >
+          <Plus size={16} strokeWidth={1.75} />
+        </IconButton>
+      </Stack>
       {photos.length === 0 ? (
-        <p className="text-xs text-muted-foreground">まだ写真がありません</p>
+        <Typography variant="caption" color="text.secondary">
+          まだ写真がありません
+        </Typography>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+            gap: 1.5,
+          }}
+        >
           {photos.map((photo) => (
-            <div key={photo.id} className="relative group">
-              <img
+            <Box
+              key={photo.id}
+              sx={{ position: 'relative', '&:hover .remove-overlay': { opacity: 1 } }}
+            >
+              <Box
+                component="img"
                 src={photo.url}
                 alt={photo.caption ?? ''}
-                className="w-full aspect-square object-cover rounded-md border border-border"
+                sx={{
+                  width: '100%',
+                  aspectRatio: '1',
+                  objectFit: 'cover',
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'divider',
+                  display: 'block',
+                }}
               />
               {photo.caption && (
-                <p className="text-xs text-muted-foreground mt-1 truncate">{photo.caption}</p>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    display: 'block',
+                    mt: 0.5,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {photo.caption}
+                </Typography>
               )}
-              <button
-                type="button"
+              <IconButton
+                className="remove-overlay"
+                size="small"
+                aria-label="写真を削除"
                 onClick={() => void onRemove(photo.id)}
-                className="absolute top-1 right-1 text-xs bg-destructive text-destructive-foreground rounded px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                sx={{
+                  position: 'absolute',
+                  top: 4,
+                  right: 4,
+                  bgcolor: 'background.paper',
+                  color: 'error.main',
+                  opacity: 0,
+                  transition: 'opacity 120ms ease',
+                  '&:hover': { bgcolor: 'background.paper' },
+                }}
               >
-                削除
-              </button>
-            </div>
+                <X size={14} strokeWidth={1.75} />
+              </IconButton>
+            </Box>
           ))}
-        </div>
+        </Box>
       )}
       <AddPhotoDialog
         open={showAddDialog}
@@ -53,6 +116,6 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
           setShowAddDialog(false)
         }}
       />
-    </section>
+    </Box>
   )
 }
