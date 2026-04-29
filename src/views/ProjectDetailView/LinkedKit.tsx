@@ -29,9 +29,7 @@ export function LinkedKit({ kit }: LinkedKitProps) {
         style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
       >
         <Stack
-          direction="row"
-          spacing={2}
-          alignItems="center"
+          spacing={1.5}
           sx={{
             padding: 1,
             margin: -1,
@@ -40,11 +38,11 @@ export function LinkedKit({ kit }: LinkedKitProps) {
             '&:hover': { backgroundColor: 'action.hover' },
           }}
         >
+          {/* 画像を一番上に配置 (full width)、image なし時は控えめな placeholder */}
           <Box
             sx={{
-              width: 56,
-              height: 56,
-              flexShrink: 0,
+              width: '100%',
+              aspectRatio: '16 / 9',
               borderRadius: 1,
               border: 1,
               borderColor: 'divider',
@@ -52,7 +50,7 @@ export function LinkedKit({ kit }: LinkedKitProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '0.625rem',
+              fontSize: '0.75rem',
               color: 'text.secondary',
               bgcolor: 'action.hover',
             }}
@@ -68,7 +66,7 @@ export function LinkedKit({ kit }: LinkedKitProps) {
               'No Image'
             )}
           </Box>
-          <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Box sx={{ minWidth: 0 }}>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {kit.name}
             </Typography>

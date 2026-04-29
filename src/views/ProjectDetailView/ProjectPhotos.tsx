@@ -1,4 +1,6 @@
 import Box from '@mui/material/Box'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
 import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -15,6 +17,8 @@ interface ProjectPhotosProps {
 
 export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
   const [showAddDialog, setShowAddDialog] = useState(false)
+  // 画像クリックで lightbox dialog 表示
+  const [lightboxPhoto, setLightboxPhoto] = useState<ProjectPhoto | null>(null)
 
   return (
     <Box
@@ -61,6 +65,7 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
                 component="img"
                 src={photo.url}
                 alt={photo.caption ?? ''}
+                onClick={() => setLightboxPhoto(photo)}
                 sx={{
                   width: '100%',
                   aspectRatio: '1',
@@ -69,6 +74,9 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
                   border: 1,
                   borderColor: 'divider',
                   display: 'block',
+                  cursor: 'zoom-in',
+                  transition: 'opacity 120ms ease',
+                  '&:hover': { opacity: 0.9 },
                 }}
               />
               {photo.caption && (
@@ -90,7 +98,10 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
                 className="remove-overlay"
                 size="small"
                 aria-label="写真を削除"
-                onClick={() => void onRemove(photo.id)}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  void onRemove(photo.id)
+                }}
                 sx={{
                   position: 'absolute',
                   top: 4,
@@ -116,6 +127,47 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
           setShowAddDialog(false)
         }}
       />
+      {/* Lightbox: 画像クリックで full-size 表示 */}
+      <Dialog
+        open={lightboxPhoto !== null}
+        onClose={() => setLightboxPhoto(null)}
+        maxWidth="lg"
+        fullWidth
+      >
+        {lightboxPhoto && (
+          <DialogContent sx={{ padding: 0, bgcolor: 'background.default', position: 'relative' }}>
+            <IconButton
+              size="small"
+              aria-label="閉じる"
+              onClick={() => setLightboxPhoto(null)}
+              sx={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                bgcolor: 'background.paper',
+                '&:hover': { bgcolor: 'background.paper' },
+              }}
+            >
+              <X size={16} strokeWidth={1.75} />
+            </IconButton>
+            <Box
+              component="img"
+              src={lightboxPhoto.url}
+              alt={lightboxPhoto.caption ?? ''}
+              sx={{ width: '100%', display: 'block' }}
+            />
+            {lightboxPhoto.caption && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ padding: 2, textAlign: 'center' }}
+              >
+                {lightboxPhoto.caption}
+              </Typography>
+            )}
+          </DialogContent>
+        )}
+      </Dialog>
     </Box>
   )
 }

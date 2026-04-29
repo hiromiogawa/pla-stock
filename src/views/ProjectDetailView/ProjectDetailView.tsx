@@ -88,24 +88,17 @@ export function ProjectDetailView({
         py: { xs: 3, md: 5 },
       }}
     >
-      {/* Navigation tier */}
+      {/* Navigation tier (icon only、tooltip で意味補完) */}
       <Box>
-        <Button
-          variant="ghost"
-          size="sm"
+        <IconButton
+          size="small"
+          aria-label="プロジェクト一覧へ戻る"
+          title="プロジェクト一覧へ戻る"
           onClick={handleBackToList}
-          sx={{
-            color: 'text.secondary',
-            paddingInlineStart: 0.5,
-            paddingInlineEnd: 1,
-            minWidth: 'unset',
-            gap: 0.75,
-            '&:hover': { color: 'text.primary' },
-          }}
+          sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
         >
-          <ArrowLeft size={16} strokeWidth={1.75} />
-          プロジェクト一覧へ
-        </Button>
+          <ArrowLeft size={20} strokeWidth={1.75} />
+        </IconButton>
       </Box>
 
       {/* Identification + secondary action (edit) */}

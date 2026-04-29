@@ -51,7 +51,20 @@ export function ProjectPaintUses({ paints, allPaints, onAdd, onRemove }: Project
           まだ塗料が追加されていません
         </Typography>
       ) : (
-        <Stack component="ul" spacing={1} sx={{ margin: 0, padding: 0, listStyle: 'none' }}>
+        <Box
+          component="ul"
+          sx={{
+            margin: 0,
+            padding: 0,
+            listStyle: 'none',
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+            gap: 1,
+            // 塗料数が増えた時 (20+) でも他 section を圧迫しないよう max-height + scroll
+            maxHeight: 320,
+            overflowY: 'auto',
+          }}
+        >
           {paints.map((paint) => (
             <Stack
               key={paint.id}
@@ -106,7 +119,7 @@ export function ProjectPaintUses({ paints, allPaints, onAdd, onRemove }: Project
               </IconButton>
             </Stack>
           ))}
-        </Stack>
+        </Box>
       )}
       <AddPaintDialog
         open={showAddDialog}
