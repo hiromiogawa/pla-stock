@@ -36,7 +36,7 @@ export function KitDetailView({
       <Stack
         spacing={2}
         sx={{
-          maxWidth: '768px',
+          maxWidth: '896px',
           mx: 'auto',
           px: { xs: 2, md: 4 },
           py: { xs: 5, md: 10 },
@@ -60,7 +60,7 @@ export function KitDetailView({
     <Stack
       spacing={3}
       sx={{
-        maxWidth: '768px',
+        maxWidth: '896px',
         mx: 'auto',
         px: { xs: 2, md: 4 },
         py: { xs: 3, md: 5 },

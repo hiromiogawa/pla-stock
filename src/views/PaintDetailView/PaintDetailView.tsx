@@ -30,7 +30,7 @@ export function PaintDetailView({
 }: PaintDetailViewProps) {
   if (!stock || !paint) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 md:px-8 text-center space-y-4">
+      <div className="max-w-4xl mx-auto px-4 py-10 md:px-8 text-center space-y-4">
         <h1 className="text-2xl font-bold">塗料が見つかりません</h1>
         <p className="text-sm text-muted-foreground">
           指定された paintId の塗料は存在しないか、在庫がありません。
@@ -43,7 +43,7 @@ export function PaintDetailView({
   const paintLabel = `${paint.brand} ${paint.code} ${paint.name}`
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
       <PaintDetailHeader
         paint={paint}
         stock={stock}

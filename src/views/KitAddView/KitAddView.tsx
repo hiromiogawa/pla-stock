@@ -16,7 +16,7 @@ export function KitAddView({
   handleStockSubmit,
 }: KitAddViewProps) {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">キットを在庫に追加</h1>

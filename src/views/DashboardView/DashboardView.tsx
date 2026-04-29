@@ -27,7 +27,7 @@ export function DashboardView({ stats }: DashboardViewProps) {
   ] as const
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-10">
+    <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold tracking-tight">こんにちは、{userName} さん</h1>
         <p className="text-sm text-muted-foreground mt-1">

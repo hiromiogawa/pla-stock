@@ -49,7 +49,7 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
   }, [paints])
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">塗料</h1>
