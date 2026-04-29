@@ -44,9 +44,8 @@ interface KitRowProps {
   kit: Kit
 }
 
-// kit は別 entity だが「このプロジェクトで何を作っているか」は
-// プロジェクト情報の一部として扱う方が読み手の認知負荷が低いため、
-// 独立 section ではなく dl 内に同居させる。
+// 使用キットは「どのキットを作っているか」の identity 情報のみで十分。
+// grade / scale は kit detail で確認できる二次情報。
 function KitRow({ kit }: KitRowProps) {
   return (
     <Box sx={fieldRowSx}>
@@ -57,21 +56,20 @@ function KitRow({ kit }: KitRowProps) {
         <Link
           to="/kits/$kitId"
           params={{ kitId: kit.id }}
-          style={{ textDecoration: 'none', color: 'inherit', display: 'inline-block' }}
+          style={{
+            textDecoration: 'none',
+            color: 'inherit',
+            fontSize: '0.875rem',
+            transition: 'opacity 120ms ease',
+          }}
         >
           <Stack
-            spacing={0.25}
-            sx={{
-              transition: 'opacity 120ms ease',
-              '&:hover': { opacity: 0.7 },
-            }}
+            direction="row"
+            alignItems="center"
+            spacing={0.5}
+            sx={{ '&:hover': { opacity: 0.7 } }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {kit.name}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {kit.grade} · {kit.scale}
-            </Typography>
+            <Typography variant="body2">{kit.name}</Typography>
           </Stack>
         </Link>
       </Box>
