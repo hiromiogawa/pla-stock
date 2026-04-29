@@ -17,22 +17,23 @@
  * pla-stock では neutral 中心、primary も neutral 寄り (彩度低)。
  */
 export const tonalPalettes = {
-  // primary = M3 green tonal palette (低彩度寄り、Refined Minimalism と整合)
-  // 模型趣味の道具感をわずかに加味して緑系。主役は塗料 swatch、UI は控えめ。
+  // primary = sage 系 muted green (Refined Minimalism に整合)
+  // 模型趣味の道具感をわずかに加味して緑系、ただし vivid にせず控えめ。
+  // 主役は塗料 swatch、UI 自体は無彩色寄り。
   // 詳細: docs/specs/2026-04-29-design-direction.md
   primary: {
     0: '#000000',
-    10: '#002106',
-    20: '#003910',
-    30: '#00531a',
-    40: '#006e25',
-    50: '#1a8a30',
-    60: '#3aa54a',
-    70: '#5cc065',
-    80: '#7edc81',
-    90: '#9bf99c',
-    95: '#c8ffc6',
-    99: '#f6fff5',
+    10: '#0f1a12',
+    20: '#1f2e22',
+    30: '#314434',
+    40: '#4a6651',
+    50: '#5e7d65',
+    60: '#7b977f',
+    70: '#9bb19c',
+    80: '#bccdbb',
+    90: '#dde7db',
+    95: '#edf2eb',
+    99: '#f9fbf7',
     100: '#ffffff',
   },
   // neutral = pure grey (背景・境界・本文)

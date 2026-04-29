@@ -1,6 +1,5 @@
 import { UserButton } from '@clerk/tanstack-react-start'
 import Box from '@mui/material/Box'
-import ListItemButton from '@mui/material/ListItemButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
@@ -41,7 +40,7 @@ export function Sidebar() {
           pla-stock
         </Typography>
       </Box>
-      <Stack component="nav" spacing={0.25} sx={{ flex: 1, px: 1.5, py: 2 }}>
+      <Stack component="nav" spacing={0} sx={{ flex: 1, px: 1, py: 1 }}>
         {APP_NAV_ITEMS.map((item) =>
           item.disabled ? (
             <Box
@@ -52,8 +51,8 @@ export function Sidebar() {
               sx={{
                 display: 'block',
                 px: 1.5,
-                py: 1,
-                fontSize: 'body2.fontSize',
+                py: 0.75,
+                fontSize: '0.875rem',
                 color: 'text.disabled',
                 cursor: 'not-allowed',
               }}
@@ -61,25 +60,34 @@ export function Sidebar() {
               {item.label}
             </Box>
           ) : (
-            <ListItemButton
+            <Box
               key={item.key}
               component={Link}
               to={item.to}
-              sx={(theme) => ({
-                borderRadius: 1,
-                minHeight: 'unset',
+              sx={{
+                display: 'block',
                 px: 1.5,
-                py: 1,
-                fontSize: theme.typography.body2.fontSize,
+                py: 0.75,
+                borderRadius: 0.75,
+                fontSize: '0.875rem',
                 fontWeight: 500,
+                color: 'text.secondary',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 120ms, color 120ms',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                  color: 'text.primary',
+                },
                 '&.active': {
-                  backgroundColor: theme.palette.action.selected,
+                  backgroundColor: 'action.selected',
+                  color: 'text.primary',
                   fontWeight: 600,
                 },
-              })}
+              }}
             >
               {item.label}
-            </ListItemButton>
+            </Box>
           ),
         )}
       </Stack>
