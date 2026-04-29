@@ -244,3 +244,6 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 - **UI を変更する PR は controller 自身が Playwright で screenshot 検証する** (subagent の DONE 報告だけで PR 作成しない)
 - **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
 - **新規ライブラリ採用は ADR 起票必須** (`docs/adr/`)
+- **UI コード変更前 (`.tsx` の styling / sx prop / 新規 component) は必ず `frontend-design` skill を invoke する**
+  - 特に「**見た目に対する feedback**」(例: 「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず**、まず skill で Design Thinking (Tone / Differentiation / Constraints) を再適用する
+  - spec (`docs/specs/2026-04-29-design-direction.md`) は方針、skill は **その実装局面での craft 適用ガイド**。両方必須
