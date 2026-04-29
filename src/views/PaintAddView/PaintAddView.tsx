@@ -1,40 +1,20 @@
-import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import type { Paint } from '~/entities/paint'
-import { addPaintEvent } from '~/entities/paint'
-import type { PaintPurchaseEventInput } from '~/features/paint-stock-add'
 import { Button } from '~/shared/ui/button'
 import { PaintSearchPhase } from './PaintSearchPhase'
 import { PaintStockForm } from './PaintStockForm'
+import type { UsePaintAddReturn } from './usePaintAdd'
 
-type Phase = { kind: 'search' } | { kind: 'add-stock'; paint: Paint }
-
-interface PaintAddViewProps {
+interface PaintAddViewProps extends UsePaintAddReturn {
   paints: Paint[]
-  userId: string
 }
 
-export function PaintAddView({ paints, userId }: PaintAddViewProps) {
-  const navigate = useNavigate()
-  const [phase, setPhase] = useState<Phase>({ kind: 'search' })
-
-  const handleStockSubmit = async (paintId: string, values: PaintPurchaseEventInput) => {
-    await addPaintEvent({
-      userId,
-      paintId,
-      delta: 1,
-      reason: 'purchase',
-      purchasedAt: values.purchasedAt ?? null,
-      priceYen: values.purchasePriceYen ?? null,
-      purchaseLocation: values.purchaseLocation ?? null,
-      note: values.note ?? null,
-    })
-    void navigate({
-      to: '/paints/$paintId',
-      params: { paintId },
-    })
-  }
-
+export function PaintAddView({
+  paints,
+  phase,
+  goToSearch,
+  selectPaint,
+  handleStockSubmit,
+}: PaintAddViewProps) {
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
       <div className="flex items-start justify-between gap-3">
@@ -45,24 +25,19 @@ export function PaintAddView({ paints, userId }: PaintAddViewProps) {
           </p>
         </div>
         {phase.kind !== 'search' && (
-          <Button variant="outline" onClick={() => setPhase({ kind: 'search' })}>
+          <Button variant="outline" onClick={goToSearch}>
             検索に戻る
           </Button>
         )}
       </div>
 
-      {phase.kind === 'search' && (
-        <PaintSearchPhase
-          paints={paints}
-          onSelectMaster={(paint) => setPhase({ kind: 'add-stock', paint })}
-        />
-      )}
+      {phase.kind === 'search' && <PaintSearchPhase paints={paints} onSelectMaster={selectPaint} />}
 
       {phase.kind === 'add-stock' && (
         <PaintStockForm
           paint={phase.paint}
           onSubmit={(values) => handleStockSubmit(phase.paint.id, values)}
-          onCancel={() => setPhase({ kind: 'search' })}
+          onCancel={goToSearch}
         />
       )}
     </div>

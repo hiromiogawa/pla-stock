@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getPaints } from '~/entities/paint'
 import { PaintAddView } from '~/views/PaintAddView'
+import { usePaintAdd } from '~/views/PaintAddView/usePaintAdd'
 
 export const Route = createFileRoute('/_auth/paints/new')({
   loader: async ({ context }) => {
@@ -13,5 +14,6 @@ export const Route = createFileRoute('/_auth/paints/new')({
 
 function PaintAddRoute() {
   const { paints, userId } = Route.useLoaderData()
-  return <PaintAddView paints={paints} userId={userId} />
+  const hookProps = usePaintAdd({ userId })
+  return <PaintAddView paints={paints} {...hookProps} />
 }
