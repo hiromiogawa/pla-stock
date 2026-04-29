@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import FormControl from '@mui/material/FormControl'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 import type { Project, ProjectStatus } from '~/entities/project'
 import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
 import { Textarea } from '~/shared/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 export interface ProjectEditValues {
   name: string
@@ -78,18 +80,19 @@ export function ProjectEditForm({ project, onSave, onCancel }: ProjectEditFormPr
       </div>
       <div className="space-y-2">
         <Label htmlFor="edit-status">ステータス</Label>
-        <Select value={status} onValueChange={(v) => setStatus(v as ProjectStatus)}>
-          <SelectTrigger id="edit-status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
+        <FormControl fullWidth size="small">
+          <Select
+            id="edit-status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as ProjectStatus)}
+          >
             {STATUS_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>
+              <MenuItem key={opt.value} value={opt.value}>
                 {opt.label}
-              </SelectItem>
+              </MenuItem>
             ))}
-          </SelectContent>
-        </Select>
+          </Select>
+        </FormControl>
       </div>
       <div className="space-y-2">
         <Label htmlFor="edit-startedAt">開始日</Label>

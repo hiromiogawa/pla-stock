@@ -1,7 +1,9 @@
+import FormControl from '@mui/material/FormControl'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 import type { ColorFamily, FinishType } from '~/entities/paint'
 import { COLOR_FAMILY_VALUES, FINISH_TYPE_VALUES } from '~/entities/paint'
 import { Input } from '~/shared/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 export interface PaintFilters {
   search: string
@@ -36,51 +38,47 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
         placeholder="名前 / コードで検索"
         className="md:col-span-3"
       />
-      <Select value={filters.brand} onValueChange={(v) => onChange({ ...filters, brand: v })}>
-        <SelectTrigger>
-          <SelectValue placeholder="ブランド" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">すべてのブランド</SelectItem>
+      <FormControl fullWidth size="small">
+        <Select
+          value={filters.brand}
+          onChange={(e) => onChange({ ...filters, brand: e.target.value as string })}
+        >
+          <MenuItem value="all">すべてのブランド</MenuItem>
           {brands.map((b) => (
-            <SelectItem key={b} value={b}>
+            <MenuItem key={b} value={b}>
               {b}
-            </SelectItem>
+            </MenuItem>
           ))}
-        </SelectContent>
-      </Select>
-      <Select
-        value={filters.colorFamily}
-        onValueChange={(v) =>
-          onChange({ ...filters, colorFamily: v as PaintFilters['colorFamily'] })
-        }
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="色系統" />
-        </SelectTrigger>
-        <SelectContent>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <Select
+          value={filters.colorFamily}
+          onChange={(e) =>
+            onChange({ ...filters, colorFamily: e.target.value as PaintFilters['colorFamily'] })
+          }
+        >
           {COLOR_FAMILIES.map((c) => (
-            <SelectItem key={c} value={c}>
+            <MenuItem key={c} value={c}>
               {c === 'all' ? 'すべての色系統' : c}
-            </SelectItem>
+            </MenuItem>
           ))}
-        </SelectContent>
-      </Select>
-      <Select
-        value={filters.finishType}
-        onValueChange={(v) => onChange({ ...filters, finishType: v as PaintFilters['finishType'] })}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="フィニッシュ" />
-        </SelectTrigger>
-        <SelectContent>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <Select
+          value={filters.finishType}
+          onChange={(e) =>
+            onChange({ ...filters, finishType: e.target.value as PaintFilters['finishType'] })
+          }
+        >
           {FINISH_TYPES.map((f) => (
-            <SelectItem key={f} value={f}>
+            <MenuItem key={f} value={f}>
               {f === 'all' ? 'すべてのフィニッシュ' : f}
-            </SelectItem>
+            </MenuItem>
           ))}
-        </SelectContent>
-      </Select>
+        </Select>
+      </FormControl>
     </div>
   )
 }

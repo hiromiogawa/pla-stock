@@ -1,11 +1,13 @@
 import { useForm } from '@tanstack/react-form'
+import FormControl from '@mui/material/FormControl'
+import MenuItem from '@mui/material/MenuItem'
+import Select from '@mui/material/Select'
 import type { Kit } from '~/entities/kit'
 import { projectAddSchema, type ProjectAddInput } from '~/features/project-add'
 import { Button } from '~/shared/ui/button'
 import { Input } from '~/shared/ui/input'
 import { Label } from '~/shared/ui/label'
 import { Textarea } from '~/shared/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/shared/ui/select'
 
 interface ProjectCreateFormProps {
   /** count > 0 の自分の在庫キットだけを渡す (空配列なら view 側で empty state を出す前提) */
@@ -58,18 +60,29 @@ export function ProjectCreateForm({
         {(field) => (
           <div className="space-y-2">
             <Label htmlFor={field.name}>キット *</Label>
-            <Select value={field.state.value} onValueChange={(v) => field.handleChange(v)}>
-              <SelectTrigger id={field.name}>
-                <SelectValue placeholder="在庫キットから選択" />
-              </SelectTrigger>
-              <SelectContent>
+            <FormControl fullWidth size="small">
+              <Select
+                id={field.name}
+                value={field.state.value}
+                displayEmpty
+                onChange={(e) => field.handleChange(e.target.value as string)}
+                renderValue={(selected) => {
+                  if (!selected) {
+                    return <span style={{ color: 'rgba(0,0,0,0.45)' }}>在庫キットから選択</span>
+                  }
+                  const kit = selectableKits.find((k) => k.id === selected)
+                  return kit
+                    ? `${kit.name}（${kit.grade} · ${kit.scale}） 在庫: ${stockCountByKitId[kit.id] ?? 0}`
+                    : (selected as string)
+                }}
+              >
                 {selectableKits.map((kit) => (
-                  <SelectItem key={kit.id} value={kit.id}>
+                  <MenuItem key={kit.id} value={kit.id}>
                     {kit.name}（{kit.grade} · {kit.scale}） 在庫: {stockCountByKitId[kit.id] ?? 0}
-                  </SelectItem>
+                  </MenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </Select>
+            </FormControl>
           </div>
         )}
       </form.Field>
