@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { getKits, getKitStocksWithStock } from '~/entities/kit'
 import { ProjectCreateView } from '~/views/ProjectCreateView'
+import { useProjectCreate } from '~/views/ProjectCreateView/useProjectCreate'
 
 export const Route = createFileRoute('/_auth/projects/new')({
   loader: async ({ context }) => {
@@ -27,11 +28,12 @@ export const Route = createFileRoute('/_auth/projects/new')({
 
 function ProjectCreateRoute() {
   const { selectableKits, stockCountByKitId, userId } = Route.useLoaderData()
+  const hookProps = useProjectCreate({ userId })
   return (
     <ProjectCreateView
       selectableKits={selectableKits}
       stockCountByKitId={stockCountByKitId}
-      userId={userId}
+      {...hookProps}
     />
   )
 }
