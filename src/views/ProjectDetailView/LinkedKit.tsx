@@ -38,11 +38,12 @@ export function LinkedKit({ kit }: LinkedKitProps) {
             '&:hover': { backgroundColor: 'action.hover' },
           }}
         >
-          {/* 画像を一番上に配置 (full width)、image なし時は控えめな placeholder */}
+          {/* 画像を上部に配置 (compact、controlled max-width で大きすぎないように) */}
           <Box
             sx={{
               width: '100%',
-              aspectRatio: '16 / 9',
+              maxWidth: 240,
+              aspectRatio: '4 / 3',
               borderRadius: 1,
               border: 1,
               borderColor: 'divider',

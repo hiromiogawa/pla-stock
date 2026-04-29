@@ -148,38 +148,25 @@ export function ProjectDetailView({
       {/* 写真 (section action: 追加) */}
       <ProjectPhotos photos={photos} onAdd={handleAddPhoto} onRemove={handleRemovePhoto} />
 
-      {/* Tertiary action: Danger Zone */}
+      {/* Tertiary action: 控えめな削除リンク (Refined Minimalism = Danger Zone は重くしない) */}
       {!editing && (
-        <Box
-          sx={{
-            borderRadius: 2,
-            border: 1,
-            borderColor: 'error.main',
-            bgcolor: 'background.paper',
-            padding: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 2,
-          }}
-        >
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'error.main' }}>
-              プロジェクトを削除
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              関連する塗料リンク・写真も cascade 削除されます。元に戻せません。
-            </Typography>
-          </Box>
-          <IconButton
-            size="small"
-            aria-label="プロジェクトを削除"
+        <Stack direction="row" justifyContent="flex-end" sx={{ pt: 2 }}>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setShowDeleteDialog(true)}
-            sx={{ color: 'error.main', flexShrink: 0 }}
+            sx={{
+              color: 'error.main',
+              gap: 0.75,
+              minWidth: 'unset',
+              paddingInline: 1,
+              '&:hover': { color: 'error.dark', backgroundColor: 'action.hover' },
+            }}
           >
-            <Trash2 size={16} strokeWidth={1.75} />
-          </IconButton>
-        </Box>
+            <Trash2 size={14} strokeWidth={1.75} />
+            プロジェクトを削除
+          </Button>
+        </Stack>
       )}
 
       <ProjectDeleteDialog
