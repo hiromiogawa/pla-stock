@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
+import { useSnackbar } from 'notistack'
 import type { Project } from '~/entities/project'
 import {
   addProjectPaintUse,
@@ -41,6 +42,7 @@ export interface UseProjectDetailReturn {
  * - 写真の追加・削除 (addProjectPhoto / deleteProjectPhoto)
  * - mutation 後は router.invalidate() で loader 再実行 → 最新 paints/photos を再取得
  * - 削除成功時は一覧へ navigation
+ * - mutation 失敗 / null 戻り時は Snackbar (notistack) で error 通知
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用は持たない (#43 ルール)。
@@ -48,6 +50,7 @@ export interface UseProjectDetailReturn {
 export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetailReturn {
   const navigate = useNavigate()
   const router = useRouter()
+  const { enqueueSnackbar } = useSnackbar()
   const [editing, setEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
@@ -65,10 +68,10 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
         setEditing(false)
         await router.invalidate()
       } else {
-        console.warn('updateProject returned null')
+        enqueueSnackbar('プロジェクトの更新に失敗しました', { variant: 'error' })
       }
     },
-    [project, userId, router],
+    [project, userId, router, enqueueSnackbar],
   )
 
   const handleDelete = useCallback(async () => {
@@ -77,9 +80,9 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
     if (ok) {
       void navigate({ to: '/projects' })
     } else {
-      console.warn('deleteProject returned false')
+      enqueueSnackbar('プロジェクトの削除に失敗しました', { variant: 'error' })
     }
-  }, [project, userId, navigate])
+  }, [project, userId, navigate, enqueueSnackbar])
 
   const handleAddPaint = useCallback(
     async (paintId: string) => {

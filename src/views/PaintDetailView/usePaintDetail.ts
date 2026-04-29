@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
+import { useSnackbar } from 'notistack'
 import type { Paint, PaintStock } from '~/entities/paint'
 import { addPaintEvent } from '~/entities/paint'
 import type { PaintPurchaseValues } from './PaintPurchaseDialog'
@@ -30,6 +31,7 @@ export interface UsePaintDetailReturn {
  * - 出庫記録: addPaintEvent({ delta: -1, reason: <release reason> })
  * - mutation 後は router.invalidate() で loader 再実行 → 最新 stock/events を再取得
  * - 一覧へ戻る navigation
+ * - mutation 失敗時は Snackbar (notistack) で error 通知
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用は持たない (#43 ルール)。
@@ -37,6 +39,7 @@ export interface UsePaintDetailReturn {
 export function usePaintDetail(input: UsePaintDetailInput): UsePaintDetailReturn {
   const navigate = useNavigate()
   const router = useRouter()
+  const { enqueueSnackbar } = useSnackbar()
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)
   const [showReleaseDialog, setShowReleaseDialog] = useState(false)
 
@@ -59,10 +62,13 @@ export function usePaintDetail(input: UsePaintDetailInput): UsePaintDetailReturn
         setShowPurchaseDialog(false)
         await router.invalidate()
       } catch (err) {
-        console.warn('addPaintEvent (purchase) failed', err)
+        enqueueSnackbar(
+          `塗料の購入記録に失敗しました: ${err instanceof Error ? err.message : String(err)}`,
+          { variant: 'error' },
+        )
       }
     },
-    [paint, userId, router],
+    [paint, userId, router, enqueueSnackbar],
   )
 
   const handleRelease = useCallback(
@@ -79,10 +85,13 @@ export function usePaintDetail(input: UsePaintDetailInput): UsePaintDetailReturn
         setShowReleaseDialog(false)
         await router.invalidate()
       } catch (err) {
-        console.warn('addPaintEvent (release) failed', err)
+        enqueueSnackbar(
+          `塗料の出庫記録に失敗しました: ${err instanceof Error ? err.message : String(err)}`,
+          { variant: 'error' },
+        )
       }
     },
-    [paint, userId, router],
+    [paint, userId, router, enqueueSnackbar],
   )
 
   const handleBackToList = useCallback(() => {
