@@ -170,3 +170,31 @@ oxlint で機械強制（`*DetailView.tsx` / `*AddView.tsx` / `*CreateView.tsx` 
  */
 export function useKitDetail(input: ...): ... { ... }
 ```
+
+### デザインシステム (ADR-0002)
+
+UI は **MUI v7 + Emotion** を採用。判断ルールは **Material Design 3** ガイドラインを参照する。
+
+- 公式 docs: https://m3.material.io/ (色 / typography / spacing / elevation / state layer の規約)
+- MUI docs: https://mui.com/material-ui/ (component の API / sx prop の書き方)
+- pla-stock のトーン: **道具感 (Linear / Notion 風)** = neutral / monochrome バリアント、彩度低め
+
+判断時の優先順:
+1. M3 ガイドライン (色の意味論、コンポーネント階層)
+2. MUI docs (具体 API)
+3. `src/theme/tokens.ts` (M3 準拠の token 実体)
+
+### Emotion 隔離方針 (#43-style 機械強制)
+
+MUI v7 は内部 engine に Emotion を使うが、**user code は MUI 抽象しか触らない**。将来 Pigment CSS 等への engine 切替時に user code 書換を最小化するため。
+
+| ルール | 内容 |
+|---|---|
+| 1 | styling は MUI の `sx` prop で |
+| 2 | `styled()` は `@mui/material/styles` から (NEVER `@emotion/styled`) |
+| 3 | `@emotion/*` の直接 import 禁止 (oxlint 機械強制) |
+| 4 | theme tokens は `src/theme/` に集約 (engine 非依存の plain TS object) |
+| 5 | `createTheme()` 引数は M3 schema 準拠 |
+| 6 | `<ThemeProvider>` は `@mui/material/styles` から (NEVER `@emotion/react`) |
+
+ルール 3 は `lint-config/oxlint-emotion-isolation.jsonc` で `no-restricted-imports` 強制。違反すると pre-commit / CI で reject。

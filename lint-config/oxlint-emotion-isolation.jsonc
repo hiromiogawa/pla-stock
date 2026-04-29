@@ -1,0 +1,43 @@
+// ============================================================================
+// oxlint-emotion-isolation.jsonc — Emotion 直接 import 禁止
+// ----------------------------------------------------------------------------
+// 役割:
+//   MUI v7 は Emotion を内部 engine に持つ。user code は MUI 抽象 (sx prop /
+//   styled from @mui/material/styles / ThemeProvider from @mui/material/styles)
+//   経由でのみ styling すること。
+//
+//   将来 Pigment CSS や別 engine に MUI が乗り換える際、user code の書換を
+//   最小化するために Emotion 依存を機械強制で隔離する。
+//
+// 戦略:
+//   - 戦略 1: styling は sx prop で
+//   - 戦略 2: styled() は @mui/material/styles から
+//   - 戦略 3: @emotion/* の import を禁止 (本ファイル)
+//   - 戦略 6: ThemeProvider は MUI 経由
+//
+// 関連:
+//   - ADR-0002 (MUI v7 + Emotion 採用、Emotion 隔離戦略)
+//   - CLAUDE.md `## デザイン規約 > Emotion 隔離方針`
+// ============================================================================
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+
+  "overrides": [
+    {
+      "files": ["src/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@emotion/*"],
+                "message": "Emotion は MUI 経由で使うこと。@emotion/* の直接 import は禁止 (将来 Pigment CSS 等に MUI が乗り換える際の影響範囲を最小化)。styling は sx prop、styled() は @mui/material/styles、ThemeProvider は @mui/material/styles から。"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
