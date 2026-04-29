@@ -10,14 +10,23 @@ interface PaintStockFormProps {
   onCancel: () => void
 }
 
+interface PaintStockFormDefaults {
+  purchasedAt: string
+  purchasePriceYen: string | number | null
+  purchaseLocation: string
+  note: string
+}
+
+const PAINT_STOCK_FORM_DEFAULTS: PaintStockFormDefaults = {
+  purchasedAt: '',
+  purchasePriceYen: '',
+  purchaseLocation: '',
+  note: '',
+}
+
 export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProps) {
   const form = useForm({
-    defaultValues: {
-      purchasedAt: '',
-      purchasePriceYen: '' as string | number | null,
-      purchaseLocation: '',
-      note: '',
-    },
+    defaultValues: PAINT_STOCK_FORM_DEFAULTS,
     onSubmit: async ({ value }) => {
       const parsed = paintPurchaseEventSchema.parse({
         purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,

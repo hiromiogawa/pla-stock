@@ -11,9 +11,9 @@ interface PaintSearchPhaseProps {
 export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhaseProps) {
   const [query, setQuery] = useState('')
 
-  const candidates = useMemo(() => {
+  const candidates = useMemo<Paint[]>(() => {
     const q = query.trim().toLowerCase()
-    if (q === '') return [] as Paint[]
+    if (q === '') return []
     return paints
       .filter((p) => {
         return (
@@ -25,6 +25,33 @@ export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhasePro
       .slice(0, 30)
   }, [paints, query])
 
+  function renderResults() {
+    if (query.trim() === '') {
+      return (
+        <p className="text-sm text-muted-foreground">
+          キーワードを入力してマスターから検索してください。
+        </p>
+      )
+    }
+    if (candidates.length === 0) {
+      return (
+        <p className="text-sm text-muted-foreground">
+          「{query}」に一致する塗料が見つかりませんでした。マスターに無い塗料は admin
+          に申請してください (Phase E 以降の機能)。
+        </p>
+      )
+    }
+    return (
+      <ul className="space-y-2">
+        {candidates.map((paint) => (
+          <li key={paint.id}>
+            <PaintMasterCandidate paint={paint} onSelect={() => onSelectMaster(paint)} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border bg-card p-4 space-y-3">
@@ -35,24 +62,7 @@ export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhasePro
           placeholder="ブランド / コード / 名前で検索 (例: Mr.Color, C1, ホワイト)"
           autoFocus
         />
-        {query.trim() === '' ? (
-          <p className="text-sm text-muted-foreground">
-            キーワードを入力してマスターから検索してください。
-          </p>
-        ) : candidates.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            「{query}」に一致する塗料が見つかりませんでした。マスターに無い塗料は admin
-            に申請してください (Phase E 以降の機能)。
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {candidates.map((paint) => (
-              <li key={paint.id}>
-                <PaintMasterCandidate paint={paint} onSelect={() => onSelectMaster(paint)} />
-              </li>
-            ))}
-          </ul>
-        )}
+        {renderResults()}
       </div>
     </div>
   )

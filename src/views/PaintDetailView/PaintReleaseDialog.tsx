@@ -22,6 +22,14 @@ const REASON_OPTIONS: Array<{ value: ReleaseReason; label: string }> = [
   { value: 'other', label: 'その他' },
 ]
 
+/** runtime narrowing: 想定外の値が来たら 'discard' に fallback */
+function toReleaseReason(v: string): ReleaseReason {
+  for (const o of REASON_OPTIONS) {
+    if (o.value === v) return o.value
+  }
+  return 'discard'
+}
+
 export interface PaintReleaseValues {
   reason: ReleaseReason
   note: string | null
@@ -62,10 +70,12 @@ export function PaintReleaseDialog({
           <div className="space-y-2">
             <Label htmlFor="reason">理由</Label>
             <FormControl fullWidth size="small">
-              <Select
+              <Select<ReleaseReason>
                 id="reason"
                 value={values.reason}
-                onChange={(e) => setValues({ ...values, reason: e.target.value as ReleaseReason })}
+                onChange={(e) =>
+                  setValues({ ...values, reason: toReleaseReason(String(e.target.value)) })
+                }
               >
                 {REASON_OPTIONS.map((o) => (
                   <MenuItem key={o.value} value={o.value}>

@@ -11,11 +11,38 @@ interface KitSearchPhaseProps {
 export function KitSearchPhase({ kits, onSelectMaster }: KitSearchPhaseProps) {
   const [query, setQuery] = useState('')
 
-  const candidates = useMemo(() => {
+  const candidates = useMemo<Kit[]>(() => {
     const q = query.trim().toLowerCase()
-    if (q === '') return [] as Kit[]
+    if (q === '') return []
     return kits.filter((k) => k.name.toLowerCase().includes(q)).slice(0, 20)
   }, [kits, query])
+
+  function renderResults() {
+    if (query.trim() === '') {
+      return (
+        <p className="text-sm text-muted-foreground">
+          キーワードを入力してマスターから検索してください。
+        </p>
+      )
+    }
+    if (candidates.length === 0) {
+      return (
+        <p className="text-sm text-muted-foreground">
+          「{query}」に一致するキットが見つかりませんでした。マスターに無いキットは admin
+          に申請してください (Phase E 以降の機能)。
+        </p>
+      )
+    }
+    return (
+      <ul className="space-y-2">
+        {candidates.map((kit) => (
+          <li key={kit.id}>
+            <KitMasterCandidate kit={kit} onSelect={() => onSelectMaster(kit)} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -27,24 +54,7 @@ export function KitSearchPhase({ kits, onSelectMaster }: KitSearchPhaseProps) {
           placeholder="キット名で検索 (例: RX-78-2, Sazabi)"
           autoFocus
         />
-        {query.trim() === '' ? (
-          <p className="text-sm text-muted-foreground">
-            キーワードを入力してマスターから検索してください。
-          </p>
-        ) : candidates.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            「{query}」に一致するキットが見つかりませんでした。マスターに無いキットは admin
-            に申請してください (Phase E 以降の機能)。
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {candidates.map((kit) => (
-              <li key={kit.id}>
-                <KitMasterCandidate kit={kit} onSelect={() => onSelectMaster(kit)} />
-              </li>
-            ))}
-          </ul>
-        )}
+        {renderResults()}
       </div>
     </div>
   )

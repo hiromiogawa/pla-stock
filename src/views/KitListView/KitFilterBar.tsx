@@ -21,6 +21,21 @@ export const INITIAL_FILTERS: KitFilters = {
 const GRADES: Array<Grade | 'all'> = ['all', 'HG', 'RG', 'EG', 'MG', 'PG', 'other']
 const SCALES: Array<Scale | 'all'> = ['all', '1/144', '1/100', '1/60', '1/48', 'other']
 
+/** runtime narrowing: 想定外の値が来たら 'all' に fallback */
+function toGrade(v: string): KitFilters['grade'] {
+  for (const g of GRADES) {
+    if (g === v) return g
+  }
+  return 'all'
+}
+
+function toScale(v: string): KitFilters['scale'] {
+  for (const s of SCALES) {
+    if (s === v) return s
+  }
+  return 'all'
+}
+
 interface KitFilterBarProps {
   filters: KitFilters
   makers: string[] // 一覧から動的に集めた候補
@@ -38,9 +53,9 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
         className="md:col-span-3"
       />
       <FormControl fullWidth size="small">
-        <Select
+        <Select<KitFilters['grade']>
           value={filters.grade}
-          onChange={(e) => onChange({ ...filters, grade: e.target.value as KitFilters['grade'] })}
+          onChange={(e) => onChange({ ...filters, grade: toGrade(String(e.target.value)) })}
         >
           {GRADES.map((g) => (
             <MenuItem key={g} value={g}>
@@ -50,9 +65,9 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
-        <Select
+        <Select<KitFilters['scale']>
           value={filters.scale}
-          onChange={(e) => onChange({ ...filters, scale: e.target.value as KitFilters['scale'] })}
+          onChange={(e) => onChange({ ...filters, scale: toScale(String(e.target.value)) })}
         >
           {SCALES.map((s) => (
             <MenuItem key={s} value={s}>
@@ -62,9 +77,9 @@ export function KitFilterBar({ filters, makers, onChange }: KitFilterBarProps) {
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
-        <Select
+        <Select<string>
           value={filters.maker}
-          onChange={(e) => onChange({ ...filters, maker: e.target.value as string })}
+          onChange={(e) => onChange({ ...filters, maker: String(e.target.value) })}
         >
           <MenuItem value="all">すべてのブランド</MenuItem>
           {makers.map((m) => (

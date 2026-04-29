@@ -23,6 +23,8 @@ const STATUS_LABEL: Record<Project['status'], string> = {
   abandoned: '頓挫',
 }
 
+const SORT_INDICATOR: Record<'asc' | 'desc', string> = { asc: ' ↑', desc: ' ↓' }
+
 const columns: ColumnDef<ProjectTableRow>[] = [
   {
     id: 'name',
@@ -43,40 +45,37 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     id: 'status',
     accessorFn: (row) => row.project.status,
     header: 'ステータス',
-    cell: ({ getValue }) => {
-      const status = getValue() as Project['status']
-      return (
-        <Badge variant="outline" className="text-xs">
-          {STATUS_LABEL[status]}
-        </Badge>
-      )
-    },
+    cell: ({ row }) => (
+      <Badge variant="outline" className="text-xs">
+        {STATUS_LABEL[row.original.project.status]}
+      </Badge>
+    ),
   },
   {
     id: 'kit',
     accessorFn: (row) => row.linkedKitName ?? '',
     header: '使用キット',
-    cell: ({ getValue }) => {
-      const v = getValue() as string
-      return v === '' ? <span className="text-muted-foreground">未紐付き</span> : v
+    cell: ({ row }) => {
+      const v = row.original.linkedKitName
+      return v === null || v === '' ? <span className="text-muted-foreground">未紐付き</span> : v
     },
   },
   {
     id: 'startedAt',
     accessorFn: (row) => row.project.startedAt ?? '',
     header: '開始日',
-    cell: ({ getValue }) => {
-      const v = getValue() as string
-      return v === '' ? '—' : v
+    cell: ({ row }) => {
+      const v = row.original.project.startedAt
+      return v === null || v === '' ? '—' : v
     },
   },
   {
     id: 'completedAt',
     accessorFn: (row) => row.project.completedAt ?? '',
     header: '完成日',
-    cell: ({ getValue }) => {
-      const v = getValue() as string
-      return v === '' ? '—' : v
+    cell: ({ row }) => {
+      const v = row.original.project.completedAt
+      return v === null || v === '' ? '—' : v
     },
   },
 ]
@@ -111,7 +110,10 @@ export function ProjectTable({ rows }: ProjectTableProps) {
                 >
                   <span className="inline-flex items-center gap-1">
                     {flexRender(header.column.columnDef.header, header.getContext())}
-                    {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    {(() => {
+                      const sorted = header.column.getIsSorted()
+                      return sorted === false ? null : SORT_INDICATOR[sorted]
+                    })()}
                   </span>
                 </th>
               ))}

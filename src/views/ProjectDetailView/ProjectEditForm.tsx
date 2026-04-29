@@ -30,7 +30,7 @@ export function ProjectEditForm({ project, onSave, onCancel }: ProjectEditFormPr
     defaultValues: {
       name: project.name,
       description: project.description ?? '',
-      status: project.status as ProjectStatus,
+      status: project.status,
       startedAt: project.startedAt ?? '',
       completedAt: project.completedAt ?? '',
     },

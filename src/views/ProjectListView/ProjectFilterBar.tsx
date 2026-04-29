@@ -30,6 +30,14 @@ const STATUS_LABEL: Record<ProjectStatus | 'all', string> = {
   abandoned: '頓挫',
 }
 
+/** runtime narrowing: 想定外の値が来たら 'all' に fallback */
+function toStatus(v: string): ProjectFilters['status'] {
+  for (const s of STATUSES) {
+    if (s === v) return s
+  }
+  return 'all'
+}
+
 interface ProjectFilterBarProps {
   filters: ProjectFilters
   onChange: (next: ProjectFilters) => void
@@ -46,11 +54,9 @@ export function ProjectFilterBar({ filters, onChange }: ProjectFilterBarProps) {
         className="md:col-span-2"
       />
       <FormControl fullWidth size="small">
-        <Select
+        <Select<ProjectFilters['status']>
           value={filters.status}
-          onChange={(e) =>
-            onChange({ ...filters, status: e.target.value as ProjectFilters['status'] })
-          }
+          onChange={(e) => onChange({ ...filters, status: toStatus(String(e.target.value)) })}
         >
           {STATUSES.map((s) => (
             <MenuItem key={s} value={s}>

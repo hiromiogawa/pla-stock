@@ -10,14 +10,23 @@ interface KitStockFormProps {
   onCancel: () => void
 }
 
+interface KitStockFormDefaults {
+  purchasedAt: string
+  purchasePriceYen: string | number | null
+  purchaseLocation: string
+  note: string
+}
+
+const KIT_STOCK_FORM_DEFAULTS: KitStockFormDefaults = {
+  purchasedAt: '',
+  purchasePriceYen: '',
+  purchaseLocation: '',
+  note: '',
+}
+
 export function KitStockForm({ kit, onSubmit, onCancel }: KitStockFormProps) {
   const form = useForm({
-    defaultValues: {
-      purchasedAt: '',
-      purchasePriceYen: '' as string | number | null,
-      purchaseLocation: '',
-      note: '',
-    },
+    defaultValues: KIT_STOCK_FORM_DEFAULTS,
     onSubmit: async ({ value }) => {
       const parsed = purchaseEventSchema.parse({
         purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,

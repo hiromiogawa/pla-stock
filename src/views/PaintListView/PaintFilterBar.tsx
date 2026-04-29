@@ -22,6 +22,21 @@ export const INITIAL_FILTERS: PaintFilters = {
 const COLOR_FAMILIES: Array<ColorFamily | 'all'> = ['all', ...COLOR_FAMILY_VALUES]
 const FINISH_TYPES: Array<FinishType | 'all'> = ['all', ...FINISH_TYPE_VALUES]
 
+/** runtime narrowing: 想定外の値が来たら 'all' に fallback */
+function toColorFamily(v: string): PaintFilters['colorFamily'] {
+  for (const c of COLOR_FAMILIES) {
+    if (c === v) return c
+  }
+  return 'all'
+}
+
+function toFinishType(v: string): PaintFilters['finishType'] {
+  for (const f of FINISH_TYPES) {
+    if (f === v) return f
+  }
+  return 'all'
+}
+
 interface PaintFilterBarProps {
   filters: PaintFilters
   brands: string[]
@@ -39,9 +54,9 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
         className="md:col-span-3"
       />
       <FormControl fullWidth size="small">
-        <Select
+        <Select<string>
           value={filters.brand}
-          onChange={(e) => onChange({ ...filters, brand: e.target.value as string })}
+          onChange={(e) => onChange({ ...filters, brand: String(e.target.value) })}
         >
           <MenuItem value="all">すべてのブランド</MenuItem>
           {brands.map((b) => (
@@ -52,10 +67,10 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
-        <Select
+        <Select<PaintFilters['colorFamily']>
           value={filters.colorFamily}
           onChange={(e) =>
-            onChange({ ...filters, colorFamily: e.target.value as PaintFilters['colorFamily'] })
+            onChange({ ...filters, colorFamily: toColorFamily(String(e.target.value)) })
           }
         >
           {COLOR_FAMILIES.map((c) => (
@@ -66,10 +81,10 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
-        <Select
+        <Select<PaintFilters['finishType']>
           value={filters.finishType}
           onChange={(e) =>
-            onChange({ ...filters, finishType: e.target.value as PaintFilters['finishType'] })
+            onChange({ ...filters, finishType: toFinishType(String(e.target.value)) })
           }
         >
           {FINISH_TYPES.map((f) => (
