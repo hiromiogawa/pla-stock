@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.claude.com/claude-code/settings-schema.json",
+  "permissions": {
+    "deny": [
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --force-with-lease:*)",
+      "Bash(git push --no-verify:*)",
+      "Bash(git push origin +:*)",
+      "Bash(git push origin main:*)",
+      "Bash(git push origin master:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -f:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(git branch -D:*)",
+      "Bash(rm -rf /:*)",
+      "Bash(rm -rf ~:*)",
+      "Bash(rm -rf $HOME:*)",
+      "Bash(wrangler deploy:*)",
+      "Bash(wrangler secret put:*)",
+      "Bash(wrangler secret delete:*)",
+      "Bash(wrangler d1 execute * --remote:*)",
+      "Bash(wrangler d1 migrations apply * --remote:*)",
+      "Edit(.env*)",
+      "Write(.env*)",
+      "Edit(.dev.vars*)",
+      "Write(.dev.vars*)"
+    ],
+    "ask": [
+      "Bash(rm -rf:*)",
+      "Bash(rm -r:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm uninstall:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(gh release delete:*)",
+      "Bash(gh pr close:*)"
+    ]
+  }
+}

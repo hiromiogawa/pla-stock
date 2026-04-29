@@ -52,5 +52,9 @@ Thumbs.db
 # scratch
 /tmp/
 
+# Claude Code local-only settings
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
 # visual companion working dir
 /.superpowers/

@@ -1,43 +1,152 @@
-import { Link } from '@tanstack/react-router'
 import { UserButton } from '@clerk/tanstack-react-start'
-import { APP_NAV_ITEMS } from '~/shared/config/nav'
-import { cn } from '~/shared/lib/utils'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import { Link } from '@tanstack/react-router'
+import { FolderKanban, Home, type LucideIcon, Package, Palette, Settings } from 'lucide-react'
+import { APP_NAV_ITEMS, type NavItem } from '~/shared/config/nav'
+
+/**
+ * Sidebar (md+ で表示)。
+ *
+ * デザイン方針: Refined Minimalism (Linear / Notion / Vercel 風)。
+ * 詳細は docs/specs/2026-04-29-design-direction.md。
+ *
+ * - 14px medium body / weight contrast で hierarchy
+ * - lucide icon 16px stroke 1.75 (default の 2 より craft 感)
+ * - hover/active で bg + color + weight を多軸変化
+ * - hairline divider で構造を区切る
+ * - active state は TanStack Router の自動 className "active" を sx の `&.active` で pickup
+ */
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  dashboard: Home,
+  kits: Package,
+  paints: Palette,
+  projects: FolderKanban,
+  settings: Settings,
+}
 
 export function Sidebar() {
   return (
-    <aside className="hidden md:flex md:w-56 md:flex-col md:border-r md:border-border md:bg-card">
-      <div className="px-4 py-5 border-b border-border">
-        <span className="text-lg font-semibold tracking-tight">pla-stock</span>
-      </div>
-      <nav className="flex-1 px-2 py-3 space-y-1">
-        {APP_NAV_ITEMS.map((item) =>
-          item.disabled ? (
-            <span
-              key={item.key}
-              role="link"
-              aria-disabled="true"
-              className="block px-3 py-2 text-sm text-muted-foreground/60 cursor-not-allowed"
-              title="Phase A-2 以降で実装"
-            >
-              {item.label}
-            </span>
-          ) : (
-            <Link
-              key={item.key}
-              to={item.to}
-              activeProps={{ className: 'bg-accent text-accent-foreground' }}
-              className={cn(
-                'block px-3 py-2 rounded-md text-sm font-medium text-foreground/80 hover:bg-accent hover:text-accent-foreground',
-              )}
-            >
-              {item.label}
-            </Link>
-          ),
-        )}
-      </nav>
-      <div className="p-4 border-t border-border">
+    <Box
+      component="aside"
+      sx={{
+        display: { xs: 'none', md: 'flex' },
+        width: '14rem',
+        flexDirection: 'column',
+        borderRight: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+      }}
+    >
+      {/* Brand */}
+      <Box
+        sx={{
+          px: 3,
+          py: 2.5,
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Typography
+          component="span"
+          sx={{
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            letterSpacing: '-0.01em',
+            color: 'text.primary',
+          }}
+        >
+          pla-stock
+        </Typography>
+      </Box>
+
+      {/* Nav */}
+      <Stack component="nav" spacing={0.25} sx={{ flex: 1, px: 1.5, pt: 1 }}>
+        {APP_NAV_ITEMS.map((item) => (
+          <SidebarItem key={item.key} item={item} />
+        ))}
+      </Stack>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          px: 2,
+          py: 2,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
         <UserButton />
-      </div>
-    </aside>
+      </Box>
+    </Box>
+  )
+}
+
+interface SidebarItemProps {
+  item: NavItem
+}
+
+function SidebarItem({ item }: SidebarItemProps) {
+  const Icon = ICON_MAP[item.key] ?? Home
+
+  if (item.disabled) {
+    return (
+      <Box
+        role="link"
+        aria-disabled="true"
+        title="Phase A-2 以降で実装"
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          px: 1.5,
+          py: 1,
+          fontSize: '0.875rem',
+          fontWeight: 500,
+          color: 'text.disabled',
+          cursor: 'not-allowed',
+        }}
+      >
+        <Icon size={16} strokeWidth={1.75} />
+        {item.label}
+      </Box>
+    )
+  }
+
+  return (
+    <Box
+      component={Link}
+      to={item.to}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
+        px: 1.5,
+        py: 1,
+        borderRadius: 0.75,
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        color: 'text.secondary',
+        textDecoration: 'none',
+        cursor: 'pointer',
+        transition: 'background-color 120ms ease, color 120ms ease',
+        '&:hover': {
+          backgroundColor: 'action.hover',
+          color: 'text.primary',
+        },
+        '&.active': {
+          backgroundColor: 'action.selected',
+          color: 'text.primary',
+          fontWeight: 600,
+        },
+      }}
+    >
+      <Icon size={16} strokeWidth={1.75} />
+      {item.label}
+    </Box>
   )
 }

@@ -171,13 +171,14 @@ oxlint で機械強制（`*DetailView.tsx` / `*AddView.tsx` / `*CreateView.tsx` 
 export function useKitDetail(input: ...): ... { ... }
 ```
 
-### デザインシステム (ADR-0002)
+### デザインシステム (ADR-0002 / `docs/specs/2026-04-29-design-direction.md`)
 
 UI は **MUI v7 + Emotion** を採用。判断ルールは **Material Design 3** ガイドラインを参照する。
 
 - 公式 docs: https://m3.material.io/ (色 / typography / spacing / elevation / state layer の規約)
 - MUI docs: https://mui.com/material-ui/ (component の API / sx prop の書き方)
-- pla-stock のトーン: **道具感 (Linear / Notion 風)** = neutral / monochrome バリアント、彩度低め
+- pla-stock の方向性 (Tone / Differentiation 等) は **`docs/specs/2026-04-29-design-direction.md`** に確定 (Refined Minimalism + 塗料 color swatch 差別化、primary は M3 green)
+- UI 変更時は **`frontend-design` skill を invoke** して spec 方針との整合性確認
 
 判断時の優先順:
 1. M3 ガイドライン (色の意味論、コンポーネント階層)
@@ -235,3 +236,14 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 - `e` (event), `p` (paint/project/part), `o` (option) 等の単文字省略は禁止
 - 文脈に応じて意味のある名前を付ける (`event` / `paint` / `option` 等)
 - 例外は `_` (意図的未使用の destructured 変数) のみ
+
+## AI 運用ルール
+
+物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は機械化できない判断系のみ:
+
+- **UI を変更する PR は controller 自身が Playwright で screenshot 検証する** (subagent の DONE 報告だけで PR 作成しない)
+- **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
+- **新規ライブラリ採用は ADR 起票必須** (`docs/adr/`)
+- **UI コード変更前 (`.tsx` の styling / sx prop / 新規 component) は必ず `frontend-design` skill を invoke する**
+  - 特に「**見た目に対する feedback**」(例: 「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず**、まず skill で Design Thinking (Tone / Differentiation / Constraints) を再適用する
+  - spec (`docs/specs/2026-04-29-design-direction.md`) は方針、skill は **その実装局面での craft 適用ガイド**。両方必須

@@ -1,13 +1,16 @@
+import Box from '@mui/material/Box'
 import type { PropsWithChildren } from 'react'
 import { BottomTabBar } from './BottomTabBar'
 import { Sidebar } from './Sidebar'
 
 export function AppShell({ children }: PropsWithChildren) {
   return (
-    <div className="min-h-screen flex bg-background">
+    <Box sx={{ minHeight: '100vh', display: 'flex', bgcolor: 'background.default' }}>
       <Sidebar />
-      <main className="flex-1 pb-12 md:pb-0">{children}</main>
+      <Box component="main" sx={{ flex: 1, pb: { xs: 12, md: 0 } }}>
+        {children}
+      </Box>
       <BottomTabBar />
-    </div>
+    </Box>
   )
 }
