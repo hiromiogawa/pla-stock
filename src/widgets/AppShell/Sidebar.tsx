@@ -41,7 +41,7 @@ export function Sidebar() {
           pla-stock
         </Typography>
       </Box>
-      <Stack component="nav" spacing={1} sx={{ flex: 1, px: 2, py: 3 }}>
+      <Stack component="nav" spacing={0.25} sx={{ flex: 1, px: 1.5, py: 2 }}>
         {APP_NAV_ITEMS.map((item) =>
           item.disabled ? (
             <Box
@@ -51,8 +51,8 @@ export function Sidebar() {
               title="Phase A-2 以降で実装"
               sx={{
                 display: 'block',
-                px: 3,
-                py: 2,
+                px: 1.5,
+                py: 1,
                 fontSize: 'body2.fontSize',
                 color: 'text.disabled',
                 cursor: 'not-allowed',
@@ -67,8 +67,9 @@ export function Sidebar() {
               to={item.to}
               sx={(theme) => ({
                 borderRadius: 1,
-                px: 3,
-                py: 2,
+                minHeight: 'unset',
+                px: 1.5,
+                py: 1,
                 fontSize: theme.typography.body2.fontSize,
                 fontWeight: 500,
                 '&.active': {
