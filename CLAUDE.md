@@ -235,3 +235,11 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 - `e` (event), `p` (paint/project/part), `o` (option) 等の単文字省略は禁止
 - 文脈に応じて意味のある名前を付ける (`event` / `paint` / `option` 等)
 - 例外は `_` (意図的未使用の destructured 変数) のみ
+
+## AI 運用ルール
+
+物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は機械化できない判断系のみ:
+
+- **UI を変更する PR は controller 自身が Playwright で screenshot 検証する** (subagent の DONE 報告だけで PR 作成しない)
+- **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
+- **新規ライブラリ採用は ADR 起票必須** (`docs/adr/`)

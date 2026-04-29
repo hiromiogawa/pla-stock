@@ -9,8 +9,8 @@ import { APP_NAV_ITEMS } from '~/shared/config/nav'
 /**
  * Sidebar (md+ で表示)。
  *
- * Tailwind w-56 = 14rem = 224px。MUI theme.spacing(56) は 56 * 4 = 224px なので一致する。
- * (本プロジェクトは theme.spacing.unit = 4 の M3 4dp grid)
+ * MUI sx の `width` は number → px 解釈のため、Tailwind w-56 (14rem = 224px) は
+ * `width: '14rem'` で表現する (theme.spacing は適用されない)。
  *
  * active state:
  *   TanStack Router の Link は active 時に自動で `className="active"` を付与する。
@@ -25,7 +25,7 @@ export function Sidebar() {
       component="aside"
       sx={{
         display: { xs: 'none', md: 'flex' },
-        width: 56,
+        width: '14rem',
         flexDirection: 'column',
         borderRight: 1,
         borderColor: 'divider',

@@ -7,8 +7,8 @@ import { Button } from '~/shared/ui/button'
 /**
  * 未認証ユーザー向けランディング。
  *
- * Tailwind の max-w-3xl (48rem = 768px) は MUI theme.spacing(192) と一致 (192 * 4 = 768)。
- * max-w-2xl (42rem = 672px) は MUI theme.spacing(168)。
+ * MUI sx の `maxWidth` に number を渡すと px 解釈 (theme.spacing ではない) のため、
+ * 文字列 px or breakpoint 名 (`'sm'` 等) で指定する。
  */
 export function LandingView() {
   return (
@@ -24,7 +24,7 @@ export function LandingView() {
       <Box component="header" sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Box
           sx={{
-            maxWidth: 192,
+            maxWidth: '768px',
             mx: 'auto',
             px: 6,
             py: 4,
@@ -52,7 +52,7 @@ export function LandingView() {
           px: 6,
         }}
       >
-        <Stack spacing={8} sx={{ maxWidth: 168, width: '100%', textAlign: 'center' }}>
+        <Stack spacing={8} sx={{ maxWidth: '672px', width: '100%', textAlign: 'center' }}>
           <Stack spacing={3}>
             <Typography
               variant="h4"
@@ -83,7 +83,7 @@ export function LandingView() {
       <Box component="footer" sx={{ borderTop: 1, borderColor: 'divider' }}>
         <Box
           sx={{
-            maxWidth: 192,
+            maxWidth: '768px',
             mx: 'auto',
             px: 6,
             py: 4,
