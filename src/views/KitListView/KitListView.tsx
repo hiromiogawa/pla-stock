@@ -15,7 +15,7 @@ interface KitListViewProps {
 export function KitListView({ stocks, kits }: KitListViewProps) {
   const [filters, setFilters] = useState<KitFilters>(INITIAL_FILTERS)
 
-  const kitById = useMemo(() => new Map(kits.map((k) => [k.id, k])), [kits])
+  const kitById = useMemo(() => new Map(kits.map((kit) => [kit.id, kit])), [kits])
 
   const rows = useMemo(() => {
     return stocks
@@ -37,7 +37,7 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
   }, [stocks, kitById, filters])
 
   const makers = useMemo(() => {
-    return Array.from(new Set(kits.map((k) => k.maker))).sort()
+    return Array.from(new Set(kits.map((kit) => kit.maker))).sort()
   }, [kits])
 
   return (

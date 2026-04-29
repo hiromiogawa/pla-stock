@@ -18,14 +18,14 @@ interface AddPaintDialogProps {
 export function AddPaintDialog({ open, candidates, onOpenChange, onSelect }: AddPaintDialogProps) {
   const [query, setQuery] = useState('')
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (q === '') return candidates.slice(0, 30)
+    const normalized = query.trim().toLowerCase()
+    if (normalized === '') return candidates.slice(0, 30)
     return candidates
       .filter(
-        (p) =>
-          p.brand.toLowerCase().includes(q) ||
-          p.code.toLowerCase().includes(q) ||
-          p.name.toLowerCase().includes(q),
+        (paint) =>
+          paint.brand.toLowerCase().includes(normalized) ||
+          paint.code.toLowerCase().includes(normalized) ||
+          paint.name.toLowerCase().includes(normalized),
       )
       .slice(0, 30)
   }, [candidates, query])
@@ -46,7 +46,7 @@ export function AddPaintDialog({ open, candidates, onOpenChange, onSelect }: Add
         <Input
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder="ブランド / コード / 名前で検索"
           autoFocus
         />

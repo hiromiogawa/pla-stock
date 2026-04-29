@@ -12,13 +12,13 @@ export const Route = createFileRoute('/_auth/projects/new')({
     ])
 
     // count > 0 の kit_stock に対応する Kit master を抽出
-    const kitById = new Map(kits.map((k) => [k.id, k]))
+    const kitById = new Map(kits.map((kit) => [kit.id, kit]))
     const selectableKits = stocksWithStock
-      .map((s) => kitById.get(s.kitId))
-      .filter((k): k is NonNullable<typeof k> => k !== undefined)
+      .map((stock) => kitById.get(stock.kitId))
+      .filter((kit): kit is NonNullable<typeof kit> => kit !== undefined)
     const stockCountByKitId: Record<string, number> = {}
-    for (const s of stocksWithStock) {
-      stockCountByKitId[s.kitId] = s.count
+    for (const stock of stocksWithStock) {
+      stockCountByKitId[stock.kitId] = stock.count
     }
 
     return { selectableKits, stockCountByKitId, userId }

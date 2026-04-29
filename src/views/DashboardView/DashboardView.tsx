@@ -35,15 +35,15 @@ export function DashboardView({ stats }: DashboardViewProps) {
         </p>
       </div>
       <section className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
-        {cards.map((s) => (
+        {cards.map((card) => (
           <div
-            key={s.label}
+            key={card.label}
             className="rounded-lg border border-border bg-card p-4 flex flex-col gap-1"
           >
-            <span className="text-xs text-muted-foreground">{s.label}</span>
+            <span className="text-xs text-muted-foreground">{card.label}</span>
             <span className="text-2xl font-semibold">
-              {s.value}
-              <span className="text-sm font-normal text-muted-foreground ml-1">{s.unit}</span>
+              {card.value}
+              <span className="text-sm font-normal text-muted-foreground ml-1">{card.unit}</span>
             </span>
           </div>
         ))}

@@ -16,7 +16,7 @@ export function ProjectPaintUses({ paints, allPaints, onAdd, onRemove }: Project
   const [showAddDialog, setShowAddDialog] = useState(false)
 
   // すでに紐付いてる paintId を除いた候補
-  const candidates = allPaints.filter((p) => !paints.some((c) => c.id === p.id))
+  const candidates = allPaints.filter((paint) => !paints.some((current) => current.id === paint.id))
 
   return (
     <section className="rounded-lg border border-border bg-card p-4 space-y-3">

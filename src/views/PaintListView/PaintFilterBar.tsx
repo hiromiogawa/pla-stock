@@ -22,6 +22,21 @@ export const INITIAL_FILTERS: PaintFilters = {
 const COLOR_FAMILIES: Array<ColorFamily | 'all'> = ['all', ...COLOR_FAMILY_VALUES]
 const FINISH_TYPES: Array<FinishType | 'all'> = ['all', ...FINISH_TYPE_VALUES]
 
+/** runtime narrowing: 想定外の値が来たら 'all' に fallback */
+function toColorFamily(value: string): PaintFilters['colorFamily'] {
+  for (const family of COLOR_FAMILIES) {
+    if (family === value) return family
+  }
+  return 'all'
+}
+
+function toFinishType(value: string): PaintFilters['finishType'] {
+  for (const finish of FINISH_TYPES) {
+    if (finish === value) return finish
+  }
+  return 'all'
+}
+
 interface PaintFilterBarProps {
   filters: PaintFilters
   brands: string[]
@@ -34,47 +49,47 @@ export function PaintFilterBar({ filters, brands, onChange }: PaintFilterBarProp
       <Input
         type="search"
         value={filters.search}
-        onChange={(e) => onChange({ ...filters, search: e.target.value })}
+        onChange={(event) => onChange({ ...filters, search: event.target.value })}
         placeholder="名前 / コードで検索"
         className="md:col-span-3"
       />
       <FormControl fullWidth size="small">
-        <Select
+        <Select<string>
           value={filters.brand}
-          onChange={(e) => onChange({ ...filters, brand: e.target.value as string })}
+          onChange={(event) => onChange({ ...filters, brand: String(event.target.value) })}
         >
           <MenuItem value="all">すべてのブランド</MenuItem>
-          {brands.map((b) => (
-            <MenuItem key={b} value={b}>
-              {b}
+          {brands.map((brand) => (
+            <MenuItem key={brand} value={brand}>
+              {brand}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
-        <Select
+        <Select<PaintFilters['colorFamily']>
           value={filters.colorFamily}
-          onChange={(e) =>
-            onChange({ ...filters, colorFamily: e.target.value as PaintFilters['colorFamily'] })
+          onChange={(event) =>
+            onChange({ ...filters, colorFamily: toColorFamily(String(event.target.value)) })
           }
         >
-          {COLOR_FAMILIES.map((c) => (
-            <MenuItem key={c} value={c}>
-              {c === 'all' ? 'すべての色系統' : c}
+          {COLOR_FAMILIES.map((family) => (
+            <MenuItem key={family} value={family}>
+              {family === 'all' ? 'すべての色系統' : family}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
       <FormControl fullWidth size="small">
-        <Select
+        <Select<PaintFilters['finishType']>
           value={filters.finishType}
-          onChange={(e) =>
-            onChange({ ...filters, finishType: e.target.value as PaintFilters['finishType'] })
+          onChange={(event) =>
+            onChange({ ...filters, finishType: toFinishType(String(event.target.value)) })
           }
         >
-          {FINISH_TYPES.map((f) => (
-            <MenuItem key={f} value={f}>
-              {f === 'all' ? 'すべてのフィニッシュ' : f}
+          {FINISH_TYPES.map((finish) => (
+            <MenuItem key={finish} value={finish}>
+              {finish === 'all' ? 'すべてのフィニッシュ' : finish}
             </MenuItem>
           ))}
         </Select>

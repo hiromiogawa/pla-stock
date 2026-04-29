@@ -11,19 +11,46 @@ interface PaintSearchPhaseProps {
 export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhaseProps) {
   const [query, setQuery] = useState('')
 
-  const candidates = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (q === '') return [] as Paint[]
+  const candidates = useMemo<Paint[]>(() => {
+    const normalized = query.trim().toLowerCase()
+    if (normalized === '') return []
     return paints
-      .filter((p) => {
+      .filter((paint) => {
         return (
-          p.name.toLowerCase().includes(q) ||
-          p.code.toLowerCase().includes(q) ||
-          p.brand.toLowerCase().includes(q)
+          paint.name.toLowerCase().includes(normalized) ||
+          paint.code.toLowerCase().includes(normalized) ||
+          paint.brand.toLowerCase().includes(normalized)
         )
       })
       .slice(0, 30)
   }, [paints, query])
+
+  function renderResults() {
+    if (query.trim() === '') {
+      return (
+        <p className="text-sm text-muted-foreground">
+          キーワードを入力してマスターから検索してください。
+        </p>
+      )
+    }
+    if (candidates.length === 0) {
+      return (
+        <p className="text-sm text-muted-foreground">
+          「{query}」に一致する塗料が見つかりませんでした。マスターに無い塗料は admin
+          に申請してください (Phase E 以降の機能)。
+        </p>
+      )
+    }
+    return (
+      <ul className="space-y-2">
+        {candidates.map((paint) => (
+          <li key={paint.id}>
+            <PaintMasterCandidate paint={paint} onSelect={() => onSelectMaster(paint)} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -31,28 +58,11 @@ export function PaintSearchPhase({ paints, onSelectMaster }: PaintSearchPhasePro
         <Input
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           placeholder="ブランド / コード / 名前で検索 (例: Mr.Color, C1, ホワイト)"
           autoFocus
         />
-        {query.trim() === '' ? (
-          <p className="text-sm text-muted-foreground">
-            キーワードを入力してマスターから検索してください。
-          </p>
-        ) : candidates.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            「{query}」に一致する塗料が見つかりませんでした。マスターに無い塗料は admin
-            に申請してください (Phase E 以降の機能)。
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {candidates.map((paint) => (
-              <li key={paint.id}>
-                <PaintMasterCandidate paint={paint} onSelect={() => onSelectMaster(paint)} />
-              </li>
-            ))}
-          </ul>
-        )}
+        {renderResults()}
       </div>
     </div>
   )

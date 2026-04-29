@@ -26,10 +26,10 @@ export const Route = createFileRoute('/_auth/projects/$id')({
       getPaints({ userId }),
     ])
     // paintUses は paintId のみなので、対応する Paint master を引く
-    const paintById = new Map(allPaints.map((p) => [p.id, p]))
+    const paintById = new Map(allPaints.map((paint) => [paint.id, paint]))
     const paintsForProject = paintUses
       .map((link) => paintById.get(link.paintId))
-      .filter((p): p is NonNullable<typeof p> => p !== undefined)
+      .filter((paint): paint is NonNullable<typeof paint> => paint !== undefined)
     return { project, kit, paintsForProject, allPaints, photos, userId }
   },
   component: ProjectDetailRoute,

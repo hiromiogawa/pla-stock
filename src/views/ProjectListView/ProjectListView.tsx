@@ -23,8 +23,8 @@ export function ProjectListView({ projects, kitNameByProjectId }: ProjectListVie
       }))
       .filter(({ project }) => {
         if (filters.search) {
-          const q = filters.search.toLowerCase()
-          if (!project.name.toLowerCase().includes(q)) return false
+          const normalized = filters.search.toLowerCase()
+          if (!project.name.toLowerCase().includes(normalized)) return false
         }
         if (filters.status !== 'all' && project.status !== filters.status) return false
         return true

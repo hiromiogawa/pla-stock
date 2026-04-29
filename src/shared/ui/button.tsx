@@ -97,28 +97,39 @@ function mapSizeToMui(size: Exclude<ButtonSize, 'icon'>): MuiButtonProps['size']
 
 /** sx を array に正規化することで複数 sx を安全に合成 */
 function composeSx(...parts: Array<SxProps<Theme> | undefined>): SxProps<Theme> {
-  const result: SxProps<Theme>[] = []
-  for (const p of parts) {
-    if (p === undefined) continue
-    if (Array.isArray(p)) {
-      // SxProps は readonly array も含むため as で平坦化
-      result.push(...(p as SxProps<Theme>[]))
+  const flattened: Array<SxProps<Theme>> = []
+  for (const part of parts) {
+    if (part === undefined) continue
+    if (Array.isArray(part)) {
+      // SxProps は readonly array も含むため spread で平坦化。
+      // part の各要素は SxProps<Theme> 互換のため push 時に narrow する。
+      for (const inner of part) {
+        if (inner !== undefined) flattened.push(inner)
+      }
     } else {
-      result.push(p)
+      flattened.push(part)
     }
   }
-  // MUI は readonly array を sx として受け取れる
-  return result as SxProps<Theme>
+  // MUI Theme の SxProps は ReadonlyArray<...> を受け付ける形を含むが、
+  // 戻り値型として直接配列を返すと Theme パラメータの bivariance 互換性が崩れるため
+  // 1 箇所だけ disable して return する。代替策 (個別 element に sx を分配) は
+  // forwardRef との互換性が崩れるため採れない。
+  // oxlint-disable-next-line consistent-type-assertions -- MUI SxProps array shape: 配列を SxProps として返却するための narrowing
+  return flattened as SxProps<Theme>
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps | IconButtonAsButtonProps>(
   function Button(props, ref) {
-    // size / variant / sx を ownProps として剥がし、残りを下位 MUI element に渡す
-    const variant: ButtonVariant = (props as ButtonOwnProps).variant ?? 'default'
-    const size: ButtonSize = (props as ButtonOwnProps).size ?? 'default'
-    const sx = (props as { sx?: SxProps<Theme> }).sx
-    // biome-ignore lint/correctness/noUnusedVariables: 分割代入で除外しているだけ
-    const { variant: _v, size: _s, sx: _x, ...rest } = props as ButtonProps & ButtonOwnProps
+    // size / variant / sx を ownProps として剥がし、残りを下位 MUI element に渡す。
+    // ButtonProps と IconButtonAsButtonProps は ButtonOwnProps + sx を共通項に持つため
+    // union のまま分割代入できる (props の型 narrowing 不要)。
+    const {
+      variant = 'default',
+      size = 'default',
+      sx,
+      // biome-ignore lint/correctness/noUnusedVariables: 分割代入で除外しているだけ
+      ...rest
+    } = props
     const muiProps = mapVariantToMui(variant)
 
     if (size === 'icon') {
@@ -127,7 +138,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps | IconButtonAsBut
           ref={ref}
           color={muiProps.color === 'inherit' ? 'default' : muiProps.color}
           sx={composeSx(muiProps.sx, sx)}
-          {...(rest as Omit<IconButtonProps, 'size' | 'color'>)}
+          {...rest}
         />
       )
     }
@@ -140,7 +151,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps | IconButtonAsBut
         color={muiProps.color}
         disableElevation
         sx={composeSx({ textTransform: 'none' }, muiProps.sx, sx)}
-        {...(rest as Omit<MuiButtonProps, 'variant' | 'size' | 'color'>)}
+        {...rest}
       />
     )
   },

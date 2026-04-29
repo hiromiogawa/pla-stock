@@ -2,9 +2,7 @@ import { useForm } from '@tanstack/react-form'
 import type { Paint } from '~/entities/paint'
 import { paintPurchaseEventSchema, type PaintPurchaseEventInput } from '~/features/paint-stock-add'
 import { Button } from '~/shared/ui/button'
-import { Input } from '~/shared/ui/input'
-import { Label } from '~/shared/ui/label'
-import { Textarea } from '~/shared/ui/textarea'
+import { FormTextField } from '~/shared/ui/FormTextField'
 
 interface PaintStockFormProps {
   paint: Paint
@@ -12,14 +10,23 @@ interface PaintStockFormProps {
   onCancel: () => void
 }
 
+interface PaintStockFormDefaults {
+  purchasedAt: string
+  purchasePriceYen: string | number | null
+  purchaseLocation: string
+  note: string
+}
+
+const PAINT_STOCK_FORM_DEFAULTS: PaintStockFormDefaults = {
+  purchasedAt: '',
+  purchasePriceYen: '',
+  purchaseLocation: '',
+  note: '',
+}
+
 export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProps) {
   const form = useForm({
-    defaultValues: {
-      purchasedAt: '',
-      purchasePriceYen: '' as string | number | null,
-      purchaseLocation: '',
-      note: '',
-    },
+    defaultValues: PAINT_STOCK_FORM_DEFAULTS,
     onSubmit: async ({ value }) => {
       const parsed = paintPurchaseEventSchema.parse({
         purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,
@@ -37,9 +44,9 @@ export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProp
   return (
     <form
       className="rounded-lg border border-border bg-card p-4 space-y-4"
-      onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
+      onSubmit={(event) => {
+        event.preventDefault()
+        event.stopPropagation()
         void form.handleSubmit()
       }}
     >
@@ -51,68 +58,23 @@ export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProp
       </div>
 
       <form.Field name="purchasedAt">
-        {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>購入日</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="date"
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          </div>
-        )}
+        {(field) => <FormTextField field={field} label="購入日" type="date" />}
       </form.Field>
 
       <form.Field name="purchasePriceYen">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>購入価格 (円)</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="number"
-              inputMode="numeric"
-              value={field.state.value as string}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          </div>
+          <FormTextField field={field} label="購入価格 (円)" type="number" inputMode="numeric" />
         )}
       </form.Field>
 
       <form.Field name="purchaseLocation">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>購入場所</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-              placeholder="ヨドバシ梅田 / Amazon など"
-            />
-          </div>
+          <FormTextField field={field} label="購入場所" placeholder="ヨドバシ梅田 / Amazon など" />
         )}
       </form.Field>
 
       <form.Field name="note">
-        {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>メモ</Label>
-            <Textarea
-              id={field.name}
-              name={field.name}
-              rows={3}
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          </div>
-        )}
+        {(field) => <FormTextField field={field} label="メモ" multiline rows={3} />}
       </form.Field>
 
       <div className="flex gap-2 justify-end">

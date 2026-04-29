@@ -15,6 +15,8 @@ interface PaintTableRow {
   paint: Paint
 }
 
+const SORT_INDICATOR: Record<'asc' | 'desc', string> = { asc: ' ↑', desc: ' ↓' }
+
 const columns: ColumnDef<PaintTableRow>[] = [
   {
     id: 'brand',
@@ -45,7 +47,7 @@ const columns: ColumnDef<PaintTableRow>[] = [
     id: 'count',
     accessorFn: (row) => row.stock.count,
     header: '在庫数',
-    cell: ({ getValue }) => <span className="font-medium">{getValue() as number} 本</span>,
+    cell: ({ row }) => <span className="font-medium">{row.original.stock.count} 本</span>,
   },
 ]
 
@@ -79,7 +81,10 @@ export function PaintTable({ rows }: PaintTableProps) {
                 >
                   <span className="inline-flex items-center gap-1">
                     {flexRender(header.column.columnDef.header, header.getContext())}
-                    {{ asc: ' ↑', desc: ' ↓' }[header.column.getIsSorted() as string] ?? null}
+                    {(() => {
+                      const sorted = header.column.getIsSorted()
+                      return sorted === false ? null : SORT_INDICATOR[sorted]
+                    })()}
                   </span>
                 </th>
               ))}

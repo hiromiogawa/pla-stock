@@ -283,7 +283,7 @@ export async function getPaints(_input: { userId: string }): Promise<Paint[]> {
 
 /** 単一塗料 master を ID で取得 */
 export async function getPaint(input: { paintId: string; userId: string }): Promise<Paint | null> {
-  return paints.find((x) => x.id === input.paintId) ?? null
+  return paints.find((paint) => paint.id === input.paintId) ?? null
 }
 
 /** (userId, paintId) composite key で paint_stock 1 行を取得 */
@@ -291,12 +291,15 @@ export async function getPaintStock(input: {
   userId: string
   paintId: string
 }): Promise<PaintStock | null> {
-  return paintStocks.find((s) => s.userId === MOCK_USER_ID && s.paintId === input.paintId) ?? null
+  return (
+    paintStocks.find((stock) => stock.userId === MOCK_USER_ID && stock.paintId === input.paintId) ??
+    null
+  )
 }
 
 /** user の count > 0 の paint_stock のみ返す */
 export async function getPaintStocksWithStock(_input: { userId: string }): Promise<PaintStock[]> {
-  return paintStocks.filter((s) => s.userId === MOCK_USER_ID && s.count > 0)
+  return paintStocks.filter((stock) => stock.userId === MOCK_USER_ID && stock.count > 0)
 }
 
 /** paint_event 履歴を (userId, paintId) で取得 */
@@ -304,12 +307,14 @@ export async function getPaintEvents(input: {
   userId: string
   paintId: string
 }): Promise<PaintEvent[]> {
-  return paintEvents.filter((e) => e.userId === MOCK_USER_ID && e.paintId === input.paintId)
+  return paintEvents.filter(
+    (event) => event.userId === MOCK_USER_ID && event.paintId === input.paintId,
+  )
 }
 
 /** user の全 paint_event を返す (Dashboard 集計用) */
 export async function getPaintEventsAll(_input: { userId: string }): Promise<PaintEvent[]> {
-  return paintEvents.filter((e) => e.userId === MOCK_USER_ID)
+  return paintEvents.filter((event) => event.userId === MOCK_USER_ID)
 }
 
 // === Mutations ===
@@ -337,7 +342,9 @@ export async function addPaintEvent(input: {
     throw new Error('addPaintEvent: delta must be non-zero')
   }
 
-  let stock = paintStocks.find((s) => s.userId === MOCK_USER_ID && s.paintId === input.paintId)
+  let stock = paintStocks.find(
+    (existing) => existing.userId === MOCK_USER_ID && existing.paintId === input.paintId,
+  )
   if (!stock) {
     stock = { userId: MOCK_USER_ID, paintId: input.paintId, count: 0 }
     paintStocks.push(stock)

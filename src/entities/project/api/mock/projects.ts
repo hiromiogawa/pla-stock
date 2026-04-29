@@ -91,14 +91,17 @@ const projectPhotos: ProjectPhoto[] = [
 // === Read accessors ===
 
 export async function getProjects(_input: { userId: string }): Promise<Project[]> {
-  return projects.filter((p) => p.userId === MOCK_USER_ID)
+  return projects.filter((project) => project.userId === MOCK_USER_ID)
 }
 
 export async function getProject(input: {
   projectId: string
   userId: string
 }): Promise<Project | null> {
-  return projects.find((p) => p.id === input.projectId && p.userId === MOCK_USER_ID) ?? null
+  return (
+    projects.find((project) => project.id === input.projectId && project.userId === MOCK_USER_ID) ??
+    null
+  )
 }
 
 /** project に紐付く project_paint_use 一覧 */
@@ -116,7 +119,7 @@ export async function getProjectPaintIds(input: { projectId: string }): Promise<
 }
 
 export async function getProjectPhotos(input: { projectId: string }): Promise<ProjectPhoto[]> {
-  return projectPhotos.filter((ph) => ph.projectId === input.projectId)
+  return projectPhotos.filter((photo) => photo.projectId === input.projectId)
 }
 
 // === Mutations ===
@@ -168,7 +171,9 @@ export async function updateProject(input: {
   userId: string
   patch: Partial<Pick<Project, 'name' | 'description' | 'status' | 'startedAt' | 'completedAt'>>
 }): Promise<Project | null> {
-  const idx = projects.findIndex((p) => p.id === input.projectId && p.userId === MOCK_USER_ID)
+  const idx = projects.findIndex(
+    (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
+  )
   if (idx === -1) return null
   projects[idx] = { ...projects[idx], ...input.patch }
   return projects[idx]
@@ -185,7 +190,9 @@ export async function deleteProject(input: {
   projectId: string
   userId: string
 }): Promise<boolean> {
-  const idx = projects.findIndex((p) => p.id === input.projectId && p.userId === MOCK_USER_ID)
+  const idx = projects.findIndex(
+    (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
+  )
   if (idx === -1) return false
 
   const project = projects[idx]
@@ -205,15 +212,15 @@ export async function deleteProject(input: {
   projects.splice(idx, 1)
 
   // cascade: project_paint_use
-  for (let i = projectPaintUses.length - 1; i >= 0; i--) {
-    if (projectPaintUses[i].projectId === input.projectId) {
-      projectPaintUses.splice(i, 1)
+  for (let useIdx = projectPaintUses.length - 1; useIdx >= 0; useIdx--) {
+    if (projectPaintUses[useIdx].projectId === input.projectId) {
+      projectPaintUses.splice(useIdx, 1)
     }
   }
   // cascade: project_photos
-  for (let i = projectPhotos.length - 1; i >= 0; i--) {
-    if (projectPhotos[i].projectId === input.projectId) {
-      projectPhotos.splice(i, 1)
+  for (let photoIdx = projectPhotos.length - 1; photoIdx >= 0; photoIdx--) {
+    if (projectPhotos[photoIdx].projectId === input.projectId) {
+      projectPhotos.splice(photoIdx, 1)
     }
   }
 

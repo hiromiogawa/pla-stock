@@ -29,8 +29,8 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
     <Dialog open={open} onClose={() => onOpenChange(false)} fullWidth maxWidth="sm">
       <DialogTitle>写真を追加</DialogTitle>
       <form
-        onSubmit={(e) => {
-          e.preventDefault()
+        onSubmit={(event) => {
+          event.preventDefault()
           if (url.trim() === '') return
           void onSubmit({
             url: url.trim(),
@@ -53,7 +53,7 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
               <Input
                 id="photo-url"
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={(event) => setUrl(event.target.value)}
                 placeholder="https://..."
                 required
               />
@@ -63,7 +63,7 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
               <Input
                 id="photo-caption"
                 value={caption}
-                onChange={(e) => setCaption(e.target.value)}
+                onChange={(event) => setCaption(event.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -72,7 +72,7 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
                 id="photo-takenAt"
                 type="date"
                 value={takenAt}
-                onChange={(e) => setTakenAt(e.target.value)}
+                onChange={(event) => setTakenAt(event.target.value)}
               />
             </div>
           </div>

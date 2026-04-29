@@ -23,19 +23,19 @@ export function LinkedProjectsForPaint({ projects }: LinkedProjectsForPaintProps
     <section className="rounded-lg border border-border bg-card p-4">
       <h2 className="text-sm font-semibold mb-3">この塗料を使うプロジェクト</h2>
       <ul className="space-y-2">
-        {projects.map((p) => (
-          <li key={p.id} className="flex items-center justify-between gap-3">
+        {projects.map((project) => (
+          <li key={project.id} className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
               <Link
                 // @ts-expect-error /projects/:id route is registered in Issue #20
-                to={`/projects/${p.id}`}
+                to={`/projects/${project.id}`}
                 className="text-sm font-medium hover:underline truncate block"
               >
-                {p.name}
+                {project.name}
               </Link>
             </div>
             <Badge variant="outline" className="text-xs shrink-0">
-              {STATUS_LABEL[p.status]}
+              {STATUS_LABEL[project.status]}
             </Badge>
           </li>
         ))}
