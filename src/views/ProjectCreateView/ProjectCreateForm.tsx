@@ -1,13 +1,9 @@
 import { useForm } from '@tanstack/react-form'
-import FormControl from '@mui/material/FormControl'
-import MenuItem from '@mui/material/MenuItem'
-import Select from '@mui/material/Select'
 import type { Kit } from '~/entities/kit'
 import { projectAddSchema, type ProjectAddInput } from '~/features/project-add'
 import { Button } from '~/shared/ui/button'
-import { Input } from '~/shared/ui/input'
-import { Label } from '~/shared/ui/label'
-import { Textarea } from '~/shared/ui/textarea'
+import { FormSelect, type FormSelectOption } from '~/shared/ui/FormSelect'
+import { FormTextField } from '~/shared/ui/FormTextField'
 
 interface ProjectCreateFormProps {
   /** count > 0 の自分の在庫キットだけを渡す (空配列なら view 側で empty state を出す前提) */
@@ -40,6 +36,11 @@ export function ProjectCreateForm({
     },
   })
 
+  const kitOptions: FormSelectOption[] = selectableKits.map((kit) => ({
+    value: kit.id,
+    label: `${kit.name}（${kit.grade} · ${kit.scale}） 在庫: ${stockCountByKitId[kit.id] ?? 0}`,
+  }))
+
   return (
     <form
       className="rounded-lg border border-border bg-card p-4 space-y-4"
@@ -57,68 +58,30 @@ export function ProjectCreateForm({
       </div>
 
       <form.Field name="kitId">
-        {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>キット *</Label>
-            <FormControl fullWidth size="small">
-              <Select
-                id={field.name}
-                value={field.state.value}
-                displayEmpty
-                onChange={(e) => field.handleChange(e.target.value as string)}
-                renderValue={(selected) => {
-                  if (!selected) {
-                    return <span style={{ color: 'rgba(0,0,0,0.45)' }}>在庫キットから選択</span>
-                  }
-                  const kit = selectableKits.find((k) => k.id === selected)
-                  return kit
-                    ? `${kit.name}（${kit.grade} · ${kit.scale}） 在庫: ${stockCountByKitId[kit.id] ?? 0}`
-                    : (selected as string)
-                }}
-              >
-                {selectableKits.map((kit) => (
-                  <MenuItem key={kit.id} value={kit.id}>
-                    {kit.name}（{kit.grade} · {kit.scale}） 在庫: {stockCountByKitId[kit.id] ?? 0}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-        )}
+        {(field) => <FormSelect field={field} label="キット *" options={kitOptions} />}
       </form.Field>
 
       <form.Field name="name">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>名前 *</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-              placeholder="Sazabi Ver.Ka 塗装計画 など"
-              maxLength={200}
-              required
-            />
-          </div>
+          <FormTextField
+            field={field}
+            label="名前 *"
+            placeholder="Sazabi Ver.Ka 塗装計画 など"
+            slotProps={{ htmlInput: { maxLength: 200 } }}
+            required
+          />
         )}
       </form.Field>
 
       <form.Field name="description">
         {(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>説明</Label>
-            <Textarea
-              id={field.name}
-              name={field.name}
-              rows={3}
-              value={field.state.value}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-              maxLength={2000}
-            />
-          </div>
+          <FormTextField
+            field={field}
+            label="説明"
+            multiline
+            rows={3}
+            slotProps={{ htmlInput: { maxLength: 2000 } }}
+          />
         )}
       </form.Field>
 

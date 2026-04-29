@@ -1,4 +1,4 @@
 {
   "*.{ts,tsx,js,jsx}": ["oxlint --fix", "biome format --write"],
-  "*.{json,md}": ["biome format --write"]
+  "*.{json,md}": ["biome format --write --no-errors-on-unmatched"]
 }

@@ -198,3 +198,7 @@ MUI v7 は内部 engine に Emotion を使うが、**user code は MUI 抽象し
 | 6 | `<ThemeProvider>` は `@mui/material/styles` から (NEVER `@emotion/react`) |
 
 ルール 3 は `lint-config/oxlint-emotion-isolation.jsonc` で `no-restricted-imports` 強制。違反すると pre-commit / CI で reject。
+
+### Form パターン (ADR-0003)
+
+Form は **TanStack Form + MUI TextField/Select**、`<FormTextField field={...} />` / `<FormSelect field={...} options={...} />` 経由で統一。詳細 ADR-0003。
