@@ -44,11 +44,16 @@ export function Sidebar() {
       component="aside"
       sx={{
         display: { xs: 'none', md: 'flex' },
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        height: '100vh',
         width: '14rem',
         flexDirection: 'column',
         borderRight: 1,
         borderColor: 'divider',
         bgcolor: 'background.paper',
+        zIndex: (theme) => theme.zIndex.appBar,
       }}
     >
       {/* Brand */}
