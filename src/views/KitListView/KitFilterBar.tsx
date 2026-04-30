@@ -55,12 +55,14 @@ export function KitFilterBar({ filters, onChange }: KitFilterBarProps) {
         placeholder="名前で検索"
         value={filters.search}
         onChange={(event) => onChange({ ...filters, search: event.target.value })}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search size={16} strokeWidth={1.75} />
-            </InputAdornment>
-          ),
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search size={16} strokeWidth={1.75} />
+              </InputAdornment>
+            ),
+          },
         }}
       />
       <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>

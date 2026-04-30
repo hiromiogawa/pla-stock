@@ -19,7 +19,6 @@ export function KitCardList({ rows }: KitCardListProps) {
     <VirtualizedCardList
       rows={rows}
       rowKey={(row) => row.kit.id}
-      estimateRowSize={84}
       emptyMessage="該当するキットがありません"
       renderRow={({ kit, stock }) => (
         <Link

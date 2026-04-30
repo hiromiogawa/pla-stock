@@ -113,7 +113,7 @@ export function VirtualizedTable<TRow>({
                     <Box
                       component="th"
                       key={header.id}
-                      onClick={header.column.getToggleSortingHandler()}
+                      onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                       sx={{
                         position: 'sticky',
                         top: 0,
@@ -162,7 +162,7 @@ export function VirtualizedTable<TRow>({
                   ref={virtualizer.measureElement}
                   data-index={virtualRow.index}
                   onClick={(event) => {
-                    if (event.metaKey || event.ctrlKey || event.button === 1) {
+                    if (event.metaKey || event.ctrlKey) {
                       window.open(href, '_blank')
                     } else {
                       onRowClick(original)
