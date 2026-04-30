@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useNavigate } from '@tanstack/react-router'
 import { type ColumnDef } from '@tanstack/react-table'
-import type { Project } from '~/entities/project'
+import { PROJECT_STATUS_LABEL, type Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 import { VirtualizedTable } from '~/widgets/VirtualizedTable'
 
@@ -11,13 +11,6 @@ interface ProjectTableRow {
   project: Project
   linkedKitName: string | null
   linkedKitBoxArtUrl: string | null
-}
-
-const STATUS_LABEL: Record<Project['status'], string> = {
-  planning: '計画中',
-  building: '製作中',
-  completed: '完成',
-  abandoned: '頓挫',
 }
 
 const columns: ColumnDef<ProjectTableRow>[] = [
@@ -84,7 +77,7 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     size: 100,
     cell: ({ row }) => (
       <Badge variant="outline" className="text-xs">
-        {STATUS_LABEL[row.original.project.status]}
+        {PROJECT_STATUS_LABEL[row.original.project.status]}
       </Badge>
     ),
   },

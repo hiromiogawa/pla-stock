@@ -2,16 +2,9 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
-import type { Project } from '~/entities/project'
+import { PROJECT_STATUS_LABEL, type Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 import { VirtualizedCardList } from '~/widgets/VirtualizedCardList'
-
-const STATUS_LABEL: Record<Project['status'], string> = {
-  planning: '計画中',
-  building: '製作中',
-  completed: '完成',
-  abandoned: '頓挫',
-}
 
 interface ProjectCardRow {
   project: Project
@@ -84,7 +77,7 @@ export function ProjectCardList({ rows }: ProjectCardListProps) {
                   {project.name}
                 </Typography>
                 <Badge variant="outline" className="text-xs">
-                  {STATUS_LABEL[project.status]}
+                  {PROJECT_STATUS_LABEL[project.status]}
                 </Badge>
               </Stack>
               <Typography variant="caption" color="text.secondary" noWrap>

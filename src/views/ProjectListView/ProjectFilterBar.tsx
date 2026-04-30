@@ -6,11 +6,11 @@ import Select from '@mui/material/Select'
 import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import { Search } from 'lucide-react'
-import type { Project } from '~/entities/project'
+import { PROJECT_STATUS_LABEL, type ProjectStatus } from '~/entities/project'
 
 export interface ProjectFilters {
   search: string
-  status: Project['status'] | 'all'
+  status: ProjectStatus | 'all'
 }
 
 export const INITIAL_FILTERS: ProjectFilters = {
@@ -18,7 +18,7 @@ export const INITIAL_FILTERS: ProjectFilters = {
   status: 'all',
 }
 
-const STATUSES: Array<Project['status'] | 'all'> = [
+const STATUSES: Array<ProjectStatus | 'all'> = [
   'all',
   'planning',
   'building',
@@ -26,12 +26,8 @@ const STATUSES: Array<Project['status'] | 'all'> = [
   'abandoned',
 ]
 
-const STATUS_LABEL: Record<Project['status'] | 'all', string> = {
-  all: 'すべてのステータス',
-  planning: '計画中',
-  building: '製作中',
-  completed: '完成',
-  abandoned: '頓挫',
+function statusLabel(status: ProjectStatus | 'all'): string {
+  return status === 'all' ? 'すべてのステータス' : PROJECT_STATUS_LABEL[status]
 }
 
 function toStatus(value: string): ProjectFilters['status'] {
@@ -78,7 +74,7 @@ export function ProjectFilterBar({ filters, onChange }: ProjectFilterBarProps) {
           >
             {STATUSES.map((status) => (
               <MenuItem key={status} value={status}>
-                {STATUS_LABEL[status]}
+                {statusLabel(status)}
               </MenuItem>
             ))}
           </Select>
