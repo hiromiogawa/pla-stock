@@ -1,8 +1,12 @@
+import Button from '@mui/material/Button'
 import FormControl from '@mui/material/FormControl'
+import InputAdornment from '@mui/material/InputAdornment'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import { Search } from 'lucide-react'
 import type { Grade, Scale } from '~/entities/kit'
-import { Input } from '~/shared/ui/input'
 
 export interface KitFilters {
   search: string
@@ -19,7 +23,6 @@ export const INITIAL_FILTERS: KitFilters = {
 const GRADES: Array<Grade | 'all'> = ['all', 'HG', 'RG', 'EG', 'MG', 'PG', 'other']
 const SCALES: Array<Scale | 'all'> = ['all', '1/144', '1/100', '1/60', '1/48', 'other']
 
-/** runtime narrowing: 想定外の値が来たら 'all' に fallback */
 function toGrade(value: string): KitFilters['grade'] {
   for (const grade of GRADES) {
     if (grade === value) return grade
@@ -40,39 +43,65 @@ interface KitFilterBarProps {
 }
 
 export function KitFilterBar({ filters, onChange }: KitFilterBarProps) {
+  const hasActiveFilter =
+    filters.search !== '' || filters.grade !== 'all' || filters.scale !== 'all'
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 rounded-lg border border-border bg-card">
-      <Input
+    <Stack spacing={1.5}>
+      <TextField
+        size="small"
+        fullWidth
         type="search"
+        placeholder="名前で検索"
         value={filters.search}
         onChange={(event) => onChange({ ...filters, search: event.target.value })}
-        placeholder="名前で検索"
-        className="md:col-span-2"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search size={16} strokeWidth={1.75} />
+            </InputAdornment>
+          ),
+        }}
       />
-      <FormControl fullWidth size="small">
-        <Select<KitFilters['grade']>
-          value={filters.grade}
-          onChange={(event) => onChange({ ...filters, grade: toGrade(String(event.target.value)) })}
-        >
-          {GRADES.map((grade) => (
-            <MenuItem key={grade} value={grade}>
-              {grade === 'all' ? 'すべてのグレード' : grade}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth size="small">
-        <Select<KitFilters['scale']>
-          value={filters.scale}
-          onChange={(event) => onChange({ ...filters, scale: toScale(String(event.target.value)) })}
-        >
-          {SCALES.map((scale) => (
-            <MenuItem key={scale} value={scale}>
-              {scale === 'all' ? 'すべてのスケール' : scale}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <Select<KitFilters['grade']>
+            value={filters.grade}
+            onChange={(event) =>
+              onChange({ ...filters, grade: toGrade(String(event.target.value)) })
+            }
+          >
+            {GRADES.map((grade) => (
+              <MenuItem key={grade} value={grade}>
+                {grade === 'all' ? 'すべてのグレード' : grade}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <Select<KitFilters['scale']>
+            value={filters.scale}
+            onChange={(event) =>
+              onChange({ ...filters, scale: toScale(String(event.target.value)) })
+            }
+          >
+            {SCALES.map((scale) => (
+              <MenuItem key={scale} value={scale}>
+                {scale === 'all' ? 'すべてのスケール' : scale}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        {hasActiveFilter && (
+          <Button
+            size="small"
+            onClick={() => onChange(INITIAL_FILTERS)}
+            sx={{ color: 'text.secondary', textTransform: 'none' }}
+          >
+            クリア
+          </Button>
+        )}
+      </Stack>
+    </Stack>
   )
 }
