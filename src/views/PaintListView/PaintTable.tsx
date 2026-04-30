@@ -52,7 +52,7 @@ const columns: ColumnDef<PaintTableRow>[] = [
   },
   {
     id: 'identifier',
-    accessorFn: (row) => `${row.paint.brand} ${row.paint.code} ${row.paint.name}`,
+    accessorFn: (row) => row.paint.name,
     header: '名前',
     cell: ({ row }) => (
       <Stack spacing={0.25} sx={{ minWidth: 0 }}>

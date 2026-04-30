@@ -76,8 +76,8 @@ export function PaintCardList({ rows }: PaintCardListProps) {
               <Typography variant="caption" color="text.secondary" noWrap>
                 {paint.brand} · {paint.code}
               </Typography>
-              <Typography variant="caption">
-                {paint.colorFamily ?? '色系統 未設定'} · {paint.finishType ?? 'フィニッシュ 未設定'}
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {paint.colorFamily ?? '—'} · {paint.finishType ?? '—'}
               </Typography>
               <Typography variant="caption" sx={{ fontWeight: 500 }}>
                 在庫 {stock.count} 本
