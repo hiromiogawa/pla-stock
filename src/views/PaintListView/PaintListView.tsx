@@ -1,10 +1,14 @@
-import { useMemo, useState } from 'react'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
+import { Plus } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import type { Paint, PaintStock } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
+import { PaintCardList } from './PaintCardList'
 import { PaintFilterBar, INITIAL_FILTERS, type PaintFilters } from './PaintFilterBar'
 import { PaintTable } from './PaintTable'
-import { PaintCardList } from './PaintCardList'
 
 interface PaintListViewProps {
   /** count > 0 の paint_stock のみ渡す (ローダー側で絞り込み済み) */
@@ -49,25 +53,37 @@ export function PaintListView({ stocks, paints }: PaintListViewProps) {
   }, [paints])
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">塗料</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            在庫塗料 {stocks.length} 件中 {rows.length} 件を表示 (count = 0 は非表示)
-          </p>
-        </div>
-        <Button component={Link} to="/paints/new">
-          + 追加
+    <Stack
+      spacing={3}
+      sx={{ maxWidth: '896px', mx: 'auto', px: { xs: 2, md: 4 }, py: { xs: 3, md: 5 } }}
+    >
+      <Stack direction="row" spacing={2} alignItems="flex-start" justifyContent="space-between">
+        <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+          <Typography
+            variant="h5"
+            component="h1"
+            sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}
+          >
+            塗料
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {rows.length} / {stocks.length} 件
+          </Typography>
+        </Stack>
+        <Button component={Link} to="/paints/new" variant="outline" size="sm" sx={{ gap: 0.75 }}>
+          <Plus size={14} strokeWidth={1.75} />
+          追加
         </Button>
-      </div>
+      </Stack>
+
       <PaintFilterBar filters={filters} brands={brands} onChange={setFilters} />
-      <div className="md:hidden">
+
+      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
         <PaintCardList rows={rows} />
-      </div>
-      <div className="hidden md:block">
+      </Box>
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
         <PaintTable rows={rows} />
-      </div>
-    </div>
+      </Box>
+    </Stack>
   )
 }

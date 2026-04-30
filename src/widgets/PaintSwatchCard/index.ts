@@ -1,1 +1,0 @@
-export { PaintSwatchCard } from './PaintSwatchCard'
