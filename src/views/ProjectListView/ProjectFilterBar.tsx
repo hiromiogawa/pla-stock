@@ -1,12 +1,16 @@
+import Button from '@mui/material/Button'
 import FormControl from '@mui/material/FormControl'
+import InputAdornment from '@mui/material/InputAdornment'
 import MenuItem from '@mui/material/MenuItem'
 import Select from '@mui/material/Select'
-import type { ProjectStatus } from '~/entities/project'
-import { Input } from '~/shared/ui/input'
+import Stack from '@mui/material/Stack'
+import TextField from '@mui/material/TextField'
+import { Search } from 'lucide-react'
+import type { Project } from '~/entities/project'
 
 export interface ProjectFilters {
   search: string
-  status: ProjectStatus | 'all'
+  status: Project['status'] | 'all'
 }
 
 export const INITIAL_FILTERS: ProjectFilters = {
@@ -14,7 +18,7 @@ export const INITIAL_FILTERS: ProjectFilters = {
   status: 'all',
 }
 
-const STATUSES: Array<ProjectStatus | 'all'> = [
+const STATUSES: Array<Project['status'] | 'all'> = [
   'all',
   'planning',
   'building',
@@ -22,15 +26,14 @@ const STATUSES: Array<ProjectStatus | 'all'> = [
   'abandoned',
 ]
 
-const STATUS_LABEL: Record<ProjectStatus | 'all', string> = {
-  all: 'すべて',
+const STATUS_LABEL: Record<Project['status'] | 'all', string> = {
+  all: 'すべてのステータス',
   planning: '計画中',
   building: '製作中',
   completed: '完成',
   abandoned: '頓挫',
 }
 
-/** runtime narrowing: 想定外の値が来たら 'all' に fallback */
 function toStatus(value: string): ProjectFilters['status'] {
   for (const status of STATUSES) {
     if (status === value) return status
@@ -44,29 +47,52 @@ interface ProjectFilterBarProps {
 }
 
 export function ProjectFilterBar({ filters, onChange }: ProjectFilterBarProps) {
+  const hasActiveFilter = filters.search !== '' || filters.status !== 'all'
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 rounded-lg border border-border bg-card">
-      <Input
+    <Stack spacing={1.5}>
+      <TextField
+        size="small"
+        fullWidth
         type="search"
+        placeholder="名前で検索"
         value={filters.search}
         onChange={(event) => onChange({ ...filters, search: event.target.value })}
-        placeholder="プロジェクト名で検索"
-        className="md:col-span-2"
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search size={16} strokeWidth={1.75} />
+              </InputAdornment>
+            ),
+          },
+        }}
       />
-      <FormControl fullWidth size="small">
-        <Select<ProjectFilters['status']>
-          value={filters.status}
-          onChange={(event) =>
-            onChange({ ...filters, status: toStatus(String(event.target.value)) })
-          }
-        >
-          {STATUSES.map((status) => (
-            <MenuItem key={status} value={status}>
-              {STATUS_LABEL[status]}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </div>
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: 'wrap' }}>
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <Select<ProjectFilters['status']>
+            value={filters.status}
+            onChange={(event) =>
+              onChange({ ...filters, status: toStatus(String(event.target.value)) })
+            }
+          >
+            {STATUSES.map((status) => (
+              <MenuItem key={status} value={status}>
+                {STATUS_LABEL[status]}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        {hasActiveFilter && (
+          <Button
+            size="small"
+            onClick={() => onChange(INITIAL_FILTERS)}
+            sx={{ color: 'text.secondary', textTransform: 'none' }}
+          >
+            クリア
+          </Button>
+        )}
+      </Stack>
+    </Stack>
   )
 }
