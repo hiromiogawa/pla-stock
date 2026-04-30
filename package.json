@@ -40,6 +40,7 @@
     "@tanstack/react-router-devtools": "^1.166.13",
     "@tanstack/react-start": "^1.167.42",
     "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
     "lucide-react": "1.8.0",
     "notistack": "^3.0.2",

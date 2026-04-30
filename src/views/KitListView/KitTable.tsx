@@ -1,37 +1,51 @@
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type SortingState,
-} from '@tanstack/react-table'
-import { useState } from 'react'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
 import { useNavigate } from '@tanstack/react-router'
+import { type ColumnDef } from '@tanstack/react-table'
 import type { Kit, KitStock } from '~/entities/kit'
+import { VirtualizedTable } from '~/widgets/VirtualizedTable'
 
 interface KitTableRow {
   stock: KitStock
   kit: Kit
 }
 
-const SORT_INDICATOR: Record<'asc' | 'desc', string> = { asc: ' ↑', desc: ' ↓' }
-
 const columns: ColumnDef<KitTableRow>[] = [
   {
     id: 'image',
     header: '',
     enableSorting: false,
+    size: 64,
     cell: ({ row }) => {
       const { boxArtUrl, name } = row.original.kit
       return (
-        <div className="w-12 h-12 shrink-0 rounded border border-border bg-muted/40 overflow-hidden flex items-center justify-center text-[10px] text-muted-foreground">
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: 1,
+            border: 1,
+            borderColor: 'divider',
+            bgcolor: 'action.hover',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.625rem',
+            color: 'text.secondary',
+          }}
+        >
           {boxArtUrl ? (
-            <img src={boxArtUrl} alt={name} className="w-full h-full object-cover" />
+            <Box
+              component="img"
+              src={boxArtUrl}
+              alt={name}
+              sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
           ) : (
             'No Image'
           )}
-        </div>
+        </Box>
       )
     },
   },
@@ -39,23 +53,32 @@ const columns: ColumnDef<KitTableRow>[] = [
     id: 'name',
     accessorFn: (row) => row.kit.name,
     header: '名前',
-    cell: ({ row }) => <span className="font-medium">{row.original.kit.name}</span>,
+    cell: ({ row }) => (
+      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+        {row.original.kit.name}
+      </Typography>
+    ),
   },
   {
-    id: 'grade',
-    accessorFn: (row) => row.kit.grade,
-    header: 'グレード',
-  },
-  {
-    id: 'scale',
-    accessorFn: (row) => row.kit.scale,
-    header: 'スケール',
+    id: 'meta',
+    accessorFn: (row) => `${row.kit.grade} ${row.kit.scale}`,
+    header: 'グレード · スケール',
+    cell: ({ row }) => (
+      <Typography variant="body2" color="text.secondary">
+        {row.original.kit.grade} · {row.original.kit.scale}
+      </Typography>
+    ),
   },
   {
     id: 'count',
     accessorFn: (row) => row.stock.count,
-    header: '在庫数',
-    cell: ({ row }) => <span className="font-medium">{row.original.stock.count} 個</span>,
+    header: '在庫',
+    size: 80,
+    cell: ({ row }) => (
+      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+        {row.original.stock.count} 個
+      </Typography>
+    ),
   },
 ]
 
@@ -65,66 +88,14 @@ interface KitTableProps {
 
 export function KitTable({ rows }: KitTableProps) {
   const navigate = useNavigate()
-  const [sorting, setSorting] = useState<SortingState>([])
-  const table = useReactTable({
-    data: rows,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  })
-
   return (
-    <div className="rounded-lg border border-border overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-muted/50">
-          {table.getHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="px-3 py-2 text-left font-medium text-muted-foreground cursor-pointer select-none"
-                  onClick={header.column.getToggleSortingHandler()}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {(() => {
-                      const sorted = header.column.getIsSorted()
-                      return sorted === false ? null : SORT_INDICATOR[sorted]
-                    })()}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.length === 0 ? (
-            <tr>
-              <td colSpan={columns.length} className="px-3 py-6 text-center text-muted-foreground">
-                該当するキットがありません
-              </td>
-            </tr>
-          ) : (
-            table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-t border-border cursor-pointer hover:bg-accent/50 transition-colors"
-                onClick={() =>
-                  void navigate({ to: '/kits/$kitId', params: { kitId: row.original.kit.id } })
-                }
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-3 py-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+    <VirtualizedTable
+      rows={rows}
+      columns={columns}
+      rowKey={(row) => row.kit.id}
+      onRowClick={(row) => void navigate({ to: '/kits/$kitId', params: { kitId: row.kit.id } })}
+      rowHref={(row) => `/kits/${row.kit.id}`}
+      emptyMessage="該当するキットがありません"
+    />
   )
 }

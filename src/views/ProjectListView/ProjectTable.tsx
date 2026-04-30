@@ -1,15 +1,11 @@
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type SortingState,
-} from '@tanstack/react-table'
-import { useState } from 'react'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useNavigate } from '@tanstack/react-router'
-import type { Project } from '~/entities/project'
+import { type ColumnDef } from '@tanstack/react-table'
+import { PROJECT_STATUS_LABEL, type Project } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
+import { VirtualizedTable } from '~/widgets/VirtualizedTable'
 
 interface ProjectTableRow {
   project: Project
@@ -17,35 +13,43 @@ interface ProjectTableRow {
   linkedKitBoxArtUrl: string | null
 }
 
-const STATUS_LABEL: Record<Project['status'], string> = {
-  planning: '計画中',
-  building: '製作中',
-  completed: '完成',
-  abandoned: '頓挫',
-}
-
-const SORT_INDICATOR: Record<'asc' | 'desc', string> = { asc: ' ↑', desc: ' ↓' }
-
 const columns: ColumnDef<ProjectTableRow>[] = [
   {
     id: 'image',
     header: '',
     enableSorting: false,
+    size: 64,
     cell: ({ row }) => {
       const { linkedKitBoxArtUrl } = row.original
       const projectName = row.original.project.name
       return (
-        <div className="w-12 h-12 shrink-0 rounded border border-border bg-muted/40 overflow-hidden flex items-center justify-center text-[10px] text-muted-foreground">
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            borderRadius: 1,
+            border: 1,
+            borderColor: 'divider',
+            bgcolor: 'action.hover',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.625rem',
+            color: 'text.secondary',
+          }}
+        >
           {linkedKitBoxArtUrl ? (
-            <img
+            <Box
+              component="img"
               src={linkedKitBoxArtUrl}
               alt={projectName}
-              className="w-full h-full object-cover"
+              sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
             'No Image'
           )}
-        </div>
+        </Box>
       )
     },
   },
@@ -54,23 +58,26 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     accessorFn: (row) => row.project.name,
     header: '名前',
     cell: ({ row }) => (
-      <div>
-        <div className="font-medium">{row.original.project.name}</div>
+      <Stack spacing={0.25} sx={{ minWidth: 0 }}>
+        <Typography variant="body2" sx={{ fontWeight: 500 }} noWrap>
+          {row.original.project.name}
+        </Typography>
         {row.original.project.description && (
-          <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+          <Typography variant="caption" color="text.secondary" noWrap>
             {row.original.project.description}
-          </div>
+          </Typography>
         )}
-      </div>
+      </Stack>
     ),
   },
   {
     id: 'status',
     accessorFn: (row) => row.project.status,
     header: 'ステータス',
+    size: 100,
     cell: ({ row }) => (
       <Badge variant="outline" className="text-xs">
-        {STATUS_LABEL[row.original.project.status]}
+        {PROJECT_STATUS_LABEL[row.original.project.status]}
       </Badge>
     ),
   },
@@ -80,29 +87,26 @@ const columns: ColumnDef<ProjectTableRow>[] = [
     header: '使用キット',
     cell: ({ row }) => {
       const value = row.original.linkedKitName
-      return value === null || value === '' ? (
-        <span className="text-muted-foreground">未紐付き</span>
-      ) : (
-        value
+      return (
+        <Typography variant="body2" color={value ? 'text.primary' : 'text.secondary'} noWrap>
+          {value ?? '未紐付き'}
+        </Typography>
       )
     },
   },
   {
-    id: 'startedAt',
+    id: 'period',
     accessorFn: (row) => row.project.startedAt ?? '',
-    header: '開始日',
+    header: '開始 → 完成',
+    size: 160,
     cell: ({ row }) => {
-      const value = row.original.project.startedAt
-      return value === null || value === '' ? '—' : value
-    },
-  },
-  {
-    id: 'completedAt',
-    accessorFn: (row) => row.project.completedAt ?? '',
-    header: '完成日',
-    cell: ({ row }) => {
-      const value = row.original.project.completedAt
-      return value === null || value === '' ? '—' : value
+      const start = row.original.project.startedAt
+      const end = row.original.project.completedAt
+      return (
+        <Typography variant="body2" color="text.secondary" noWrap>
+          {start ?? '—'} → {end ?? '—'}
+        </Typography>
+      )
     },
   },
 ]
@@ -113,66 +117,15 @@ interface ProjectTableProps {
 
 export function ProjectTable({ rows }: ProjectTableProps) {
   const navigate = useNavigate()
-  const [sorting, setSorting] = useState<SortingState>([])
-  const table = useReactTable({
-    data: rows,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  })
-
   return (
-    <div className="rounded-lg border border-border overflow-hidden">
-      <table className="w-full text-sm">
-        <thead className="bg-muted/50">
-          {table.getHeaderGroups().map((hg) => (
-            <tr key={hg.id}>
-              {hg.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="px-3 py-2 text-left font-medium text-muted-foreground cursor-pointer select-none"
-                  onClick={header.column.getToggleSortingHandler()}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                    {(() => {
-                      const sorted = header.column.getIsSorted()
-                      return sorted === false ? null : SORT_INDICATOR[sorted]
-                    })()}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody>
-          {table.getRowModel().rows.length === 0 ? (
-            <tr>
-              <td colSpan={columns.length} className="px-3 py-6 text-center text-muted-foreground">
-                該当するプロジェクトがありません
-              </td>
-            </tr>
-          ) : (
-            table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-t border-border cursor-pointer hover:bg-accent/50 transition-colors"
-                onClick={() =>
-                  void navigate({ to: '/projects/$id', params: { id: row.original.project.id } })
-                }
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-3 py-2">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+    <VirtualizedTable
+      rows={rows}
+      columns={columns}
+      rowKey={(row) => row.project.id}
+      onRowClick={(row) => void navigate({ to: '/projects/$id', params: { id: row.project.id } })}
+      rowHref={(row) => `/projects/${row.project.id}`}
+      estimateRowSize={64}
+      emptyMessage="該当するプロジェクトがありません"
+    />
   )
 }

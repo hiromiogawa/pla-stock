@@ -10,6 +10,13 @@
  */
 export type ProjectStatus = 'planning' | 'building' | 'completed' | 'abandoned'
 
+export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
+  planning: '計画中',
+  building: '製作中',
+  completed: '完成',
+  abandoned: '頓挫',
+}
+
 export interface Project {
   id: string
   userId: string

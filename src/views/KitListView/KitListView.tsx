@@ -1,10 +1,14 @@
-import { useMemo, useState } from 'react'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
+import { Plus } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import type { Kit, KitStock } from '~/entities/kit'
 import { Button } from '~/shared/ui/button'
+import { KitCardList } from './KitCardList'
 import { KitFilterBar, INITIAL_FILTERS, type KitFilters } from './KitFilterBar'
 import { KitTable } from './KitTable'
-import { KitCardList } from './KitCardList'
 
 interface KitListViewProps {
   /** count > 0 の kit_stock のみ渡す (ローダー側で絞り込み済み) */
@@ -36,25 +40,37 @@ export function KitListView({ stocks, kits }: KitListViewProps) {
   }, [stocks, kitById, filters])
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 md:px-8 md:py-10 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">キット</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            在庫キット {stocks.length} 件中 {rows.length} 件を表示 (count = 0 は非表示)
-          </p>
-        </div>
-        <Button component={Link} to="/kits/new">
-          + 在庫を追加
+    <Stack
+      spacing={3}
+      sx={{ maxWidth: '896px', mx: 'auto', px: { xs: 2, md: 4 }, py: { xs: 3, md: 5 } }}
+    >
+      <Stack direction="row" spacing={2} alignItems="flex-start" justifyContent="space-between">
+        <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+          <Typography
+            variant="h5"
+            component="h1"
+            sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}
+          >
+            キット
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {rows.length} / {stocks.length} 件
+          </Typography>
+        </Stack>
+        <Button component={Link} to="/kits/new" variant="outline" size="sm" sx={{ gap: 0.75 }}>
+          <Plus size={14} strokeWidth={1.75} />
+          追加
         </Button>
-      </div>
+      </Stack>
+
       <KitFilterBar filters={filters} onChange={setFilters} />
-      <div className="md:hidden">
+
+      <Box sx={{ display: { xs: 'block', md: 'none' } }}>
         <KitCardList rows={rows} />
-      </div>
-      <div className="hidden md:block">
+      </Box>
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
         <KitTable rows={rows} />
-      </div>
-    </div>
+      </Box>
+    </Stack>
   )
 }
