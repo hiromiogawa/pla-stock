@@ -16,25 +16,25 @@ description: docs/adr/ に不変のアーキテクチャ決定記録（ADR）を
 
 ## ファイル構成
 
+このプロジェクトは **flat 構成** (`docs/adr/NNNN-short-name.md`)。1 プロジェクト 1 連番、サブディレクトリは作らない。
+
 ```
 docs/adr/
-  root/                    # プロジェクト全体の決定
-    ADR-001-xxx.md
-    ADR-002-xxx.md
-  packages/                # パッケージ固有の決定
-    core/
-      ADR-001-xxx.md
-    storage-postgres/
-      ADR-001-xxx.md
+  0001-tooling.md
+  0002-mui-emotion.md
+  0003-tanstack-form-mui-pattern.md
+  ...
 ```
+
+> 補足: 大規模 monorepo で「root + packages/<pkg>/」のように分けるプロジェクトもあるが、本プロジェクトは単一パッケージのため flat に統一している。
 
 ## テンプレート
 
 ```markdown
-# ADR-XXX: タイトル
+# ADR-NNNN: タイトル
 
 ## ステータス
-Proposed | Accepted | Deprecated | Superseded by ADR-YYY
+Proposed | Accepted | Deprecated | Superseded by ADR-NNNN
 
 ## コンテキスト
 なぜこの決定が必要だったか。背景と制約条件。
@@ -56,15 +56,16 @@ Proposed | Accepted | Deprecated | Superseded by ADR-YYY
 
 ## 命名規則
 
-`ADR-XXX-short-description.md`
-- XXX は連番（001, 002, ...）
-- root と packages で独立した連番
+`NNNN-short-description.md`（ファイル名は 4 桁 zero-pad の連番）
+- 連番は `docs/adr/` 配下で 1 つに統一
+- 中身の見出しは `# ADR-NNNN: 日本語タイトル` 形式（例: `# ADR-0005: Domain enum 集約規約`）
+- 既存最大番号を `ls docs/adr/` で確認してから採番
 
 ## ルール
 
 - ADR は **不変** — 変更する場合は新しい ADR で Supersede
-- ステータスを更新して「Deprecated」or「Superseded by ADR-YYY」にする
-- コミット: `docs(adr): add ADR-XXX for topic`
+- ステータスを更新して「Deprecated」or「Superseded by ADR-NNNN」にする
+- コミット: `docs(docs): ADR-NNNN を追加 (タイトル要旨)` 形式（scope は `.project-config.yml` の `docs`）
 
 ## よくある間違い
 
@@ -72,6 +73,5 @@ Proposed | Accepted | Deprecated | Superseded by ADR-YYY
 |--------|-----------|
 | 既存 ADR を書き換える | ADR は不変。新 ADR で Supersede |
 | 選択肢を比較せず結論だけ書く | 却下された代替案と理由こそ ADR の価値 |
-| 番号重複 | 作成前に既存最大番号を確認 |
-| root と packages の番号を混同 | それぞれ独立した連番 |
+| 番号重複 | 作成前に `ls docs/adr/` で既存最大番号を確認 |
 | ADR 作成後に memory 保存を忘れる | brainstorming 中なら design-decision を使う |

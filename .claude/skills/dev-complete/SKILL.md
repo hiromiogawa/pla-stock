@@ -47,7 +47,7 @@ skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせる
 
 1. 変更をステージング
 2. `type(scope): description` フォーマットでコミット
-3. scope は対象パッケージ名（core, storage-postgres, embedding-onnx, mcp-server, hooks）
+3. scope は `.project-config.yml` の `scopes` フィールドを参照（例: `kit` / `paint` / `views` / `docs` 等）
 
 ### Step 4: github-flow（PR作成）
 
