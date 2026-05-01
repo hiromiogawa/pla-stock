@@ -16,6 +16,7 @@ export interface UseKitAddReturn {
   goToSearch: () => void
   selectKit: (kit: Kit) => void
   handleStockSubmit: (kitId: string, values: PurchaseEventInput) => Promise<void>
+  handleBackToList: () => void
 }
 
 /**
@@ -67,10 +68,15 @@ export function useKitAdd(input: UseKitAddInput): UseKitAddReturn {
     [userId, navigate, enqueueSnackbar],
   )
 
+  const handleBackToList = useCallback(() => {
+    void navigate({ to: '/kits' })
+  }, [navigate])
+
   return {
     phase,
     goToSearch,
     selectKit,
     handleStockSubmit,
+    handleBackToList,
   }
 }

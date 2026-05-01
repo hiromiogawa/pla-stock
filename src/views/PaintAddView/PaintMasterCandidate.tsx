@@ -1,3 +1,6 @@
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import type { Paint } from '~/entities/paint'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
@@ -9,12 +12,23 @@ interface PaintMasterCandidateProps {
 
 export function PaintMasterCandidate({ paint, onSelect }: PaintMasterCandidateProps) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border border-border p-3">
-      <div className="min-w-0 flex-1">
-        <div className="text-sm font-medium truncate">
+    <Stack
+      direction="row"
+      spacing={1.5}
+      alignItems="center"
+      sx={{
+        padding: 1.5,
+        borderRadius: 1,
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography variant="body2" sx={{ fontWeight: 500 }} noWrap>
           {paint.brand} {paint.code} {paint.name}
-        </div>
-        <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
+        </Typography>
+        <Stack direction="row" spacing={0.75} sx={{ mt: 0.5 }}>
           {paint.colorFamily && (
             <Badge variant="outline" className="text-xs">
               {paint.colorFamily}
@@ -25,9 +39,11 @@ export function PaintMasterCandidate({ paint, onSelect }: PaintMasterCandidatePr
               {paint.finishType}
             </Badge>
           )}
-        </div>
-      </div>
-      <Button onClick={onSelect}>在庫に追加</Button>
-    </div>
+        </Stack>
+      </Box>
+      <Button size="sm" onClick={onSelect} sx={{ flexShrink: 0 }}>
+        在庫に追加
+      </Button>
+    </Stack>
   )
 }
