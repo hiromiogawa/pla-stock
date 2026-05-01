@@ -1,20 +1,21 @@
-import { useState } from 'react'
+import Box from '@mui/material/Box'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import FormControl from '@mui/material/FormControl'
-import FormLabel from '@mui/material/FormLabel'
-import MenuItem from '@mui/material/MenuItem'
-import OutlinedInput from '@mui/material/OutlinedInput'
-import Select from '@mui/material/Select'
+import Stack from '@mui/material/Stack'
+import { useForm } from '@tanstack/react-form'
+import { z } from 'zod'
 import type { PaintEventReason } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
+import type { FormSelectOption } from '~/shared/ui/FormSelect'
+import { FormSelect } from '~/shared/ui/FormSelect'
+import { FormTextField } from '~/shared/ui/FormTextField'
 
 type ReleaseReason = Exclude<PaintEventReason, 'purchase'>
 
-const REASON_OPTIONS: Array<{ value: ReleaseReason; label: string }> = [
+const REASON_OPTIONS: FormSelectOption[] = [
   { value: 'discard', label: '廃棄（使い切り）' },
   { value: 'sell', label: '売却' },
   { value: 'gift', label: '譲渡' },
@@ -22,13 +23,18 @@ const REASON_OPTIONS: Array<{ value: ReleaseReason; label: string }> = [
   { value: 'other', label: 'その他' },
 ]
 
-/** runtime narrowing: 想定外の値が来たら 'discard' に fallback */
-function toReleaseReason(value: string): ReleaseReason {
-  for (const option of REASON_OPTIONS) {
-    if (option.value === value) return option.value
-  }
-  return 'discard'
-}
+const RELEASE_REASON_VALUES = [
+  'discard',
+  'sell',
+  'gift',
+  'lost',
+  'other',
+] as const satisfies readonly [ReleaseReason, ...ReleaseReason[]]
+
+const paintReleaseSchema = z.object({
+  reason: z.enum(RELEASE_REASON_VALUES),
+  note: z.string().max(2000).optional().nullable(),
+})
 
 export interface PaintReleaseValues {
   reason: ReleaseReason
@@ -42,71 +48,76 @@ interface PaintReleaseDialogProps {
   onConfirm: (values: PaintReleaseValues) => void | Promise<void>
 }
 
+interface PaintReleaseFormDefaults {
+  reason: ReleaseReason
+  note: string
+}
+
+const PAINT_RELEASE_FORM_DEFAULTS: PaintReleaseFormDefaults = {
+  reason: 'discard',
+  note: '',
+}
+
 export function PaintReleaseDialog({
   open,
   paintLabel,
   onOpenChange,
   onConfirm,
 }: PaintReleaseDialogProps) {
-  const [values, setValues] = useState<PaintReleaseValues>({
-    reason: 'discard',
-    note: null,
+  const form = useForm({
+    defaultValues: PAINT_RELEASE_FORM_DEFAULTS,
+    onSubmit: async ({ value }) => {
+      const parsed = paintReleaseSchema.parse({
+        reason: value.reason,
+        note: value.note === '' ? null : value.note,
+      })
+      await onConfirm({
+        reason: parsed.reason,
+        note: parsed.note ?? null,
+      })
+      form.reset()
+      onOpenChange(false)
+    },
   })
 
-  const handleConfirm = async () => {
-    await onConfirm(values)
-    setValues({ reason: 'discard', note: null })
+  const handleClose = () => {
+    form.reset()
     onOpenChange(false)
   }
 
   return (
-    <Dialog open={open} onClose={() => onOpenChange(false)} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle>手放し記録を追加</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          「{paintLabel}」を 1 本手放します。在庫が 1 減ります。
-        </DialogContentText>
-        <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <FormLabel htmlFor="reason">理由</FormLabel>
-            <FormControl fullWidth size="small">
-              <Select<ReleaseReason>
-                id="reason"
-                value={values.reason}
-                onChange={(event) =>
-                  setValues({ ...values, reason: toReleaseReason(String(event.target.value)) })
-                }
-              >
-                {REASON_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-          <div className="space-y-2">
-            <FormLabel htmlFor="note">メモ</FormLabel>
-            <OutlinedInput
-              id="note"
-              multiline
-              rows={2}
-              value={values.note ?? ''}
-              onChange={(event) => setValues({ ...values, note: event.target.value || null })}
-              size="small"
-              fullWidth
-            />
-          </div>
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
-          キャンセル
-        </Button>
-        <Button variant="destructive" onClick={handleConfirm}>
-          手放しを記録
-        </Button>
-      </DialogActions>
+      <Box
+        component="form"
+        onSubmit={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          void form.handleSubmit()
+        }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            「{paintLabel}」を 1 本手放します。在庫が 1 減ります。
+          </DialogContentText>
+          <Stack spacing={2} sx={{ pt: 2 }}>
+            <form.Field name="reason">
+              {(field) => <FormSelect field={field} label="理由" options={REASON_OPTIONS} />}
+            </form.Field>
+            <form.Field name="note">
+              {(field) => <FormTextField field={field} label="メモ" multiline rows={2} />}
+            </form.Field>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button type="button" variant="outline" onClick={handleClose}>
+            キャンセル
+          </Button>
+          <Button type="submit" variant="destructive">
+            手放しを記録
+          </Button>
+        </DialogActions>
+      </Box>
     </Dialog>
   )
 }

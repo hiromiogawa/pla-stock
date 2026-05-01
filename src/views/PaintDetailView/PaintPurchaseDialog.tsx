@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import Box from '@mui/material/Box'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import FormLabel from '@mui/material/FormLabel'
-import OutlinedInput from '@mui/material/OutlinedInput'
+import Stack from '@mui/material/Stack'
+import { useForm } from '@tanstack/react-form'
+import { paintPurchaseEventSchema } from '~/features/paint-stock-add'
 import { Button } from '~/shared/ui/button'
+import { FormTextField } from '~/shared/ui/FormTextField'
 
 export interface PaintPurchaseValues {
   purchasedAt: string | null
@@ -22,94 +24,102 @@ interface PaintPurchaseDialogProps {
   onConfirm: (values: PaintPurchaseValues) => void | Promise<void>
 }
 
+interface PaintPurchaseFormDefaults {
+  purchasedAt: string
+  purchasePriceYen: string | number | null
+  purchaseLocation: string
+  note: string
+}
+
+const PAINT_PURCHASE_FORM_DEFAULTS: PaintPurchaseFormDefaults = {
+  purchasedAt: '',
+  purchasePriceYen: '',
+  purchaseLocation: '',
+  note: '',
+}
+
 export function PaintPurchaseDialog({
   open,
   paintLabel,
   onOpenChange,
   onConfirm,
 }: PaintPurchaseDialogProps) {
-  const [values, setValues] = useState<PaintPurchaseValues>({
-    purchasedAt: null,
-    priceYen: null,
-    purchaseLocation: null,
-    note: null,
+  const form = useForm({
+    defaultValues: PAINT_PURCHASE_FORM_DEFAULTS,
+    onSubmit: async ({ value }) => {
+      const parsed = paintPurchaseEventSchema.parse({
+        purchasedAt: value.purchasedAt === '' ? null : value.purchasedAt,
+        purchasePriceYen:
+          value.purchasePriceYen === '' || value.purchasePriceYen === null
+            ? null
+            : Number(value.purchasePriceYen),
+        purchaseLocation: value.purchaseLocation === '' ? null : value.purchaseLocation,
+        note: value.note === '' ? null : value.note,
+      })
+      await onConfirm({
+        purchasedAt: parsed.purchasedAt ?? null,
+        priceYen: parsed.purchasePriceYen ?? null,
+        purchaseLocation: parsed.purchaseLocation ?? null,
+        note: parsed.note ?? null,
+      })
+      form.reset()
+      onOpenChange(false)
+    },
   })
 
-  const handleConfirm = async () => {
-    await onConfirm(values)
-    setValues({ purchasedAt: null, priceYen: null, purchaseLocation: null, note: null })
+  const handleClose = () => {
+    form.reset()
     onOpenChange(false)
   }
 
   return (
-    <Dialog open={open} onClose={() => onOpenChange(false)} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle>購入記録を追加</DialogTitle>
-      <DialogContent>
-        <DialogContentText>「{paintLabel}」を 1 本購入して在庫に追加します。</DialogContentText>
-        <div className="space-y-4 py-2">
-          <div className="space-y-2">
-            <FormLabel htmlFor="purchasedAt">購入日</FormLabel>
-            <OutlinedInput
-              id="purchasedAt"
-              type="date"
-              value={values.purchasedAt ?? ''}
-              onChange={(event) =>
-                setValues({ ...values, purchasedAt: event.target.value || null })
-              }
-              size="small"
-              fullWidth
-            />
-          </div>
-          <div className="space-y-2">
-            <FormLabel htmlFor="priceYen">購入価格 (円)</FormLabel>
-            <OutlinedInput
-              id="priceYen"
-              type="number"
-              inputProps={{ inputMode: 'numeric' }}
-              value={values.priceYen ?? ''}
-              onChange={(event) =>
-                setValues({
-                  ...values,
-                  priceYen: event.target.value === '' ? null : Number(event.target.value),
-                })
-              }
-              size="small"
-              fullWidth
-            />
-          </div>
-          <div className="space-y-2">
-            <FormLabel htmlFor="purchaseLocation">購入場所</FormLabel>
-            <OutlinedInput
-              id="purchaseLocation"
-              value={values.purchaseLocation ?? ''}
-              onChange={(event) =>
-                setValues({ ...values, purchaseLocation: event.target.value || null })
-              }
-              placeholder="ヨドバシ梅田 / Amazon など"
-              size="small"
-              fullWidth
-            />
-          </div>
-          <div className="space-y-2">
-            <FormLabel htmlFor="note">メモ</FormLabel>
-            <OutlinedInput
-              id="note"
-              multiline
-              rows={2}
-              value={values.note ?? ''}
-              onChange={(event) => setValues({ ...values, note: event.target.value || null })}
-              size="small"
-              fullWidth
-            />
-          </div>
-        </div>
-      </DialogContent>
-      <DialogActions>
-        <Button variant="outline" onClick={() => onOpenChange(false)}>
-          キャンセル
-        </Button>
-        <Button onClick={handleConfirm}>購入記録を追加</Button>
-      </DialogActions>
+      <Box
+        component="form"
+        onSubmit={(event) => {
+          event.preventDefault()
+          event.stopPropagation()
+          void form.handleSubmit()
+        }}
+      >
+        <DialogContent>
+          <DialogContentText>「{paintLabel}」を 1 本購入して在庫に追加します。</DialogContentText>
+          <Stack spacing={2} sx={{ pt: 2 }}>
+            <form.Field name="purchasedAt">
+              {(field) => <FormTextField field={field} label="購入日" type="date" />}
+            </form.Field>
+            <form.Field name="purchasePriceYen">
+              {(field) => (
+                <FormTextField
+                  field={field}
+                  label="購入価格 (円)"
+                  type="number"
+                  inputMode="numeric"
+                />
+              )}
+            </form.Field>
+            <form.Field name="purchaseLocation">
+              {(field) => (
+                <FormTextField
+                  field={field}
+                  label="購入場所"
+                  placeholder="ヨドバシ梅田 / Amazon など"
+                />
+              )}
+            </form.Field>
+            <form.Field name="note">
+              {(field) => <FormTextField field={field} label="メモ" multiline rows={2} />}
+            </form.Field>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button type="button" variant="outline" onClick={handleClose}>
+            キャンセル
+          </Button>
+          <Button type="submit">購入記録を追加</Button>
+        </DialogActions>
+      </Box>
     </Dialog>
   )
 }
