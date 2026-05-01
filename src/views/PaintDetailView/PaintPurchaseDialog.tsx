@@ -4,10 +4,9 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import FormLabel from '@mui/material/FormLabel'
+import OutlinedInput from '@mui/material/OutlinedInput'
 import { Button } from '~/shared/ui/button'
-import { Input } from '~/shared/ui/input'
-import { Label } from '~/shared/ui/label'
-import { Textarea } from '~/shared/ui/textarea'
 
 export interface PaintPurchaseValues {
   purchasedAt: string | null
@@ -49,22 +48,24 @@ export function PaintPurchaseDialog({
         <DialogContentText>「{paintLabel}」を 1 本購入して在庫に追加します。</DialogContentText>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="purchasedAt">購入日</Label>
-            <Input
+            <FormLabel htmlFor="purchasedAt">購入日</FormLabel>
+            <OutlinedInput
               id="purchasedAt"
               type="date"
               value={values.purchasedAt ?? ''}
               onChange={(event) =>
                 setValues({ ...values, purchasedAt: event.target.value || null })
               }
+              size="small"
+              fullWidth
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="priceYen">購入価格 (円)</Label>
-            <Input
+            <FormLabel htmlFor="priceYen">購入価格 (円)</FormLabel>
+            <OutlinedInput
               id="priceYen"
               type="number"
-              inputMode="numeric"
+              inputProps={{ inputMode: 'numeric' }}
               value={values.priceYen ?? ''}
               onChange={(event) =>
                 setValues({
@@ -72,26 +73,33 @@ export function PaintPurchaseDialog({
                   priceYen: event.target.value === '' ? null : Number(event.target.value),
                 })
               }
+              size="small"
+              fullWidth
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="purchaseLocation">購入場所</Label>
-            <Input
+            <FormLabel htmlFor="purchaseLocation">購入場所</FormLabel>
+            <OutlinedInput
               id="purchaseLocation"
               value={values.purchaseLocation ?? ''}
               onChange={(event) =>
                 setValues({ ...values, purchaseLocation: event.target.value || null })
               }
               placeholder="ヨドバシ梅田 / Amazon など"
+              size="small"
+              fullWidth
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="note">メモ</Label>
-            <Textarea
+            <FormLabel htmlFor="note">メモ</FormLabel>
+            <OutlinedInput
               id="note"
+              multiline
               rows={2}
               value={values.note ?? ''}
               onChange={(event) => setValues({ ...values, note: event.target.value || null })}
+              size="small"
+              fullWidth
             />
           </div>
         </div>

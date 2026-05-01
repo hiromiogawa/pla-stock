@@ -4,9 +4,9 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import OutlinedInput from '@mui/material/OutlinedInput'
 import type { Paint } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
-import { Input } from '~/shared/ui/input'
 
 interface AddPaintDialogProps {
   open: boolean
@@ -43,12 +43,14 @@ export function AddPaintDialog({ open, candidates, onOpenChange, onSelect }: Add
         <DialogContentText>
           このプロジェクトで使う塗料を選択してください。在庫の count は変化しません。
         </DialogContentText>
-        <Input
+        <OutlinedInput
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="ブランド / コード / 名前で検索"
           autoFocus
+          size="small"
+          fullWidth
         />
         <div className="overflow-y-auto flex-1 space-y-1">
           {filtered.length === 0 ? (

@@ -4,9 +4,9 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import FormLabel from '@mui/material/FormLabel'
+import OutlinedInput from '@mui/material/OutlinedInput'
 import { Button } from '~/shared/ui/button'
-import { Input } from '~/shared/ui/input'
-import { Label } from '~/shared/ui/label'
 
 export interface AddPhotoInput {
   url: string
@@ -49,30 +49,36 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
           </DialogContentText>
           <div className="space-y-4 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="photo-url">画像 URL *</Label>
-              <Input
+              <FormLabel htmlFor="photo-url">画像 URL *</FormLabel>
+              <OutlinedInput
                 id="photo-url"
                 value={url}
                 onChange={(event) => setUrl(event.target.value)}
                 placeholder="https://..."
                 required
+                size="small"
+                fullWidth
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="photo-caption">キャプション</Label>
-              <Input
+              <FormLabel htmlFor="photo-caption">キャプション</FormLabel>
+              <OutlinedInput
                 id="photo-caption"
                 value={caption}
                 onChange={(event) => setCaption(event.target.value)}
+                size="small"
+                fullWidth
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="photo-takenAt">撮影日</Label>
-              <Input
+              <FormLabel htmlFor="photo-takenAt">撮影日</FormLabel>
+              <OutlinedInput
                 id="photo-takenAt"
                 type="date"
                 value={takenAt}
                 onChange={(event) => setTakenAt(event.target.value)}
+                size="small"
+                fullWidth
               />
             </div>
           </div>
