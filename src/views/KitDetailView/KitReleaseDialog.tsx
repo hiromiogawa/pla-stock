@@ -5,12 +5,12 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
+import FormLabel from '@mui/material/FormLabel'
 import MenuItem from '@mui/material/MenuItem'
+import OutlinedInput from '@mui/material/OutlinedInput'
 import Select from '@mui/material/Select'
 import type { KitEventReason } from '~/entities/kit'
 import { Button } from '~/shared/ui/button'
-import { Label } from '~/shared/ui/label'
-import { Textarea } from '~/shared/ui/textarea'
 
 type ReleaseReason = Exclude<KitEventReason, 'purchase' | 'project'>
 
@@ -65,7 +65,7 @@ export function KitReleaseDialog({
         <DialogContentText>「{kitName}」を 1 個手放します。在庫が 1 減ります。</DialogContentText>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="reason">理由</Label>
+            <FormLabel htmlFor="reason">理由</FormLabel>
             <FormControl fullWidth size="small">
               <Select<ReleaseReason>
                 id="reason"
@@ -83,12 +83,15 @@ export function KitReleaseDialog({
             </FormControl>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="note">メモ</Label>
-            <Textarea
+            <FormLabel htmlFor="note">メモ</FormLabel>
+            <OutlinedInput
               id="note"
+              multiline
               rows={2}
               value={values.note ?? ''}
               onChange={(event) => setValues({ ...values, note: event.target.value || null })}
+              size="small"
+              fullWidth
             />
           </div>
         </div>
