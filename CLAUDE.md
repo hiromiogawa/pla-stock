@@ -218,6 +218,26 @@ MUI v7 は内部 engine に Emotion を使うが、**user code は MUI 抽象し
 
 Form は **TanStack Form + MUI TextField/Select**、`<FormTextField field={...} />` / `<FormSelect field={...} options={...} />` 経由で統一。詳細 ADR-0003。
 
+### Domain enum (ADR-0005)
+
+ドメインの離散値 (event reason / status / category 等の literal union) は **entities/{domain}/model.ts に values 配列 + 型派生 + labels の 3 点セット** で集約する。view / dialog 側で値リスト・label を再宣言しない。
+
+```ts
+// entities/kit/model.ts
+export const KIT_EVENT_REASONS = [
+  'purchase', 'project', 'gift', 'sell', 'discard', 'other',
+] as const
+export type KitEventReason = (typeof KIT_EVENT_REASONS)[number]
+export const KIT_EVENT_REASON_LABELS = {
+  purchase: '購入', project: 'プロジェクト', gift: '譲渡',
+  sell: '売却', discard: '廃棄', other: 'その他',
+} as const satisfies Record<KitEventReason, string>
+```
+
+利用側は import で値・型・labels を取り出し、UI 専用 subset (例: release だけで使う reasons) は dialog 内に `as const satisfies readonly KitEventReason[]` で型整合だけ守って宣言。同 subset を 2 箇所以上で使うなら entity 側に昇格させる。
+
+機械強制はせず convention 運用。AI エージェントが本規約に違反した場合は ADR-0007 に FAIL エントリとして追記し `failure-record` → `rule-cycle` で再発防止サイクルを回す。詳細 ADR-0005 / ADR-0007。
+
 ### 型アサーション・三項ネスト禁止 (PR #56 レビュー由来)
 
 oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
