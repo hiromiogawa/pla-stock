@@ -7,6 +7,14 @@ description: 実装完了時の仕上げ（self-review → docs-freshness → co
 
 実装が終わったとき、コミット・PR作成までの仕上げを統括する。
 
+## ⚠ 起動規律 (FAIL-002 由来 / ADR-0007)
+
+**この skill の内容が context に表示された = Skill tool で起動された証跡**。手順を最初から省略せず踏むこと。
+
+skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせるだけでは **本 skill 起動の代替にならない**。本 skill は self-review / docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。Skill tool 経由で起動しないと連鎖が起きず工程が抜ける。
+
+「コマンドは走らせたから手順は把握してる」「軽微な変更だから略式で OK」は省略合理化のサイン。Red Flag が浮かんだら STOP し、Skill tool で `dev-complete` (および内側の `self-review`) を改めて起動する。
+
 ## いつ使うか
 
 - 実装が一段落したとき（「実装できた」「テスト通った」）

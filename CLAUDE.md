@@ -269,6 +269,28 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
   - 特に「**見た目に対する feedback**」(例: 「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず**、まず skill で Design Thinking (Tone / Differentiation / Constraints) を再適用する
   - spec (`docs/specs/2026-04-29-design-direction.md`) は方針、skill は **その実装局面での craft 適用ガイド**。両方必須
 
+### Skill tool 起動の規律 (FAIL-002 由来 / ADR-0007)
+
+トリガー表 (本ドキュメント冒頭) で「起動する Skill」と書かれているものは、**Skill tool で明示起動する**。skill 内に書かれた検証コマンドを `pnpm xxx` で手打ちしても skill 起動の代替にはならない。
+
+特に以下は **コマンド手打ちでの代替を厳禁**:
+
+| 起動が必須な skill | コマンド手打ちで代替できない理由 |
+|---|---|
+| `dev-complete` | self-review / docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。手打ちでは連鎖が起きず工程が抜ける |
+| `self-review` | 検証コマンド以外に「**差分ファイルを新鮮な目で再読**」「ツールで検出できない懸念探索」が含まれる。コマンドだけ走らせると人間レビュー視点が抜ける |
+| `dev-start` | memory 検索 / Issue 確認 / ブランチ作成のオーケストレーション。手打ちで進めると memory 検索が抜けがち |
+| `frontend-design` | Design Thinking (Tone / Differentiation / Constraints) の適用ガイド。skill を読み流して反応的に sx を弄ると craft が崩れる |
+
+**Red Flag** (これが浮かんだら STOP — Skill tool 起動を省略しようとしているサイン):
+
+- 「skill の内容は把握してるからコマンドだけで OK」 → 把握してても手順が抜ける。Skill tool 起動して checklist を毎回踏む
+- 「docs / 軽微な変更だから self-review 軽くて OK」 → docs こそ grep カウント汚染等の落とし穴あり (FAIL-002 で実証)。重さは内容ではなく **省略を許さない態度** で決める
+- 「`pnpm check:parallel` が pre-commit hook で走るから OK」 → hook は最後の砦であって self-review の代替ではない。差分 re-read は hook で代替できない
+- 「task で `self-review` をマークしたから OK」 → タスク完了マークは記録、Skill tool 起動が実行。両方必要
+
+実装系タスクで TaskCreate を使う際は、**「Skill tool で `dev-complete` を起動」を独立タスクとして必ず切る** と、起動行為が可視化されて省略しにくくなる。
+
 ### `verify:ui` 運用
 
 ```sh
