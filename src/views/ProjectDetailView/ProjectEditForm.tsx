@@ -92,25 +92,11 @@ export function ProjectEditForm({ project, onSave, onCancel }: ProjectEditFormPr
         </form.Field>
 
         <form.Field name="startedAt">
-          {(field) => (
-            <FormTextField
-              field={field}
-              label="開始日"
-              type="date"
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          )}
+          {(field) => <FormTextField field={field} label="開始日" type="date" />}
         </form.Field>
 
         <form.Field name="completedAt">
-          {(field) => (
-            <FormTextField
-              field={field}
-              label="完成日"
-              type="date"
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          )}
+          {(field) => <FormTextField field={field} label="完成日" type="date" />}
         </form.Field>
 
         <form.Subscribe
