@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react'
 import type { Kit } from '~/entities/kit'
 import type { Paint } from '~/entities/paint'
-import type { Project, ProjectPhoto } from '~/entities/project'
+import { PROJECT_STATUS_LABEL, type Project, type ProjectPhoto } from '~/entities/project'
 import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 import { ProjectDeleteDialog } from './ProjectDeleteDialog'
@@ -21,13 +21,6 @@ interface ProjectDetailViewProps extends UseProjectDetailReturn {
   paintsForProject: Paint[]
   allPaints: Paint[]
   photos: ProjectPhoto[]
-}
-
-const STATUS_LABEL: Record<Project['status'], string> = {
-  planning: '計画中',
-  building: '製作中',
-  completed: '完成',
-  abandoned: '頓挫',
 }
 
 const STATUS_VARIANT: Record<Project['status'], 'default' | 'secondary' | 'outline'> = {
@@ -111,7 +104,9 @@ export function ProjectDetailView({
             {project.name}
           </Typography>
           <Box>
-            <Badge variant={STATUS_VARIANT[project.status]}>{STATUS_LABEL[project.status]}</Badge>
+            <Badge variant={STATUS_VARIANT[project.status]}>
+              {PROJECT_STATUS_LABEL[project.status]}
+            </Badge>
           </Box>
         </Stack>
         {!editing && (

@@ -1,5 +1,8 @@
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useForm } from '@tanstack/react-form'
-import type { Project, ProjectStatus } from '~/entities/project'
+import { PROJECT_STATUS_LABEL, type Project, type ProjectStatus } from '~/entities/project'
 import { Button } from '~/shared/ui/button'
 import { FormSelect, type FormSelectOption } from '~/shared/ui/FormSelect'
 import { FormTextField } from '~/shared/ui/FormTextField'
@@ -18,12 +21,12 @@ interface ProjectEditFormProps {
   onCancel: () => void
 }
 
-const STATUS_OPTIONS: FormSelectOption[] = [
-  { value: 'planning', label: '計画中' },
-  { value: 'building', label: '製作中' },
-  { value: 'completed', label: '完成' },
-  { value: 'abandoned', label: '頓挫' },
-]
+const STATUS_ORDER: ProjectStatus[] = ['planning', 'building', 'completed', 'abandoned']
+
+const STATUS_OPTIONS: FormSelectOption[] = STATUS_ORDER.map((status) => ({
+  value: status,
+  label: PROJECT_STATUS_LABEL[status],
+}))
 
 export function ProjectEditForm({ project, onSave, onCancel }: ProjectEditFormProps) {
   const form = useForm({
@@ -56,67 +59,78 @@ export function ProjectEditForm({ project, onSave, onCancel }: ProjectEditFormPr
   })
 
   return (
-    <form
+    <Box
+      component="form"
       onSubmit={(event) => {
         event.preventDefault()
         event.stopPropagation()
         void form.handleSubmit()
       }}
-      className="rounded-lg border border-border bg-card p-4 space-y-4"
+      sx={{
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        padding: 2,
+      }}
     >
-      <h2 className="text-sm font-semibold">プロジェクトを編集</h2>
+      <Stack spacing={3}>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          プロジェクトを編集
+        </Typography>
 
-      <form.Field name="name">
-        {(field) => <FormTextField field={field} label="名前 *" required />}
-      </form.Field>
+        <form.Field name="name">
+          {(field) => <FormTextField field={field} label="名前 *" required />}
+        </form.Field>
 
-      <form.Field name="description">
-        {(field) => <FormTextField field={field} label="説明" multiline rows={3} />}
-      </form.Field>
+        <form.Field name="description">
+          {(field) => <FormTextField field={field} label="説明" multiline rows={3} />}
+        </form.Field>
 
-      <form.Field name="status">
-        {(field) => <FormSelect field={field} label="ステータス" options={STATUS_OPTIONS} />}
-      </form.Field>
+        <form.Field name="status">
+          {(field) => <FormSelect field={field} label="ステータス" options={STATUS_OPTIONS} />}
+        </form.Field>
 
-      <form.Field name="startedAt">
-        {(field) => (
-          <FormTextField
-            field={field}
-            label="開始日"
-            type="date"
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
-        )}
-      </form.Field>
+        <form.Field name="startedAt">
+          {(field) => (
+            <FormTextField
+              field={field}
+              label="開始日"
+              type="date"
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+          )}
+        </form.Field>
 
-      <form.Field name="completedAt">
-        {(field) => (
-          <FormTextField
-            field={field}
-            label="完成日"
-            type="date"
-            slotProps={{ inputLabel: { shrink: true } }}
-          />
-        )}
-      </form.Field>
+        <form.Field name="completedAt">
+          {(field) => (
+            <FormTextField
+              field={field}
+              label="完成日"
+              type="date"
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+          )}
+        </form.Field>
 
-      <form.Subscribe
-        selector={(state) => ({
-          name: state.values.name,
-          isSubmitting: state.isSubmitting,
-        })}
-      >
-        {({ name, isSubmitting }) => (
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-              キャンセル
-            </Button>
-            <Button type="submit" disabled={isSubmitting || !name.trim()}>
-              {isSubmitting ? '保存中…' : '保存'}
-            </Button>
-          </div>
-        )}
-      </form.Subscribe>
-    </form>
+        <form.Subscribe
+          selector={(state) => ({
+            name: state.values.name,
+            isSubmitting: state.isSubmitting,
+          })}
+        >
+          {({ name, isSubmitting }) => (
+            <Stack direction="row" spacing={1.5} justifyContent="flex-end" sx={{ pt: 1 }}>
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+                キャンセル
+              </Button>
+              <Button type="submit" disabled={isSubmitting || !name.trim()}>
+                {isSubmitting ? '保存中…' : '保存'}
+              </Button>
+            </Stack>
+          )}
+        </form.Subscribe>
+      </Stack>
+    </Box>
   )
 }
