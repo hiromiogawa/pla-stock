@@ -1,5 +1,7 @@
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import type { Kit } from '~/entities/kit'
-import { Badge } from '~/shared/ui/badge'
 import { Button } from '~/shared/ui/button'
 
 interface KitMasterCandidateProps {
@@ -9,18 +11,29 @@ interface KitMasterCandidateProps {
 
 export function KitMasterCandidate({ kit, onSelect }: KitMasterCandidateProps) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border border-border p-3">
-      <div className="min-w-0 flex-1">
-        <div className="text-sm font-medium truncate">{kit.name}</div>
-        <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
-          <Badge variant="outline" className="text-xs">
-            {kit.grade}
-          </Badge>
-          <span>·</span>
-          <span>{kit.scale}</span>
-        </div>
-      </div>
-      <Button onClick={onSelect}>在庫に追加</Button>
-    </div>
+    <Stack
+      direction="row"
+      spacing={1.5}
+      alignItems="center"
+      sx={{
+        padding: 1.5,
+        borderRadius: 1,
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+      }}
+    >
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography variant="body2" sx={{ fontWeight: 500 }} noWrap>
+          {kit.name}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {kit.grade} · {kit.scale}
+        </Typography>
+      </Box>
+      <Button size="sm" onClick={onSelect} sx={{ flexShrink: 0 }}>
+        在庫に追加
+      </Button>
+    </Stack>
   )
 }
