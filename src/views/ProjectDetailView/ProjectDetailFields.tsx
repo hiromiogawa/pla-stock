@@ -3,14 +3,7 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { Link } from '@tanstack/react-router'
 import type { Kit } from '~/entities/kit'
-import type { Project } from '~/entities/project'
-
-const STATUS_LABEL: Record<Project['status'], string> = {
-  planning: '計画中',
-  building: '製作中',
-  completed: '完成',
-  abandoned: '頓挫',
-}
+import { PROJECT_STATUS_LABEL, type Project } from '~/entities/project'
 
 const fieldRowSx = {
   display: 'grid',
@@ -95,7 +88,7 @@ export function ProjectDetailFields({ project, kit }: ProjectDetailFieldsProps) 
       <Box component="dl" sx={{ margin: 0 }}>
         <FieldRow label="名前" value={project.name} />
         <FieldRow label="説明" value={project.description} />
-        <FieldRow label="ステータス" value={STATUS_LABEL[project.status]} />
+        <FieldRow label="ステータス" value={PROJECT_STATUS_LABEL[project.status]} />
         <FieldRow label="開始日" value={project.startedAt} />
         <FieldRow label="完成日" value={project.completedAt} />
         <KitRow kit={kit} />
