@@ -16,6 +16,7 @@ export interface UsePaintAddReturn {
   goToSearch: () => void
   selectPaint: (paint: Paint) => void
   handleStockSubmit: (paintId: string, values: PaintPurchaseEventInput) => Promise<void>
+  handleBackToList: () => void
 }
 
 /**
@@ -66,10 +67,15 @@ export function usePaintAdd(input: UsePaintAddInput): UsePaintAddReturn {
     [userId, navigate, enqueueSnackbar],
   )
 
+  const handleBackToList = useCallback(() => {
+    void navigate({ to: '/paints' })
+  }, [navigate])
+
   return {
     phase,
     goToSearch,
     selectPaint,
     handleStockSubmit,
+    handleBackToList,
   }
 }

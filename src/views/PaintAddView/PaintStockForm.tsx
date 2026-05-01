@@ -1,3 +1,6 @@
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useForm } from '@tanstack/react-form'
 import type { Paint } from '~/entities/paint'
 import { paintPurchaseEventSchema, type PaintPurchaseEventInput } from '~/features/paint-stock-add'
@@ -42,47 +45,62 @@ export function PaintStockForm({ paint, onSubmit, onCancel }: PaintStockFormProp
   })
 
   return (
-    <form
-      className="rounded-lg border border-border bg-card p-4 space-y-4"
+    <Box
+      component="form"
       onSubmit={(event) => {
         event.preventDefault()
         event.stopPropagation()
         void form.handleSubmit()
       }}
+      sx={{
+        borderRadius: 2,
+        border: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        padding: 2,
+      }}
     >
-      <div>
-        <h2 className="text-sm font-semibold">購入記録を追加</h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          {paint.brand} {paint.code} {paint.name} の購入記録を追加して在庫に +1 します。
-        </p>
-      </div>
+      <Stack spacing={2}>
+        <Stack spacing={0.5}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+            購入記録を追加
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {paint.brand} {paint.code} {paint.name} の購入記録を追加して在庫に +1 します。
+          </Typography>
+        </Stack>
 
-      <form.Field name="purchasedAt">
-        {(field) => <FormTextField field={field} label="購入日" type="date" />}
-      </form.Field>
+        <form.Field name="purchasedAt">
+          {(field) => <FormTextField field={field} label="購入日" type="date" />}
+        </form.Field>
 
-      <form.Field name="purchasePriceYen">
-        {(field) => (
-          <FormTextField field={field} label="購入価格 (円)" type="number" inputMode="numeric" />
-        )}
-      </form.Field>
+        <form.Field name="purchasePriceYen">
+          {(field) => (
+            <FormTextField field={field} label="購入価格 (円)" type="number" inputMode="numeric" />
+          )}
+        </form.Field>
 
-      <form.Field name="purchaseLocation">
-        {(field) => (
-          <FormTextField field={field} label="購入場所" placeholder="ヨドバシ梅田 / Amazon など" />
-        )}
-      </form.Field>
+        <form.Field name="purchaseLocation">
+          {(field) => (
+            <FormTextField
+              field={field}
+              label="購入場所"
+              placeholder="ヨドバシ梅田 / Amazon など"
+            />
+          )}
+        </form.Field>
 
-      <form.Field name="note">
-        {(field) => <FormTextField field={field} label="メモ" multiline rows={3} />}
-      </form.Field>
+        <form.Field name="note">
+          {(field) => <FormTextField field={field} label="メモ" multiline rows={3} />}
+        </form.Field>
 
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          キャンセル
-        </Button>
-        <Button type="submit">追加</Button>
-      </div>
-    </form>
+        <Stack direction="row" spacing={1.5} justifyContent="flex-end" sx={{ pt: 1 }}>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            キャンセル
+          </Button>
+          <Button type="submit">追加</Button>
+        </Stack>
+      </Stack>
+    </Box>
   )
 }
