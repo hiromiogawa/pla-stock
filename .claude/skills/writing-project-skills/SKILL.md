@@ -1,6 +1,6 @@
 ---
 name: writing-project-skills
-description: claude-memory プロジェクトの .claude/skills/ 配下に置く skill の delta 規約（公式 skill-creator への追加ルール）を定める. Use when 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき
+description: pla-stock プロジェクトの .claude/skills/ 配下に置く skill の delta 規約（公式 skill-creator への追加ルール）を定める. Use when 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき
 ---
 
 # プロジェクト skill 規約（公式 skill-creator の delta）
@@ -50,7 +50,7 @@ description: <動作を一文>. Use when <トリガー条件>
 
 - `.project-config.yml` を参照する skill はパス直書きではなく「値は `.project-config.yml` を参照」と書く
 - `docs/adr/`, `docs/specs/`, `docs/generated/` 等のパスはこのプロジェクトの既存構造に従う
-- パッケージスコープ: `core`, `embedding-onnx`, `storage-postgres`, `mcp-server`, `hooks`
+- scope（コミット/ブランチ）: `.project-config.yml` の `scopes` フィールドを参照（例示が必要な場合は pla-stock 実値 `kit` / `paint` / `views` 等を使う）
 
 ## 作成・編集後のフロー
 
