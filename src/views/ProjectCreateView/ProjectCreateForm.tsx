@@ -60,7 +60,7 @@ export function ProjectCreateForm({
         padding: 2,
       }}
     >
-      <Stack spacing={2}>
+      <Stack spacing={3}>
         <Stack spacing={0.5}>
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             新規プロジェクト

@@ -60,7 +60,7 @@ export function KitStockForm({ kit, onSubmit, onCancel }: KitStockFormProps) {
         padding: 2,
       }}
     >
-      <Stack spacing={2}>
+      <Stack spacing={3}>
         <Stack spacing={0.5}>
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             購入記録を追加
