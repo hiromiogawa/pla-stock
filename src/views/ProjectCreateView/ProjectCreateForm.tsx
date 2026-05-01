@@ -60,7 +60,7 @@ export function ProjectCreateForm({
         padding: 2,
       }}
     >
-      <Stack spacing={2}>
+      <Stack spacing={3}>
         <Stack spacing={0.5}>
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             新規プロジェクト
@@ -80,7 +80,7 @@ export function ProjectCreateForm({
               field={field}
               label="名前 *"
               placeholder="Sazabi Ver.Ka 塗装計画 など"
-              slotProps={{ htmlInput: { maxLength: 200 } }}
+              inputProps={{ maxLength: 200 }}
               required
             />
           )}
@@ -93,7 +93,7 @@ export function ProjectCreateForm({
               label="説明"
               multiline
               rows={3}
-              slotProps={{ htmlInput: { maxLength: 2000 } }}
+              inputProps={{ maxLength: 2000 }}
             />
           )}
         </form.Field>
