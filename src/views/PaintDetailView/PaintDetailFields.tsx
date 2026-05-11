@@ -3,7 +3,12 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { Minus, Plus } from 'lucide-react'
-import type { Paint, PaintEvent, PaintStock } from '~/entities/paint'
+import {
+  PAINT_EVENT_REASON_LABELS,
+  type Paint,
+  type PaintEvent,
+  type PaintStock,
+} from '~/entities/paint'
 
 interface FieldRowProps {
   label: string
@@ -31,15 +36,6 @@ function FieldRow({ label, value }: FieldRowProps) {
       </Typography>
     </Box>
   )
-}
-
-const REASON_LABEL: Record<PaintEvent['reason'], string> = {
-  purchase: '購入',
-  gift: '贈り物',
-  sell: '売却',
-  discard: '廃棄',
-  lost: '紛失',
-  other: 'その他',
 }
 
 interface SectionProps {
@@ -181,7 +177,7 @@ export function PaintDetailFields({
                 </Typography>
                 <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Typography variant="body2" color="text.secondary" component="span">
-                    {REASON_LABEL[event.reason]}
+                    {PAINT_EVENT_REASON_LABELS[event.reason]}
                   </Typography>
                   {event.priceYen != null && (
                     <Typography
