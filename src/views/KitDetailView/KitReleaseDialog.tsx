@@ -7,28 +7,27 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import type { KitEventReason } from '~/entities/kit'
+import { KIT_EVENT_REASON_LABELS, type KitEventReason } from '~/entities/kit'
 import { Button } from '~/shared/ui/button'
-import type { FormSelectOption } from '~/shared/ui/FormSelect'
 import { FormSelect } from '~/shared/ui/FormSelect'
 import { FormTextField } from '~/shared/ui/FormTextField'
 
 type ReleaseReason = Exclude<KitEventReason, 'purchase' | 'project'>
 
-const REASON_OPTIONS: FormSelectOption[] = [
-  { value: 'gift', label: '譲渡' },
-  { value: 'sell', label: '売却' },
-  { value: 'discard', label: '廃棄' },
-  { value: 'other', label: 'その他' },
-]
-
-const RELEASE_REASON_VALUES = ['gift', 'sell', 'discard', 'other'] as const satisfies readonly [
+// 在庫を「手放す」操作で選べる reason の subset。
+// ADR-0005 の規約: 同 subset を 2 箇所以上で使うようになったら entity 側に昇格。
+const RELEASE_REASONS = ['gift', 'sell', 'discard', 'other'] as const satisfies readonly [
   ReleaseReason,
   ...ReleaseReason[],
 ]
 
+const REASON_OPTIONS = RELEASE_REASONS.map((value) => ({
+  value,
+  label: KIT_EVENT_REASON_LABELS[value],
+}))
+
 const kitReleaseSchema = z.object({
-  reason: z.enum(RELEASE_REASON_VALUES),
+  reason: z.enum(RELEASE_REASONS),
   note: z.string().max(2000).optional().nullable(),
 })
 

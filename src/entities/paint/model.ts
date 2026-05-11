@@ -63,10 +63,33 @@ export interface PaintStock {
 }
 
 /**
- * 塗料入出庫の理由。
+ * 塗料入出庫の理由 (SSoT)。
+ *
+ * ADR-0005 (Domain enum 集約規約) に従い tuple + 型派生 + labels の 3 点セットで集約。
+ * tuple は型派生と label Record の網羅性チェックに使うため module-private。
+ * 外部利用が必要になったら export する。
  * 注: 'project' はない — project_paint_use は count に影響しない M:N 関係。
  */
-export type PaintEventReason = 'purchase' | 'gift' | 'sell' | 'discard' | 'lost' | 'other'
+const PAINT_EVENT_REASONS = ['purchase', 'gift', 'sell', 'discard', 'lost', 'other'] as const
+
+/** 塗料入出庫の理由 */
+export type PaintEventReason = (typeof PAINT_EVENT_REASONS)[number]
+
+/**
+ * PaintEventReason に対する日本語 label (release dialog 表記基準)。
+ *
+ * 注: discard は塗料の文脈で「使い切って廃棄」を含意するため `廃棄（使い切り）` とする。
+ * 履歴 view (PaintDetailFields) 側は別 label record を持っており、表記揺れが残る。
+ * 統一は別 Issue で扱う。
+ */
+export const PAINT_EVENT_REASON_LABELS = {
+  purchase: '購入',
+  gift: '譲渡',
+  sell: '売却',
+  discard: '廃棄（使い切り）',
+  lost: '紛失',
+  other: 'その他',
+} as const satisfies Record<PaintEventReason, string>
 
 /**
  * 塗料入出庫イベント (audit ledger)。

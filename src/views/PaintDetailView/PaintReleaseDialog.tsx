@@ -7,32 +7,27 @@ import DialogTitle from '@mui/material/DialogTitle'
 import Stack from '@mui/material/Stack'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import type { PaintEventReason } from '~/entities/paint'
+import { PAINT_EVENT_REASON_LABELS, type PaintEventReason } from '~/entities/paint'
 import { Button } from '~/shared/ui/button'
-import type { FormSelectOption } from '~/shared/ui/FormSelect'
 import { FormSelect } from '~/shared/ui/FormSelect'
 import { FormTextField } from '~/shared/ui/FormTextField'
 
 type ReleaseReason = Exclude<PaintEventReason, 'purchase'>
 
-const REASON_OPTIONS: FormSelectOption[] = [
-  { value: 'discard', label: '廃棄（使い切り）' },
-  { value: 'sell', label: '売却' },
-  { value: 'gift', label: '譲渡' },
-  { value: 'lost', label: '紛失' },
-  { value: 'other', label: 'その他' },
+// 在庫を「手放す」操作で選べる reason の subset。
+// ADR-0005 の規約: 同 subset を 2 箇所以上で使うようになったら entity 側に昇格。
+const RELEASE_REASONS = ['discard', 'sell', 'gift', 'lost', 'other'] as const satisfies readonly [
+  ReleaseReason,
+  ...ReleaseReason[],
 ]
 
-const RELEASE_REASON_VALUES = [
-  'discard',
-  'sell',
-  'gift',
-  'lost',
-  'other',
-] as const satisfies readonly [ReleaseReason, ...ReleaseReason[]]
+const REASON_OPTIONS = RELEASE_REASONS.map((value) => ({
+  value,
+  label: PAINT_EVENT_REASON_LABELS[value],
+}))
 
 const paintReleaseSchema = z.object({
-  reason: z.enum(RELEASE_REASON_VALUES),
+  reason: z.enum(RELEASE_REASONS),
   note: z.string().max(2000).optional().nullable(),
 })
 

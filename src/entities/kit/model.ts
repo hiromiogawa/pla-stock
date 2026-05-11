@@ -41,8 +41,27 @@ export interface KitStock {
   count: number
 }
 
+/**
+ * キット入出庫の理由 (SSoT)。
+ *
+ * ADR-0005 (Domain enum 集約規約) に従い tuple + 型派生 + labels の 3 点セットで集約。
+ * tuple は型派生と label Record の網羅性チェックに使うため module-private。
+ * 外部利用が必要になったら export する。
+ */
+const KIT_EVENT_REASONS = ['purchase', 'project', 'gift', 'sell', 'discard', 'other'] as const
+
 /** キット入出庫の理由 */
-export type KitEventReason = 'purchase' | 'project' | 'gift' | 'sell' | 'discard' | 'other'
+export type KitEventReason = (typeof KIT_EVENT_REASONS)[number]
+
+/** KitEventReason に対する日本語 label。 */
+export const KIT_EVENT_REASON_LABELS = {
+  purchase: '購入',
+  project: 'プロジェクト',
+  gift: '譲渡',
+  sell: '売却',
+  discard: '廃棄',
+  other: 'その他',
+} as const satisfies Record<KitEventReason, string>
 
 /**
  * キット入出庫イベント (audit ledger)。
