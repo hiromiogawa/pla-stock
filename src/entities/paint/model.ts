@@ -76,11 +76,10 @@ const PAINT_EVENT_REASONS = ['purchase', 'gift', 'sell', 'discard', 'lost', 'oth
 export type PaintEventReason = (typeof PAINT_EVENT_REASONS)[number]
 
 /**
- * PaintEventReason に対する日本語 label (release dialog 表記基準)。
+ * PaintEventReason に対する日本語 label。
  *
- * 注: discard は塗料の文脈で「使い切って廃棄」を含意するため `廃棄（使い切り）` とする。
- * 履歴 view (PaintDetailFields) 側は別 label record を持っており、表記揺れが残る。
- * 統一は別 Issue で扱う。
+ * 注: discard は塗料の文脈で「使い切って廃棄」を含意するため `廃棄（使い切り）` とする
+ * (kit 側の単なる `廃棄` とは区別)。
  */
 export const PAINT_EVENT_REASON_LABELS = {
   purchase: '購入',

@@ -3,7 +3,7 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { Minus, Plus } from 'lucide-react'
-import type { Kit, KitEvent, KitStock } from '~/entities/kit'
+import { KIT_EVENT_REASON_LABELS, type Kit, type KitEvent, type KitStock } from '~/entities/kit'
 
 interface FieldRowProps {
   label: string
@@ -31,15 +31,6 @@ function FieldRow({ label, value }: FieldRowProps) {
       </Typography>
     </Box>
   )
-}
-
-const REASON_LABEL: Record<KitEvent['reason'], string> = {
-  purchase: '購入',
-  project: 'プロジェクト',
-  gift: '贈り物',
-  sell: '売却',
-  discard: '廃棄',
-  other: 'その他',
 }
 
 interface SectionProps {
@@ -183,7 +174,7 @@ export function KitDetailFields({
                 </Typography>
                 <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Typography variant="body2" color="text.secondary" component="span">
-                    {REASON_LABEL[event.reason]}
+                    {KIT_EVENT_REASON_LABELS[event.reason]}
                   </Typography>
                   {event.priceYen != null && (
                     <Typography
