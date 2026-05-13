@@ -148,7 +148,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 220,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-01-15T10:00:00Z',
+    createdAt: new Date('2026-01-15T10:00:00Z'),
   },
   {
     id: 'pe-2',
@@ -160,7 +160,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 220,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-01-15T10:01:00Z',
+    createdAt: new Date('2026-01-15T10:01:00Z'),
   },
   {
     id: 'pe-3',
@@ -172,7 +172,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 280,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-01-15T10:02:00Z',
+    createdAt: new Date('2026-01-15T10:02:00Z'),
   },
   {
     id: 'pe-4',
@@ -184,7 +184,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 440,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-02-20T10:00:00Z',
+    createdAt: new Date('2026-02-20T10:00:00Z'),
   },
   {
     id: 'pe-5',
@@ -196,7 +196,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 220,
     purchaseLocation: null,
     note: 'シャアザク用',
-    createdAt: '2026-03-01T10:00:00Z',
+    createdAt: new Date('2026-03-01T10:00:00Z'),
   },
   // paint-6: 購入 +1
   {
@@ -209,7 +209,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 770,
     purchaseLocation: null,
     note: null,
-    createdAt: '2025-12-10T10:00:00Z',
+    createdAt: new Date('2025-12-10T10:00:00Z'),
   },
   // paint-6: 使い切り廃棄 -1 → count=0
   {
@@ -222,7 +222,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: null,
     purchaseLocation: null,
     note: 'used up',
-    createdAt: '2026-03-01T10:00:00Z',
+    createdAt: new Date('2026-03-01T10:00:00Z'),
   },
   {
     id: 'pe-8',
@@ -234,7 +234,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 506,
     purchaseLocation: null,
     note: 'シャアザク用',
-    createdAt: '2026-03-01T10:01:00Z',
+    createdAt: new Date('2026-03-01T10:01:00Z'),
   },
   {
     id: 'pe-9',
@@ -246,7 +246,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 660,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-02-25T10:00:00Z',
+    createdAt: new Date('2026-02-25T10:00:00Z'),
   },
   {
     id: 'pe-10',
@@ -258,7 +258,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 990,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-04-10T10:00:00Z',
+    createdAt: new Date('2026-04-10T10:00:00Z'),
   },
   {
     id: 'pe-11',
@@ -270,7 +270,7 @@ const paintEvents: PaintEvent[] = [
     priceYen: 220,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-01-15T10:03:00Z',
+    createdAt: new Date('2026-01-15T10:03:00Z'),
   },
 ]
 
@@ -369,7 +369,7 @@ export async function addPaintEvent(input: {
     priceYen: input.priceYen ?? null,
     purchaseLocation: input.purchaseLocation ?? null,
     note: input.note ?? null,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
   }
   paintEvents.push(newEvent)
   return newEvent

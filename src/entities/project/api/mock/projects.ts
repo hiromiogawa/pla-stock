@@ -1,4 +1,5 @@
 import type { Project, ProjectPhoto } from '../../model'
+import type { ProjectPaintUse } from '~/entities/projectPaintUse'
 import { addKitEvent } from '~/entities/kit/api/mock/kits'
 
 /**
@@ -18,14 +19,7 @@ import { addKitEvent } from '~/entities/kit/api/mock/kits'
 
 const MOCK_USER_ID = 'mock-user-1'
 
-/** Project と Paint master の M:N 中間テーブル (count 変化なし) */
-interface ProjectPaintUseLink {
-  id: string
-  projectId: string
-  /** paint master の ID (旧: paintStockId から変更) */
-  paintId: string
-  createdAt: string
-}
+// ProjectPaintUse 型は entities/projectPaintUse から import (composite PK のため id なし)
 
 const projects: Project[] = [
   {
@@ -59,14 +53,14 @@ const projects: Project[] = [
  *   paint-stock-7 → paint-8 (ガイア フレームレッド)
  *   paint-stock-1 → paint-1 (ホワイト)
  */
-const projectPaintUses: ProjectPaintUseLink[] = [
+const projectPaintUses: ProjectPaintUse[] = [
   // project-1 (Sazabi) で使った塗料
-  { id: 'ppu-1', projectId: 'project-1', paintId: 'paint-5', createdAt: '2026-01-05T10:00:00Z' },
-  { id: 'ppu-2', projectId: 'project-1', paintId: 'paint-2', createdAt: '2026-01-05T10:01:00Z' },
-  { id: 'ppu-3', projectId: 'project-1', paintId: 'paint-4', createdAt: '2026-01-05T10:02:00Z' },
+  { projectId: 'project-1', paintId: 'paint-5', createdAt: new Date('2026-01-05T10:00:00Z') },
+  { projectId: 'project-1', paintId: 'paint-2', createdAt: new Date('2026-01-05T10:01:00Z') },
+  { projectId: 'project-1', paintId: 'paint-4', createdAt: new Date('2026-01-05T10:02:00Z') },
   // project-2 (シャアザク) で使ってる塗料
-  { id: 'ppu-4', projectId: 'project-2', paintId: 'paint-8', createdAt: '2026-03-20T10:00:00Z' },
-  { id: 'ppu-5', projectId: 'project-2', paintId: 'paint-1', createdAt: '2026-03-20T10:01:00Z' },
+  { projectId: 'project-2', paintId: 'paint-8', createdAt: new Date('2026-03-20T10:00:00Z') },
+  { projectId: 'project-2', paintId: 'paint-1', createdAt: new Date('2026-03-20T10:01:00Z') },
 ]
 
 const projectPhotos: ProjectPhoto[] = [
@@ -107,7 +101,7 @@ export async function getProject(input: {
 /** project に紐付く project_paint_use 一覧 */
 export async function getProjectPaintUses(input: {
   projectId: string
-}): Promise<ProjectPaintUseLink[]> {
+}): Promise<ProjectPaintUse[]> {
   return projectPaintUses.filter((link) => link.projectId === input.projectId)
 }
 
@@ -125,7 +119,6 @@ export async function getProjectPhotos(input: { projectId: string }): Promise<Pr
 // === Mutations ===
 
 let projectIdCounter = projects.length + 1
-let projectPaintUseIdCounter = projectPaintUses.length + 1
 let projectPhotoIdCounter = projectPhotos.length + 1
 
 /**
@@ -234,12 +227,11 @@ export async function deleteProject(input: {
 export async function addProjectPaintUse(input: {
   projectId: string
   paintId: string
-}): Promise<ProjectPaintUseLink> {
-  const newLink: ProjectPaintUseLink = {
-    id: `ppu-${projectPaintUseIdCounter++}`,
+}): Promise<ProjectPaintUse> {
+  const newLink: ProjectPaintUse = {
     projectId: input.projectId,
     paintId: input.paintId,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
   }
   projectPaintUses.push(newLink)
   return newLink

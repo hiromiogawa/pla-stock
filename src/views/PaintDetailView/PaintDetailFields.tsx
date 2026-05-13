@@ -214,7 +214,7 @@ export function PaintDetailFields({
                   color="text.secondary"
                   sx={{ flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}
                 >
-                  {event.purchasedAt ?? event.createdAt.slice(0, 10)}
+                  {event.purchasedAt ?? event.createdAt.toISOString().slice(0, 10)}
                 </Typography>
               </Stack>
             ))}

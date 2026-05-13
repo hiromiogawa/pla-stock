@@ -3,5 +3,12 @@
   "name": "pla-stock",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry"
+  "main": "@tanstack/react-start/server-entry",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pla-stock",
+      "database_id": "af1d3c77-5112-43c7-b9d6-e6d5ac7b3942"
+    }
+  ]
 }
