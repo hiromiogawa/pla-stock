@@ -4,7 +4,7 @@
 
 **MVP スコープ**: プラモデル（キット）管理 + 塗料管理の 2 ドメイン。消耗品（ヤスリ・マスキング・軟化剤など）は v2 以降。
 
-**ステータス**: Phase 1 — AI ハーネスのみ導入済み。フレームワーク / ツール類は未スキャフォールド。
+**ステータス**: Phase A-2 完了、**Phase C 着手中**。フレームワーク (TanStack Start / MUI v7 / Clerk / Drizzle + D1) は導入済み。`entities/<x>/schema.ts` を SSoT とした mock → 実 DB への段階置換中 (本 PR は基盤一式まで、server fn は後続 PR)。
 
 ---
 
@@ -121,6 +121,10 @@ Phase 2 で以下を整備予定：
 | `pnpm knip` | knip strict で未使用 export/file を検出 |
 | `pnpm check:parallel` | typecheck + depcruise + knip を並列実行 (pre-commit 用) |
 | `pnpm check` | lint → format → typecheck → depcruise → knip を直列実行 (CI 用) |
+| `pnpm db:generate` | drizzle-kit で schema から migration SQL を生成 (`drizzle/migrations/`) |
+| `pnpm db:migrate:local` | local D1 (`.wrangler/state/...`) に migration を適用 |
+| `pnpm db:migrate:remote` | prod D1 に migration を適用 (`--remote`) |
+| `pnpm db:studio` | drizzle-kit studio で DB を GUI 閲覧 |
 
 Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta pin` で `.nvmrc` に追従。
 
@@ -218,25 +222,36 @@ MUI v7 は内部 engine に Emotion を使うが、**user code は MUI 抽象し
 
 Form は **TanStack Form + MUI TextField/Select**、`<FormTextField field={...} />` / `<FormSelect field={...} options={...} />` 経由で統一。詳細 ADR-0003。
 
-### Domain enum (ADR-0005)
+### Domain schema (ADR-0008、ADR-0005 を Supersede)
 
-ドメインの離散値 (event reason / status / category 等の literal union) は **entities/{domain}/model.ts に values 配列 + 型派生 + labels の 3 点セット** で集約する。view / dialog 側で値リスト・label を再宣言しない。
+ドメインのテーブル定義・列・enum values・派生型は **`entities/{domain}/schema.ts`** に Drizzle table として集約する (SSoT)。UI 表示用 label のみ `entities/{domain}/model.ts` に置く。
 
 ```ts
-// entities/kit/model.ts
-export const KIT_EVENT_REASONS = [
-  'purchase', 'project', 'gift', 'sell', 'discard', 'other',
-] as const
+// entities/kit/schema.ts (SSoT)
+export const KIT_EVENT_REASONS = ['purchase', 'project', 'gift', 'sell', 'discard', 'other'] as const
+export const kitEvents = sqliteTable('kit_events', {
+  // ...
+  reason: text('reason', { enum: KIT_EVENT_REASONS }).notNull(),
+})
+export type KitEvent = typeof kitEvents.$inferSelect
 export type KitEventReason = (typeof KIT_EVENT_REASONS)[number]
+
+// entities/kit/model.ts (UI labels のみ)
+export type { KitEvent, KitEventReason } from './schema'
 export const KIT_EVENT_REASON_LABELS = {
-  purchase: '購入', project: 'プロジェクト', gift: '譲渡',
-  sell: '売却', discard: '廃棄', other: 'その他',
+  purchase: '購入', project: 'プロジェクト', /* ... */
 } as const satisfies Record<KitEventReason, string>
 ```
 
-利用側は import で値・型・labels を取り出し、UI 専用 subset (例: release だけで使う reasons) は dialog 内に `as const satisfies readonly KitEventReason[]` で型整合だけ守って宣言。同 subset を 2 箇所以上で使うなら entity 側に昇格させる。
+中間テーブル (M:N) は **専用 entity ディレクトリ** を切る (例: `entities/projectPaintUse/schema.ts`)。この entity だけが両端 entity の schema を import してよい。
 
-機械強制はせず convention 運用。AI エージェントが本規約に違反した場合は ADR-0007 に FAIL エントリとして追記し `failure-record` → `rule-cycle` で再発防止サイクルを回す。詳細 ADR-0005 / ADR-0007。
+利用側は entity barrel (`~/entities/{domain}`) 経由で値・型・labels を取り出し、UI 専用 subset (例: release だけで使う reasons) は dialog 内に `as const satisfies readonly KitEventReason[]` で型整合だけ守って宣言。同 subset を 2 箇所以上で使うなら entity 側に昇格させる。
+
+timestamp の 2 種類区別:
+- **時点 (instant)** `createdAt` 等 → `integer({ mode: 'timestamp_ms' })`、boundary は **`Date`**
+- **カレンダー日付** `purchasedAt` / `startedAt` 等 → `text('purchased_at')`、boundary は **`string`** ('YYYY-MM-DD')
+
+機械強制はせず convention 運用。AI エージェントが本規約に違反した場合は ADR-0007 に FAIL エントリとして追記し `failure-record` → `rule-cycle` で再発防止サイクルを回す。詳細 ADR-0006 / ADR-0008 / ADR-0007。
 
 ### 型アサーション・三項ネスト禁止 (PR #56 レビュー由来)
 

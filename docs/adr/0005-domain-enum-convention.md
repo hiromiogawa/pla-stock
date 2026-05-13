@@ -1,8 +1,8 @@
 # ADR-0005: Domain enum 集約規約 (values + 型派生 + labels)
 
-- ステータス: 承認
+- ステータス: Superseded by [ADR-0008](./0008-entity-schema-ssot.md) (2026-05-13)
 - 日付: 2026-05-01
-- 関連: Issue #79 (規約確立) / Issue #80 (cleanup 実装) / FAIL-001 (ADR-0007)
+- 関連: Issue #79 (規約確立) / Issue #80 (cleanup 実装) / FAIL-001 (ADR-0007) / ADR-0008 (本 ADR を Supersede)
 
 ## 文脈
 
@@ -128,3 +128,10 @@ subset (`RELEASE_REASONS`) は domain の純粋な subset を表現するため 
 
 - 既存の `KitEventReason` / `PaintEventReason` / 各 status type の cleanup → Issue #80
 - 状況に応じて status / finishType / colorFamily 等の他 domain enum も同パターンへ移行 → Issue #80 で副次調査
+
+## Supersede 履歴
+
+- **2026-05-13** (Phase C 着手): [ADR-0008](./0008-entity-schema-ssot.md) が **Drizzle schema を SSoT とする** 新規約を確立し、本 ADR を Supersede。
+  - 移行内容: `entities/{domain}/model.ts` から schema 定義 (values + 型派生) を `entities/{domain}/schema.ts` (Drizzle table) に集約。`model.ts` は UI labels と schema からの type re-export のみを担う。
+  - 移行理由: ADR-0006 で Drizzle ORM を採用した結果、`sqliteTable(...)` 定義が列・型・enum を統合的に表現できるようになり、model.ts の手書き interface とは drift の温床となる。
+  - 中間テーブル (M:N) は専用 entity (例: `entities/projectPaintUse/`) を切り、両端 entity の schema を import してよいルールも ADR-0008 で追加。
