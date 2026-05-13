@@ -87,7 +87,7 @@ const kitEvents: KitEvent[] = [
     priceYen: 990,
     purchaseLocation: 'ヨドバシ梅田',
     note: null,
-    createdAt: '2026-02-10T10:00:00Z',
+    createdAt: new Date('2026-02-10T10:00:00Z'),
   },
   // kit-2: 購入 +1
   {
@@ -101,7 +101,7 @@ const kitEvents: KitEvent[] = [
     priceYen: 2200,
     purchaseLocation: 'Joshin スーパーキッズランド',
     note: 'シャア専用カラー再現用にガイア赤系を準備中',
-    createdAt: '2026-03-05T10:00:00Z',
+    createdAt: new Date('2026-03-05T10:00:00Z'),
   },
   // kit-2: project-2 (シャアザク) に消費 -1 → count=0
   {
@@ -115,7 +115,7 @@ const kitEvents: KitEvent[] = [
     priceYen: null,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-03-20T10:00:00Z',
+    createdAt: new Date('2026-03-20T10:00:00Z'),
   },
   // kit-3: 購入 +1
   {
@@ -129,7 +129,7 @@ const kitEvents: KitEvent[] = [
     priceYen: 9800,
     purchaseLocation: 'Amazon',
     note: null,
-    createdAt: '2025-12-20T10:00:00Z',
+    createdAt: new Date('2025-12-20T10:00:00Z'),
   },
   // kit-3: project-1 (Sazabi) に消費 -1 → count=0
   {
@@ -143,7 +143,7 @@ const kitEvents: KitEvent[] = [
     priceYen: null,
     purchaseLocation: null,
     note: null,
-    createdAt: '2026-01-05T10:00:00Z',
+    createdAt: new Date('2026-01-05T10:00:00Z'),
   },
   // kit-5: 購入 +1 → count=1
   {
@@ -157,7 +157,7 @@ const kitEvents: KitEvent[] = [
     priceYen: 770,
     purchaseLocation: 'コンビニ受取',
     note: '初心者向けに買ってみた',
-    createdAt: '2026-04-01T10:00:00Z',
+    createdAt: new Date('2026-04-01T10:00:00Z'),
   },
 ]
 
@@ -254,7 +254,7 @@ export async function addKitEvent(input: {
     priceYen: input.priceYen ?? null,
     purchaseLocation: input.purchaseLocation ?? null,
     note: input.note ?? null,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
   }
   kitEvents.push(newEvent)
   return newEvent

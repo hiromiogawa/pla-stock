@@ -24,6 +24,10 @@
     "check:parallel": "concurrently -n typecheck,depcruise,knip -c blue,green,magenta \"pnpm run typecheck\" \"pnpm run depcruise\" \"pnpm run knip\"",
     "check": "pnpm lint && pnpm format && pnpm typecheck && pnpm depcruise && pnpm knip",
     "verify:ui": "node scripts/verify-ui.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply pla-stock --local",
+    "db:migrate:remote": "wrangler d1 migrations apply pla-stock --remote",
+    "db:studio": "drizzle-kit studio",
     "prepare": "husky"
   },
   "dependencies": {
@@ -42,6 +46,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
+    "drizzle-orm": "^0.45.2",
     "lucide-react": "1.8.0",
     "notistack": "^3.0.2",
     "react": "^19.0.0",
@@ -60,6 +65,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "concurrently": "^9.2.1",
     "dependency-cruiser": "^17.3.10",
+    "drizzle-kit": "^0.31.10",
     "husky": "^9.1.7",
     "knip": "^6.7.0",
     "lint-staged": "^16.4.0",
