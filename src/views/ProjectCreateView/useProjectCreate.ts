@@ -35,7 +35,7 @@ export function useProjectCreate(input: UseProjectCreateInput): UseProjectCreate
 
   const handleSubmit = useCallback(
     async (values: ProjectAddInput) => {
-      const stock = await getKitStock({ userId, kitId: values.kitId })
+      const stock = await getKitStock({ data: { kitId: values.kitId } })
       if (!stock || stock.count < 1) {
         enqueueSnackbar('選択したキットの在庫がありません。最新状態を確認してください。', {
           variant: 'warning',

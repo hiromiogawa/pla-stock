@@ -1,5 +1,3 @@
-export { KIT_EVENT_REASON_LABELS } from './model'
-export type { Kit, KitStock, KitEvent, KitEventReason, Grade, Scale } from './model'
 export {
   getKits,
   getKit,
@@ -7,5 +5,7 @@ export {
   getKitStocksWithStock,
   getKitEvents,
   getKitEventsAll,
-  addKitEvent,
-} from './api/mock/kits'
+} from './api/queries'
+export { addKitEvent } from './api/mock/kits'
+export { KIT_EVENT_REASON_LABELS } from './model'
+export type { Kit, KitStock, KitEvent, KitEventReason, Grade, Scale } from './model'

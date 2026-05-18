@@ -6,7 +6,7 @@ import { useKitAdd } from '~/views/KitAddView/useKitAdd'
 export const Route = createFileRoute('/_auth/kits/new')({
   loader: async ({ context }) => {
     const { userId } = context
-    const kits = await getKits({ userId })
+    const kits = await getKits()
     return { kits, userId }
   },
   component: KitAddRoute,

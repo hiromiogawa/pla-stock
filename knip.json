@@ -7,7 +7,8 @@
     "worker-configuration.d.ts",
     "vite.config.ts",
     "drizzle.config.ts",
-    "src/shared/lib/db/client.ts"
+    "src/shared/lib/db/client.ts",
+    "src/shared/lib/db/seed.ts"
   ],
   "ignoreBinaries": ["wrangler"],
   "ignoreDependencies": [
@@ -21,6 +22,7 @@
     "@radix-ui/react-select",
     "class-variance-authority",
     "lucide-react",
-    "@tanstack/react-virtual"
+    "@tanstack/react-virtual",
+    "cloudflare"
   ]
 }

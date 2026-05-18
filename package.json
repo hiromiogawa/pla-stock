@@ -28,6 +28,7 @@
     "db:migrate:local": "wrangler d1 migrations apply pla-stock --local",
     "db:migrate:remote": "wrangler d1 migrations apply pla-stock --remote",
     "db:studio": "drizzle-kit studio",
+    "db:seed:local": "tsx scripts/seed-local.mjs",
     "prepare": "husky"
   },
   "dependencies": {
@@ -59,10 +60,12 @@
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
     "@tailwindcss/vite": "^4.2.2",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.5.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "better-sqlite3": "^12.10.0",
     "concurrently": "^9.2.1",
     "dependency-cruiser": "^17.3.10",
     "drizzle-kit": "^0.31.10",
@@ -78,6 +81,9 @@
     "wrangler": "^4.74.0"
   },
   "pnpm": {
-    "minimumReleaseAge": 2880
+    "minimumReleaseAge": 2880,
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   }
 }

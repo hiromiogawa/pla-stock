@@ -21,7 +21,7 @@ const MOCK_USER_ID = 'mock-user-1'
 
 // ProjectPaintUse 型は entities/projectPaintUse から import (composite PK のため id なし)
 
-const projects: Project[] = [
+export const mockProjects: Project[] = [
   {
     id: 'project-1',
     userId: MOCK_USER_ID,
@@ -53,7 +53,7 @@ const projects: Project[] = [
  *   paint-stock-7 → paint-8 (ガイア フレームレッド)
  *   paint-stock-1 → paint-1 (ホワイト)
  */
-const projectPaintUses: ProjectPaintUse[] = [
+export const mockProjectPaintUses: ProjectPaintUse[] = [
   // project-1 (Sazabi) で使った塗料
   { projectId: 'project-1', paintId: 'paint-5', createdAt: new Date('2026-01-05T10:00:00Z') },
   { projectId: 'project-1', paintId: 'paint-2', createdAt: new Date('2026-01-05T10:01:00Z') },
@@ -63,7 +63,7 @@ const projectPaintUses: ProjectPaintUse[] = [
   { projectId: 'project-2', paintId: 'paint-1', createdAt: new Date('2026-03-20T10:01:00Z') },
 ]
 
-const projectPhotos: ProjectPhoto[] = [
+export const mockProjectPhotos: ProjectPhoto[] = [
   {
     id: 'project-photo-1',
     projectId: 'project-1',
@@ -85,7 +85,7 @@ const projectPhotos: ProjectPhoto[] = [
 // === Read accessors ===
 
 export async function getProjects(_input: { userId: string }): Promise<Project[]> {
-  return projects.filter((project) => project.userId === MOCK_USER_ID)
+  return mockProjects.filter((project) => project.userId === MOCK_USER_ID)
 }
 
 export async function getProject(input: {
@@ -93,8 +93,9 @@ export async function getProject(input: {
   userId: string
 }): Promise<Project | null> {
   return (
-    projects.find((project) => project.id === input.projectId && project.userId === MOCK_USER_ID) ??
-    null
+    mockProjects.find(
+      (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
+    ) ?? null
   )
 }
 
@@ -102,24 +103,24 @@ export async function getProject(input: {
 export async function getProjectPaintUses(input: {
   projectId: string
 }): Promise<ProjectPaintUse[]> {
-  return projectPaintUses.filter((link) => link.projectId === input.projectId)
+  return mockProjectPaintUses.filter((link) => link.projectId === input.projectId)
 }
 
 /** project に紐付く paint_id 一覧 (旧 getProjectPaintStockIds の後継) */
 export async function getProjectPaintIds(input: { projectId: string }): Promise<string[]> {
-  return projectPaintUses
+  return mockProjectPaintUses
     .filter((link) => link.projectId === input.projectId)
     .map((link) => link.paintId)
 }
 
 export async function getProjectPhotos(input: { projectId: string }): Promise<ProjectPhoto[]> {
-  return projectPhotos.filter((photo) => photo.projectId === input.projectId)
+  return mockProjectPhotos.filter((photo) => photo.projectId === input.projectId)
 }
 
 // === Mutations ===
 
-let projectIdCounter = projects.length + 1
-let projectPhotoIdCounter = projectPhotos.length + 1
+let projectIdCounter = mockProjects.length + 1
+let projectPhotoIdCounter = mockProjectPhotos.length + 1
 
 /**
  * プロジェクトを作成する。
@@ -145,7 +146,7 @@ export async function addProject(input: {
     startedAt: null,
     completedAt: null,
   }
-  projects.push(newProject)
+  mockProjects.push(newProject)
 
   // kit_event: count -1 (project 消費)
   await addKitEvent({
@@ -164,12 +165,12 @@ export async function updateProject(input: {
   userId: string
   patch: Partial<Pick<Project, 'name' | 'description' | 'status' | 'startedAt' | 'completedAt'>>
 }): Promise<Project | null> {
-  const idx = projects.findIndex(
+  const idx = mockProjects.findIndex(
     (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
   )
   if (idx === -1) return null
-  projects[idx] = { ...projects[idx], ...input.patch }
-  return projects[idx]
+  mockProjects[idx] = { ...mockProjects[idx], ...input.patch }
+  return mockProjects[idx]
 }
 
 /**
@@ -183,12 +184,12 @@ export async function deleteProject(input: {
   projectId: string
   userId: string
 }): Promise<boolean> {
-  const idx = projects.findIndex(
+  const idx = mockProjects.findIndex(
     (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
   )
   if (idx === -1) return false
 
-  const project = projects[idx]
+  const project = mockProjects[idx]
 
   // planning 状態なら在庫を戻す
   if (project.status === 'planning') {
@@ -202,18 +203,18 @@ export async function deleteProject(input: {
     })
   }
 
-  projects.splice(idx, 1)
+  mockProjects.splice(idx, 1)
 
   // cascade: project_paint_use
-  for (let useIdx = projectPaintUses.length - 1; useIdx >= 0; useIdx--) {
-    if (projectPaintUses[useIdx].projectId === input.projectId) {
-      projectPaintUses.splice(useIdx, 1)
+  for (let useIdx = mockProjectPaintUses.length - 1; useIdx >= 0; useIdx--) {
+    if (mockProjectPaintUses[useIdx].projectId === input.projectId) {
+      mockProjectPaintUses.splice(useIdx, 1)
     }
   }
   // cascade: project_photos
-  for (let photoIdx = projectPhotos.length - 1; photoIdx >= 0; photoIdx--) {
-    if (projectPhotos[photoIdx].projectId === input.projectId) {
-      projectPhotos.splice(photoIdx, 1)
+  for (let photoIdx = mockProjectPhotos.length - 1; photoIdx >= 0; photoIdx--) {
+    if (mockProjectPhotos[photoIdx].projectId === input.projectId) {
+      mockProjectPhotos.splice(photoIdx, 1)
     }
   }
 
@@ -233,7 +234,7 @@ export async function addProjectPaintUse(input: {
     paintId: input.paintId,
     createdAt: new Date(),
   }
-  projectPaintUses.push(newLink)
+  mockProjectPaintUses.push(newLink)
   return newLink
 }
 
@@ -242,11 +243,11 @@ export async function removeProjectPaintUse(input: {
   projectId: string
   paintId: string
 }): Promise<boolean> {
-  const idx = projectPaintUses.findIndex(
+  const idx = mockProjectPaintUses.findIndex(
     (link) => link.projectId === input.projectId && link.paintId === input.paintId,
   )
   if (idx === -1) return false
-  projectPaintUses.splice(idx, 1)
+  mockProjectPaintUses.splice(idx, 1)
   return true
 }
 
@@ -265,13 +266,13 @@ export async function addProjectPhoto(input: {
     caption: input.caption ?? null,
     takenAt: input.takenAt ?? null,
   }
-  projectPhotos.push(newPhoto)
+  mockProjectPhotos.push(newPhoto)
   return newPhoto
 }
 
 export async function deleteProjectPhoto(input: { photoId: string }): Promise<boolean> {
-  const idx = projectPhotos.findIndex((ph) => ph.id === input.photoId)
+  const idx = mockProjectPhotos.findIndex((ph) => ph.id === input.photoId)
   if (idx === -1) return false
-  projectPhotos.splice(idx, 1)
+  mockProjectPhotos.splice(idx, 1)
   return true
 }

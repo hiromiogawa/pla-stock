@@ -6,10 +6,7 @@ import { useProjectCreate } from '~/views/ProjectCreateView/useProjectCreate'
 export const Route = createFileRoute('/_auth/projects/new')({
   loader: async ({ context }) => {
     const { userId } = context
-    const [kits, stocksWithStock] = await Promise.all([
-      getKits({ userId }),
-      getKitStocksWithStock({ userId }),
-    ])
+    const [kits, stocksWithStock] = await Promise.all([getKits(), getKitStocksWithStock()])
 
     // count > 0 の kit_stock に対応する Kit master を抽出
     const kitById = new Map(kits.map((kit) => [kit.id, kit]))

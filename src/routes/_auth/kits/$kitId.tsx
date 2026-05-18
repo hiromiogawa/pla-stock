@@ -10,9 +10,9 @@ export const Route = createFileRoute('/_auth/kits/$kitId')({
     const kitId = params.kitId
 
     const [kit, stock, events, projects] = await Promise.all([
-      getKit({ kitId, userId }),
-      getKitStock({ userId, kitId }),
-      getKitEvents({ userId, kitId }),
+      getKit({ data: { kitId } }),
+      getKitStock({ data: { kitId } }),
+      getKitEvents({ data: { kitId } }),
       getProjects({ userId }),
     ])
 
@@ -20,7 +20,6 @@ export const Route = createFileRoute('/_auth/kits/$kitId')({
       return { stock: null, kit: null, events: [], linkedProjects: [], userId }
     }
 
-    // stock が null (未登録) でも kit は返す — 購入ボタンで追加できる
     const linkedProjects = projects.filter((project) => project.kitId === kitId)
 
     return { stock, kit, events, linkedProjects, userId }

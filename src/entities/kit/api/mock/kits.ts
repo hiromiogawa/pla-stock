@@ -16,7 +16,7 @@ import type { Kit, KitStock, KitEvent, KitEventReason } from '../../model'
 
 const MOCK_USER_ID = 'mock-user-1'
 
-const kits: Kit[] = [
+export const mockKits: Kit[] = [
   {
     id: 'kit-1',
     name: 'RX-78-2 Gundam',
@@ -63,7 +63,7 @@ const kits: Kit[] = [
  * kit_stocks: (userId, kitId) per 1 行のカウント。
  * kit-2, kit-3 はプロジェクトが消費して count=0。
  */
-const kitStocks: KitStock[] = [
+export const mockKitStocks: KitStock[] = [
   { userId: MOCK_USER_ID, kitId: 'kit-1', count: 1 },
   { userId: MOCK_USER_ID, kitId: 'kit-2', count: 0 }, // project-2 (シャアザク) が消費
   { userId: MOCK_USER_ID, kitId: 'kit-3', count: 0 }, // project-1 (Sazabi) が消費
@@ -74,7 +74,7 @@ const kitStocks: KitStock[] = [
  * kit_events: 入出庫の audit ledger。
  * SUM(delta) で kitStocks.count が再計算できることを保証する。
  */
-const kitEvents: KitEvent[] = [
+export const mockKitEvents: KitEvent[] = [
   // kit-1: 購入 +1 → count=1
   {
     id: 'ke-1',
@@ -161,46 +161,9 @@ const kitEvents: KitEvent[] = [
   },
 ]
 
-// === Read accessors (Phase C で createServerFn にラップ) ===
-
-/** カタログ全件を返す (admin curated only) */
-export async function getKits(_input: { userId: string }): Promise<Kit[]> {
-  return kits
-}
-
-/** 単一キット master を ID で取得 */
-export async function getKit(input: { kitId: string; userId: string }): Promise<Kit | null> {
-  return kits.find((kit) => kit.id === input.kitId) ?? null
-}
-
-/** (userId, kitId) composite key で kit_stock 1 行を取得 */
-export async function getKitStock(input: {
-  userId: string
-  kitId: string
-}): Promise<KitStock | null> {
-  return (
-    kitStocks.find((stock) => stock.userId === MOCK_USER_ID && stock.kitId === input.kitId) ?? null
-  )
-}
-
-/** user の count > 0 の kit_stock のみ返す */
-export async function getKitStocksWithStock(_input: { userId: string }): Promise<KitStock[]> {
-  return kitStocks.filter((stock) => stock.userId === MOCK_USER_ID && stock.count > 0)
-}
-
-/** kit_event 履歴を (userId, kitId) で取得 */
-export async function getKitEvents(input: { userId: string; kitId: string }): Promise<KitEvent[]> {
-  return kitEvents.filter((event) => event.userId === MOCK_USER_ID && event.kitId === input.kitId)
-}
-
-/** user の全 kit_event を返す (Dashboard 集計用) */
-export async function getKitEventsAll(_input: { userId: string }): Promise<KitEvent[]> {
-  return kitEvents.filter((event) => event.userId === MOCK_USER_ID)
-}
-
 // === Mutations (in-memory; Phase C では DB INSERT/UPDATE/DELETE) ===
 
-let kitEventIdCounter = kitEvents.length + 1
+let kitEventIdCounter = mockKitEvents.length + 1
 
 /**
  * kit_event を追加し、kit_stock の count を更新する。
@@ -225,12 +188,12 @@ export async function addKitEvent(input: {
   }
 
   // kit_stock を探すまたは作成
-  let stock = kitStocks.find(
+  let stock = mockKitStocks.find(
     (existing) => existing.userId === MOCK_USER_ID && existing.kitId === input.kitId,
   )
   if (!stock) {
     stock = { userId: MOCK_USER_ID, kitId: input.kitId, count: 0 }
-    kitStocks.push(stock)
+    mockKitStocks.push(stock)
   }
 
   const newCount = stock.count + input.delta
@@ -256,6 +219,6 @@ export async function addKitEvent(input: {
     note: input.note ?? null,
     createdAt: new Date(),
   }
-  kitEvents.push(newEvent)
+  mockKitEvents.push(newEvent)
   return newEvent
 }
