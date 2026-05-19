@@ -1,4 +1,5 @@
-import { sqliteTable, text, integer, primaryKey, index } from 'drizzle-orm/sqlite-core'
+import { sql } from 'drizzle-orm'
+import { sqliteTable, text, integer, primaryKey, index, check } from 'drizzle-orm/sqlite-core'
 
 /**
  * キット (Gunpla) ドメインの Drizzle schema (SSoT)。
@@ -41,6 +42,7 @@ export const kitStocks = sqliteTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId, table.kitId] }),
+    countNonNegative: check('kit_stocks_count_non_negative', sql`${table.count} >= 0`),
   }),
 )
 

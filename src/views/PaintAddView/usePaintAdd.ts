@@ -2,14 +2,10 @@ import { useCallback, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useSnackbar } from 'notistack'
 import type { Paint } from '~/entities/paint'
-import { addPaintEvent } from '~/entities/paint'
+import { addPaintEvent } from '~/features/paint-stock-add'
 import type { PaintPurchaseEventInput } from '~/features/paint-stock-add'
 
 type Phase = { kind: 'search' } | { kind: 'add-stock'; paint: Paint }
-
-interface UsePaintAddInput {
-  userId: string
-}
 
 export interface UsePaintAddReturn {
   phase: Phase
@@ -26,14 +22,14 @@ export interface UsePaintAddReturn {
  * - Phase state: 'search' (paint master 検索中) / 'add-stock' (paint 選択後、購入記録入力中)
  * - 検索フェーズへ戻る (goToSearch)
  * - master paint 選択 (selectPaint) → 'add-stock' phase へ遷移
- * - 購入記録: addPaintEvent({ delta: +1, reason: 'purchase' }) → paint_stock.count += 1
+ * - 購入記録: addPaintEvent({ data: { delta: +1, reason: 'purchase' } }) → paint_stock.count += 1
+ *   (userId は server fn 内 auth() 由来、client 入力なし)
  * - 成功時は Snackbar (notistack) で success 通知 + /paints/:paintId (詳細) へ navigation
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用は持たない (#43 ルール)。
  */
-export function usePaintAdd(input: UsePaintAddInput): UsePaintAddReturn {
-  const { userId } = input
+export function usePaintAdd(): UsePaintAddReturn {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
   const [phase, setPhase] = useState<Phase>({ kind: 'search' })
@@ -49,14 +45,15 @@ export function usePaintAdd(input: UsePaintAddInput): UsePaintAddReturn {
   const handleStockSubmit = useCallback(
     async (paintId: string, values: PaintPurchaseEventInput) => {
       await addPaintEvent({
-        userId,
-        paintId,
-        delta: 1,
-        reason: 'purchase',
-        purchasedAt: values.purchasedAt ?? null,
-        priceYen: values.purchasePriceYen ?? null,
-        purchaseLocation: values.purchaseLocation ?? null,
-        note: values.note ?? null,
+        data: {
+          paintId,
+          delta: 1,
+          reason: 'purchase',
+          purchasedAt: values.purchasedAt ?? null,
+          priceYen: values.purchasePriceYen ?? null,
+          purchaseLocation: values.purchaseLocation ?? null,
+          note: values.note ?? null,
+        },
       })
       enqueueSnackbar('塗料を在庫に追加しました', { variant: 'success' })
       void navigate({
@@ -64,7 +61,7 @@ export function usePaintAdd(input: UsePaintAddInput): UsePaintAddReturn {
         params: { paintId },
       })
     },
-    [userId, navigate, enqueueSnackbar],
+    [navigate, enqueueSnackbar],
   )
 
   const handleBackToList = useCallback(() => {

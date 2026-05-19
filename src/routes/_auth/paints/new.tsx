@@ -4,16 +4,15 @@ import { PaintAddView } from '~/views/PaintAddView'
 import { usePaintAdd } from '~/views/PaintAddView/usePaintAdd'
 
 export const Route = createFileRoute('/_auth/paints/new')({
-  loader: async ({ context }) => {
-    const { userId } = context
+  loader: async () => {
     const paints = await getPaints()
-    return { paints, userId }
+    return { paints }
   },
   component: PaintAddRoute,
 })
 
 function PaintAddRoute() {
-  const { paints, userId } = Route.useLoaderData()
-  const hookProps = usePaintAdd({ userId })
+  const { paints } = Route.useLoaderData()
+  const hookProps = usePaintAdd()
   return <PaintAddView paints={paints} {...hookProps} />
 }
