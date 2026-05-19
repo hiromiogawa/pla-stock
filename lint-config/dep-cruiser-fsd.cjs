@@ -78,9 +78,10 @@ module.exports = {
     {
       name: 'not-to-unresolvable',
       severity: 'error',
-      comment: '解決不能な import は型エラーになる前に止める',
+      comment:
+        '解決不能な import は型エラーになる前に止める (例外: cloudflare:* は workerd 提供の virtual module で型は worker-configuration.d.ts が解決)',
       from: {},
-      to: { couldNotResolve: true },
+      to: { couldNotResolve: true, pathNot: '^cloudflare:' },
     },
     {
       name: 'no-duplicate-dep-types',
@@ -96,8 +97,9 @@ module.exports = {
     {
       name: 'fsd-shared-no-upper',
       severity: 'error',
-      comment: 'shared から entities/features/widgets/views/routes への import 禁止',
-      from: { path: '^src/shared/' },
+      comment:
+        'shared から entities/features/widgets/views/routes への import 禁止 (例外: dev seed は全 entity の schema/mock を要するため許容)',
+      from: { path: '^src/shared/', pathNot: '^src/shared/lib/db/seed\\.ts$' },
       to: { path: '^src/(entities|features|widgets|views|routes)/' },
     },
     {

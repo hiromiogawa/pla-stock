@@ -3,11 +3,10 @@ import { getKits, getKitStocksWithStock } from '~/entities/kit'
 import { KitListView } from '~/views/KitListView'
 
 export const Route = createFileRoute('/_auth/kits/')({
-  loader: async ({ context }) => {
-    const { userId } = context
+  loader: async () => {
     const [stocks, kits] = await Promise.all([
-      getKitStocksWithStock({ userId }), // count > 0 のみ
-      getKits({ userId }),
+      getKitStocksWithStock(), // count > 0 のみ
+      getKits(),
     ])
     return { stocks, kits }
   },

@@ -30,6 +30,17 @@ schema の二重管理は drift の温床となる。
 現状の `.dependency-cruiser.cjs` には entity 同層 import 禁止ルールがないため
 追加設定なしで通る (将来 sibling 禁止ルールを入れるなら本 entity を例外指定)。
 
+**server fn の配置 (2026-05-18 追補):**
+
+- **read query** → `entities/{domain}/api/queries.ts` (entity 自身のデータアクセス)
+- **mutation / user-action** → `features/{action}/` (状態変更 use-case)
+
+理由: read query は「ユーザーアクション」ではなく entity のデータアクセスの関心事で、
+複数 page/domain が共有する (例: `getKits` は kit-list / kit-add / project-create が利用)。
+これを user-action feature に押し込むと cross-domain import の不自然さが生じる。
+mock も `entities/{domain}/api/mock/` に在り配置の一貫性が取れる。
+当初 ADR-0008 の「server アクションは feature 集約」は mutation を指すものとして本追補で明確化する。
+
 **`model.ts` の役割:**
 
 - schema からの type / enum re-export (consumer 向けの ergonomics)
@@ -52,6 +63,7 @@ schema の二重管理は drift の温床となる。
 - `entities/projectPaintUse/` のような junction entity が新概念として明示化
 - AI エージェントが domain 値を扱う際は `entities/{domain}/schema.ts` を参照すれば
   値配列・型派生・labels (model.ts) の所在が一意に決まる
+- read query は `entities/{domain}/api/queries.ts`、mutation は `features/` に配置 (2026-05-18 追補で明確化)
 
 ## 代替案
 

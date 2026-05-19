@@ -8,10 +8,10 @@ export const Route = createFileRoute('/_auth/dashboard')({
   loader: async ({ context }) => {
     const { userId } = context
     const [kitStocks, paintStocks, projects, kitEvents, paintEvents] = await Promise.all([
-      getKitStocksWithStock({ userId }),
+      getKitStocksWithStock(),
       getPaintStocksWithStock({ userId }),
       getProjects({ userId }),
-      getKitEventsAll({ userId }),
+      getKitEventsAll(),
       getPaintEventsAll({ userId }),
     ])
 

@@ -12,7 +12,7 @@ import type { Paint, PaintStock, PaintEvent, PaintEventReason } from '../../mode
 
 const MOCK_USER_ID = 'mock-user-1'
 
-const paints: Paint[] = [
+export const mockPaints: Paint[] = [
   {
     id: 'paint-1',
     brand: 'Mr.Color',
@@ -120,7 +120,7 @@ const paints: Paint[] = [
  * paint-6 (Mr.Surfacer) は使い切って count=0。
  * paint-7 は旧データにストックなし (未登録)。
  */
-const paintStocks: PaintStock[] = [
+export const mockPaintStocks: PaintStock[] = [
   { userId: MOCK_USER_ID, paintId: 'paint-1', count: 1 },
   { userId: MOCK_USER_ID, paintId: 'paint-2', count: 1 },
   { userId: MOCK_USER_ID, paintId: 'paint-3', count: 1 },
@@ -137,7 +137,7 @@ const paintStocks: PaintStock[] = [
  * paint_events: 入出庫の audit ledger。
  * SUM(delta) で paintStocks.count が再計算できることを保証する。
  */
-const paintEvents: PaintEvent[] = [
+export const mockPaintEvents: PaintEvent[] = [
   {
     id: 'pe-1',
     userId: MOCK_USER_ID,
@@ -278,12 +278,12 @@ const paintEvents: PaintEvent[] = [
 
 /** カタログ全件を返す (admin curated only) */
 export async function getPaints(_input: { userId: string }): Promise<Paint[]> {
-  return paints
+  return mockPaints
 }
 
 /** 単一塗料 master を ID で取得 */
 export async function getPaint(input: { paintId: string; userId: string }): Promise<Paint | null> {
-  return paints.find((paint) => paint.id === input.paintId) ?? null
+  return mockPaints.find((paint) => paint.id === input.paintId) ?? null
 }
 
 /** (userId, paintId) composite key で paint_stock 1 行を取得 */
@@ -292,14 +292,15 @@ export async function getPaintStock(input: {
   paintId: string
 }): Promise<PaintStock | null> {
   return (
-    paintStocks.find((stock) => stock.userId === MOCK_USER_ID && stock.paintId === input.paintId) ??
-    null
+    mockPaintStocks.find(
+      (stock) => stock.userId === MOCK_USER_ID && stock.paintId === input.paintId,
+    ) ?? null
   )
 }
 
 /** user の count > 0 の paint_stock のみ返す */
 export async function getPaintStocksWithStock(_input: { userId: string }): Promise<PaintStock[]> {
-  return paintStocks.filter((stock) => stock.userId === MOCK_USER_ID && stock.count > 0)
+  return mockPaintStocks.filter((stock) => stock.userId === MOCK_USER_ID && stock.count > 0)
 }
 
 /** paint_event 履歴を (userId, paintId) で取得 */
@@ -307,19 +308,19 @@ export async function getPaintEvents(input: {
   userId: string
   paintId: string
 }): Promise<PaintEvent[]> {
-  return paintEvents.filter(
+  return mockPaintEvents.filter(
     (event) => event.userId === MOCK_USER_ID && event.paintId === input.paintId,
   )
 }
 
 /** user の全 paint_event を返す (Dashboard 集計用) */
 export async function getPaintEventsAll(_input: { userId: string }): Promise<PaintEvent[]> {
-  return paintEvents.filter((event) => event.userId === MOCK_USER_ID)
+  return mockPaintEvents.filter((event) => event.userId === MOCK_USER_ID)
 }
 
 // === Mutations ===
 
-let paintEventIdCounter = paintEvents.length + 1
+let paintEventIdCounter = mockPaintEvents.length + 1
 
 /**
  * paint_event を追加し、paint_stock の count を更新する。
@@ -342,12 +343,12 @@ export async function addPaintEvent(input: {
     throw new Error('addPaintEvent: delta must be non-zero')
   }
 
-  let stock = paintStocks.find(
+  let stock = mockPaintStocks.find(
     (existing) => existing.userId === MOCK_USER_ID && existing.paintId === input.paintId,
   )
   if (!stock) {
     stock = { userId: MOCK_USER_ID, paintId: input.paintId, count: 0 }
-    paintStocks.push(stock)
+    mockPaintStocks.push(stock)
   }
 
   const newCount = stock.count + input.delta
@@ -371,6 +372,6 @@ export async function addPaintEvent(input: {
     note: input.note ?? null,
     createdAt: new Date(),
   }
-  paintEvents.push(newEvent)
+  mockPaintEvents.push(newEvent)
   return newEvent
 }

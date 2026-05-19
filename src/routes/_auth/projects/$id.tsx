@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_auth/projects/$id')({
       }
     }
     const [kit, paintUses, photos, allPaints] = await Promise.all([
-      getKit({ kitId: project.kitId, userId }),
+      getKit({ data: { kitId: project.kitId } }),
       getProjectPaintUses({ projectId: project.id }),
       getProjectPhotos({ projectId: project.id }),
       getPaints({ userId }),
