@@ -274,50 +274,6 @@ export const mockPaintEvents: PaintEvent[] = [
   },
 ]
 
-// === Read accessors ===
-
-/** カタログ全件を返す (admin curated only) */
-export async function getPaints(_input: { userId: string }): Promise<Paint[]> {
-  return mockPaints
-}
-
-/** 単一塗料 master を ID で取得 */
-export async function getPaint(input: { paintId: string; userId: string }): Promise<Paint | null> {
-  return mockPaints.find((paint) => paint.id === input.paintId) ?? null
-}
-
-/** (userId, paintId) composite key で paint_stock 1 行を取得 */
-export async function getPaintStock(input: {
-  userId: string
-  paintId: string
-}): Promise<PaintStock | null> {
-  return (
-    mockPaintStocks.find(
-      (stock) => stock.userId === MOCK_USER_ID && stock.paintId === input.paintId,
-    ) ?? null
-  )
-}
-
-/** user の count > 0 の paint_stock のみ返す */
-export async function getPaintStocksWithStock(_input: { userId: string }): Promise<PaintStock[]> {
-  return mockPaintStocks.filter((stock) => stock.userId === MOCK_USER_ID && stock.count > 0)
-}
-
-/** paint_event 履歴を (userId, paintId) で取得 */
-export async function getPaintEvents(input: {
-  userId: string
-  paintId: string
-}): Promise<PaintEvent[]> {
-  return mockPaintEvents.filter(
-    (event) => event.userId === MOCK_USER_ID && event.paintId === input.paintId,
-  )
-}
-
-/** user の全 paint_event を返す (Dashboard 集計用) */
-export async function getPaintEventsAll(_input: { userId: string }): Promise<PaintEvent[]> {
-  return mockPaintEvents.filter((event) => event.userId === MOCK_USER_ID)
-}
-
 // === Mutations ===
 
 let paintEventIdCounter = mockPaintEvents.length + 1

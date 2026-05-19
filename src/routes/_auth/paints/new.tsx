@@ -6,7 +6,7 @@ import { usePaintAdd } from '~/views/PaintAddView/usePaintAdd'
 export const Route = createFileRoute('/_auth/paints/new')({
   loader: async ({ context }) => {
     const { userId } = context
-    const paints = await getPaints({ userId })
+    const paints = await getPaints()
     return { paints, userId }
   },
   component: PaintAddRoute,
