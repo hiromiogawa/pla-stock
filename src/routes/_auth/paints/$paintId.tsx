@@ -10,9 +10,9 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
     const paintId = params.paintId
 
     const [paint, stock, events, projects] = await Promise.all([
-      getPaint({ paintId, userId }),
-      getPaintStock({ userId, paintId }),
-      getPaintEvents({ userId, paintId }),
+      getPaint({ data: { paintId } }),
+      getPaintStock({ data: { paintId } }),
+      getPaintEvents({ data: { paintId } }),
       getProjects({ userId }),
     ])
 

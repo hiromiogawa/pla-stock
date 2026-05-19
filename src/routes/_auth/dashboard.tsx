@@ -9,10 +9,10 @@ export const Route = createFileRoute('/_auth/dashboard')({
     const { userId } = context
     const [kitStocks, paintStocks, projects, kitEvents, paintEvents] = await Promise.all([
       getKitStocksWithStock(),
-      getPaintStocksWithStock({ userId }),
+      getPaintStocksWithStock(),
       getProjects({ userId }),
       getKitEventsAll(),
-      getPaintEventsAll({ userId }),
+      getPaintEventsAll(),
     ])
 
     const kitCount = kitStocks.reduce((sum, stock) => sum + stock.count, 0)

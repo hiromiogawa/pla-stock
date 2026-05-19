@@ -23,7 +23,7 @@ export const Route = createFileRoute('/_auth/projects/$id')({
       getKit({ data: { kitId: project.kitId } }),
       getProjectPaintUses({ projectId: project.id }),
       getProjectPhotos({ projectId: project.id }),
-      getPaints({ userId }),
+      getPaints(),
     ])
     // paintUses は paintId のみなので、対応する Paint master を引く
     const paintById = new Map(allPaints.map((paint) => [paint.id, paint]))
