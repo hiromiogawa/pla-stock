@@ -16,16 +16,13 @@ Measure と Explore の結果をもとに、ルールの改善提案を GitHub I
 
 ## 改善提案手順
 
-### 1. Measure + Explore のジャーナルを読む
+### 1. 前ステップの出力を受け取る
 
-```
-memory_search query="rule-journal measure" tags=["rule-journal", "measure"] limit=1
-memory_search query="rule-journal explore" tags=["rule-journal", "explore"] limit=1
-```
+直前の rule-measure / rule-explore がコンテキストに出力した要約を入力として受け取る（同一セッション順次実行。memory/ファイル読取は不要）。
 
 ### 2. 改善アクションを決定
 
-ジャーナルの内容から、以下の改善アクションを検討する:
+コンテキスト要約の内容から、以下の改善アクションを検討する:
 
 **新規ルール追加**: 未ルール化パターンが見つかった場合
 - 失敗パターンから具体的なルール文言を起案
@@ -69,16 +66,11 @@ gh issue create \
 
 ### 4. 提案が不要な場合
 
-Measure と Explore の結果から改善提案が見つからない場合は、Issue を起票せず、その旨をジャーナルに記録する。
+Measure と Explore の結果から改善提案が見つからない場合は、Issue を起票せず、その旨をコンテキストに出力する。
 
-### 5. ジャーナルを保存
+### 5. 出力の受け渡し
 
-```
-memory_save content="[rule-improve journal YYYY-MM-DD]
-- 起票Issue: #NNN [タイトル], #NNN [タイトル]
-- 提案種別内訳: 新規N件, 修正N件, アーカイブN件
-- 提案なし理由: （該当する場合）" tags=["rule-journal", "improve"] scope="project"
-```
+起票した改善提案 Issue の一覧をコンテキストに出力する。次ステップ rule-audit が同一セッションで受け取る（ファイル不変・Issue のみ起票の方針は維持）。
 
 ## 出力
 

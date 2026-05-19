@@ -60,27 +60,24 @@ gh issue close [NUMBER] --comment "rule-audit: 却下。理由: [具体的な理
 - 計測データの裏付けが不十分
 - アーカイブ対象のルールが直近の失敗防止に寄与していた
 
-### 4. サイクルメタ情報を更新
+### 4. サイクルメタの更新
 
-```
-memory_save content="[rule-audit journal YYYY-MM-DD]
-- 検証Issue数: N件
-- 承認: #NNN, #NNN
-- 却下: #NNN（理由: ...）
-- サイクル完了時刻: YYYY-MM-DD HH:MM
-- 次回閾値: 3（変更なし / 変更理由: ...）" tags=["rule-journal", "audit", "cycle-meta"] scope="project"
-```
+memory-usage に従い、ファイル memory の `rule-cycle-meta` エントリを upsert する（無ければ新規作成し `MEMORY.md` 索引に 1 行追記）。フォーマット:
 
-### 5. 古いジャーナルを整理
+```markdown
+---
+name: rule-cycle-meta
+description: rule-cycle の前回実行記録（閾値判定の基準値）
+metadata:
+  type: reference
+---
 
-3世代（3回分のサイクル）より前のジャーナルを削除する:
-
-```
-memory_search query="rule-journal" tags=["rule-journal"] limit=50
-# 3世代より前のジャーナルを特定して memory_delete
+- 前回サイクル実行日: <今日 YYYY-MM-DD>
+- その時点の FAIL 総数: <grep -c '^### FAIL-' docs/adr/0007-agent-failure-rules.md の値>
+- 補足: failure-record 後の rule-cycle は「現 FAIL 総数 − この値 ≥ 3」で本実行、未満は報告のみ
 ```
 
 ## 出力
 
 Issue への承認（`approved` ラベル）またはクローズ（理由コメント付き）。
-ジャーナルにサイクル完了を記録する。
+`rule-cycle-meta` をファイル memory に upsert してサイクル完了を記録する。

@@ -16,24 +16,13 @@ rule-measure → rule-explore → rule-improve → rule-audit を順次実行す
 
 ### 1. 閾値チェック（failure-record からの呼び出し時）
 
-前回サイクル実行以降の新規 FAIL エントリ数を確認する:
-
-```
-# 前回サイクル実行時刻を取得
-memory_search query="rule-journal cycle-meta" tags=["rule-journal", "cycle-meta"] limit=1
-```
-
-前回の cycle-meta ジャーナルに記録された FAIL 総数と、現在の FAIL 総数を比較する:
-
-```
-grep -c "^### FAIL-" docs/adr/0007-agent-failure-rules.md
-```
-
-**差分が 3 件未満**: サイクルを実行しない。「FAIL エントリが N 件蓄積。閾値 3 件まであと M 件。」と報告して終了。
-
-**差分が 3 件以上**: サイクルを実行する。
-
-**手動呼び出し時**: 閾値チェックをスキップし、即座にサイクルを実行する。
+1. memory-usage に従い、ファイル memory の `rule-cycle-meta` エントリを読む
+   （無ければ「前回 FAIL 総数 = 0」＝初回扱い）
+2. 現 FAIL 総数を取得:
+   `grep -c "^### FAIL-" docs/adr/0007-agent-failure-rules.md`
+3. **現総数 − cycle-meta 記録値 ≥ 3**: サイクル本実行。**< 3**: 「FAIL 総数 N 件。
+   閾値 3 件まであと M 件。」と報告して終了
+4. **手動呼び出し時**: 閾値チェックをスキップし即サイクル実行
 
 ### 2. サイクル実行
 
@@ -41,11 +30,11 @@ grep -c "^### FAIL-" docs/adr/0007-agent-failure-rules.md
 
 #### Step 1: rule-measure（計測）
 
-**REQUIRED SUB-SKILL:** rule-measure を実行する。ADR-0007 の失敗履歴、Git ログ、ルール総数を集計し、効果スコアを算出。結果は memory にジャーナル保存される。
+**REQUIRED SUB-SKILL:** rule-measure を実行する。ADR-0007 の失敗履歴、Git ログ、ルール総数を集計し、効果スコアを算出。結果は本セッションのコンテキストで次ステップに引き継がれる。
 
 #### Step 2: rule-explore（探索）
 
-**REQUIRED SUB-SKILL:** rule-explore を実行する。Measure の結果を踏まえ、スキル間の矛盾・重複、未ルール化パターン、アーカイブ候補を探す。結果は memory にジャーナル保存される。
+**REQUIRED SUB-SKILL:** rule-explore を実行する。Measure の結果を踏まえ、スキル間の矛盾・重複、未ルール化パターン、アーカイブ候補を探す。結果は本セッションのコンテキストで次ステップに引き継がれる。
 
 #### Step 3: rule-improve（改善提案）
 
@@ -53,7 +42,7 @@ grep -c "^### FAIL-" docs/adr/0007-agent-failure-rules.md
 
 #### Step 4: rule-audit（検証）
 
-**REQUIRED SUB-SKILL:** rule-audit を実行する。Improve が起票した Issue を精査し、承認（`approved` ラベル）またはクローズする。サイクルメタ情報を memory に保存し、古いジャーナルを整理する。
+**REQUIRED SUB-SKILL:** rule-audit を実行する。Improve が起票した Issue を精査し、承認（`approved` ラベル）またはクローズする。サイクルメタ（rule-cycle-meta）をファイル memory に upsert する。
 
 ### 3. 完了報告
 
@@ -66,6 +55,6 @@ grep -c "^### FAIL-" docs/adr/0007-agent-failure-rules.md
 
 ## 注意事項
 
-- 各ステップは順次実行する（並列不可）。前のステップのジャーナルが次のステップの入力になるため。
-- サイクル中にエラーが発生した場合、そのステップで停止し、エラー内容を報告する。途中まで保存されたジャーナルは次回サイクルで参照可能。
+- 各ステップは順次実行する（並列不可）。前ステップの出力が同一セッションのコンテキストで次ステップの入力になるため。
+- サイクル中にエラーが発生した場合、そのステップで停止し、エラー内容を報告する。中断時は cycle-meta が未更新のため、次回は measure から再実行する（二重カウントは起きない）。
 - Improve が「提案なし」と判断した場合、Audit はスキップする。
