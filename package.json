@@ -21,6 +21,7 @@
     "typecheck": "tsc --noEmit",
     "depcruise": "dependency-cruiser src",
     "knip": "knip --strict --use-tsconfig-files",
+    "check:branch": "node scripts/check-branch.mjs",
     "check:harness": "node scripts/check-harness.mjs",
     "check:parallel": "concurrently -n typecheck,depcruise,knip,harness -c blue,green,magenta,cyan \"pnpm run typecheck\" \"pnpm run depcruise\" \"pnpm run knip\" \"pnpm run check:harness\"",
     "check": "pnpm lint && pnpm format && pnpm typecheck && pnpm depcruise && pnpm knip && pnpm check:harness",
