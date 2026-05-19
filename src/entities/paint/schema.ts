@@ -1,4 +1,5 @@
-import { sqliteTable, text, integer, primaryKey, index } from 'drizzle-orm/sqlite-core'
+import { sql } from 'drizzle-orm'
+import { sqliteTable, text, integer, primaryKey, index, check } from 'drizzle-orm/sqlite-core'
 
 /**
  * 塗料ドメインの Drizzle schema (SSoT)。
@@ -56,6 +57,7 @@ export const paintStocks = sqliteTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.userId, table.paintId] }),
+    countNonNegative: check('paint_stocks_count_non_negative', sql`${table.count} >= 0`),
   }),
 )
 
