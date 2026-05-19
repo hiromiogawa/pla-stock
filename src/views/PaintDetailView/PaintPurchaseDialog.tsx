@@ -86,16 +86,29 @@ export function PaintPurchaseDialog({
         <DialogContent>
           <DialogContentText>「{paintLabel}」を 1 本購入して在庫に追加します。</DialogContentText>
           <Stack spacing={2} sx={{ pt: 2 }}>
-            <form.Field name="purchasedAt">
-              {(field) => <FormTextField field={field} label="購入日" type="date" />}
+            <form.Field
+              name="purchasedAt"
+              validators={{
+                onChange: ({ value }) =>
+                  String(value).trim() === '' ? '購入日は必須です' : undefined,
+              }}
+            >
+              {(field) => <FormTextField field={field} label="購入日" type="date" required />}
             </form.Field>
-            <form.Field name="purchasePriceYen">
+            <form.Field
+              name="purchasePriceYen"
+              validators={{
+                onChange: ({ value }) =>
+                  value === '' || value === null ? '購入価格は必須です' : undefined,
+              }}
+            >
               {(field) => (
                 <FormTextField
                   field={field}
                   label="購入価格 (円)"
                   type="number"
                   inputMode="numeric"
+                  required
                 />
               )}
             </form.Field>
