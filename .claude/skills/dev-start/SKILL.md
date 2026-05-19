@@ -25,16 +25,16 @@ master の場合は本スキルの Step 1-2 を必ず経由して feature ブラ
 
 ## 実行フロー
 
-### Step 1: memory-usage（コンテキスト検索）
+### Step 1: memory-usage（コンテキスト把握）
 
-**REQUIRED SUB-SKILL:** memory-usage に従い、関連する記憶を検索する:
+**REQUIRED SUB-SKILL:** memory-usage に従い、ファイル memory から関連する文脈を把握する:
 
-```
-memory_search query="[Issue のキーワード]" limit=5
-memory_search query="[対象パッケージ名]" tags=["design-decision"] limit=5
-```
+- memory ディレクトリの `MEMORY.md`（索引）を読む
+- Issue のキーワード / 対象パッケージ名に関連する型別エントリ
+  （`user`/`feedback`/`project`/`reference`）を開く
 
-過去の設計判断、既知の制約、関連するバグ情報を把握する。
+過去の設計判断は ADR（`docs/adr/`）、失敗事例は ADR-0007 を併せて確認する。
+（本プロジェクトは claude-memory MCP 不使用。memory-usage skill 参照）
 
 ### Step 2: github-flow（Issue確認・ブランチ作成）
 
@@ -56,7 +56,7 @@ memory_search query="[対象パッケージ名]" tags=["design-decision"] limit=
 
 以下が揃った状態で brainstorming や実装に進む:
 
-- [ ] 関連する記憶を検索済み
+- [ ] 関連する記憶（ファイル memory / ADR）を確認済み
 - [ ] Issue の内容と受け入れ条件を把握済み
 - [ ] **feature ブランチに切り替え済み**（master/main で作業していない）
 - [ ] 仕様（または Issue の受け入れ条件）を確認済み
