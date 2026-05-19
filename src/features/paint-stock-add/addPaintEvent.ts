@@ -52,11 +52,23 @@ export const addPaintEvent = createServerFn({ method: 'POST' })
       createdAt: new Date(),
     }
 
+    // SQLite evaluates CHECK(count >= 0) on the INSERT-candidate row *before*
+    // resolving the unique conflict into DO UPDATE. If we use raw delta (negative
+    // for a release) as the candidate count, even a valid release on an existing
+    // row (e.g. count=1, delta=-1 → result 0) fails the CHECK because the
+    // phantom candidate count=-1 is evaluated first.
+    //
+    // Fix: make the candidate count the TRUE resulting value:
+    //   (existing count, or 0 if no row) + delta
+    // Both conflict paths then see the same value as the post-update result,
+    // so CHECK fires correctly in all cases.
+    const nextCount = sql<number>`(select coalesce((select ${paintStocks.count} from ${paintStocks} where ${paintStocks.userId} = ${userId} and ${paintStocks.paintId} = ${data.paintId}), 0) + ${data.delta})`
+
     try {
       await db.batch([
         db
           .insert(paintStocks)
-          .values({ userId, paintId: data.paintId, count: data.delta })
+          .values({ userId, paintId: data.paintId, count: nextCount })
           .onConflictDoUpdate({
             target: [paintStocks.userId, paintStocks.paintId],
             set: { count: sql`${paintStocks.count} + ${data.delta}` },
