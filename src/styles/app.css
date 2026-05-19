@@ -83,6 +83,8 @@
     @apply bg-background text-foreground;
   }
   html {
-    color-scheme: light dark;
+    /* SSR 初期 render は light 既定 (ThemeModeProvider)。client hydrate 後は
+       ThemeModeProvider が documentElement.style.colorScheme を mode に上書き */
+    color-scheme: light;
   }
 }

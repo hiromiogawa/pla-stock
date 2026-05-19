@@ -85,6 +85,10 @@ export function ThemeModeProvider({ children }: ThemeModeProviderProps) {
   useEffect(() => {
     if (typeof document === 'undefined') return
     document.documentElement.classList.toggle('dark', mode === 'dark')
+    // native UI (date picker indicator / number spinner / scrollbar) を
+    // app テーマに追従させる。静的 `color-scheme: light dark` だと OS pref が
+    // 優先され app=light / OS=dark で native glyph が不可視になる。
+    document.documentElement.style.colorScheme = mode
   }, [mode])
 
   const setMode = useCallback((next: ThemeMode) => {

@@ -75,9 +75,13 @@ export function FormTextField({
         rows={rows}
         type={type}
         placeholder={placeholder}
-        required={required}
         disabled={disabled}
         inputProps={{
+          // native `required` 属性は付けない: ブラウザ標準バリデーション
+          // バブルが TanStack validator の custom メッセージより先に発火し
+          // てしまうため。必須強制は field validator が担い、ここでは
+          // a11y セマンティクス (screen reader) のみ aria-required で伝える。
+          ...(required ? { 'aria-required': true } : {}),
           ...(inputMode ? { inputMode } : {}),
           ...(inputProps ?? {}),
         }}
