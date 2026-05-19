@@ -23,6 +23,7 @@
     "knip": "knip --strict --use-tsconfig-files",
     "check:parallel": "concurrently -n typecheck,depcruise,knip -c blue,green,magenta \"pnpm run typecheck\" \"pnpm run depcruise\" \"pnpm run knip\"",
     "check": "pnpm lint && pnpm format && pnpm typecheck && pnpm depcruise && pnpm knip",
+    "gen:skill-index": "node scripts/gen-skill-index.mjs",
     "verify:ui": "node scripts/verify-ui.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply pla-stock --local",
