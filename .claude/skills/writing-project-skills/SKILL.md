@@ -1,8 +1,7 @@
 ---
 name: writing-project-skills
 description: pla-stock プロジェクトの .claude/skills/ 配下に置く skill の delta 規約（公式 skill-creator への追加ルール）を定める. Use when 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき
-kind: orchestrator
-subskills: []
+kind: atomic
 trigger: 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき
 ---
 
