@@ -8,13 +8,19 @@ import type { PaintEvent } from '~/entities/paint'
 import { addPaintEventInput } from './schemas'
 
 /**
- * D1/SQLite の CHECK 制約違反を判定する。違反 message は
- * `CHECK constraint failed` を含む。判定外れは元 error を re-throw する
- * ため integrity は不変 (保証は DB の CHECK が持つ)。
+ * D1/SQLite の在庫 CHECK(count>=0) 制約違反を判定する。
+ *
+ * `CHECK constraint failed` かつ stock count 非負制約名を含むときのみ true。
+ * 無関係な CHECK 違反 / その他 error は false → 呼び出し側で元 error を
+ * re-throw するため integrity は不変 (保証は DB の CHECK が持つ)。
  */
 function isStockCheckViolation(err: unknown): boolean {
   const message = err instanceof Error ? err.message : String(err)
-  return message.includes('CHECK constraint failed')
+  return (
+    message.includes('CHECK constraint failed') &&
+    (message.includes('paint_stocks_count_non_negative') ||
+      message.includes('kit_stocks_count_non_negative'))
+  )
 }
 
 /**

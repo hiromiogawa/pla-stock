@@ -13,6 +13,8 @@ export const paintPurchaseEventSchema = z.object({
 
 export type PaintPurchaseEventInput = z.infer<typeof paintPurchaseEventSchema>
 
+// NOTE: form schema uses `purchasePriceYen`; server input uses `priceYen`.
+// Callers (usePaintAdd/usePaintDetail) bridge the two field names.
 /**
  * addPaintEvent server fn の入力検証。userId は含めない (auth() 由来)。
  */
