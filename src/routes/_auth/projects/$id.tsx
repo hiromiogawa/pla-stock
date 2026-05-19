@@ -8,7 +8,7 @@ import { useProjectDetail } from '~/views/ProjectDetailView/useProjectDetail'
 export const Route = createFileRoute('/_auth/projects/$id')({
   loader: async ({ params, context }) => {
     const { userId } = context
-    const project = await getProject({ projectId: params.id, userId })
+    const project = await getProject({ data: { projectId: params.id } })
     if (!project) {
       return {
         project: null,
@@ -21,8 +21,8 @@ export const Route = createFileRoute('/_auth/projects/$id')({
     }
     const [kit, paintUses, photos, allPaints] = await Promise.all([
       getKit({ data: { kitId: project.kitId } }),
-      getProjectPaintUses({ projectId: project.id }),
-      getProjectPhotos({ projectId: project.id }),
+      getProjectPaintUses({ data: { projectId: project.id } }),
+      getProjectPhotos({ data: { projectId: project.id } }),
       getPaints(),
     ])
     // paintUses は paintId のみなので、対応する Paint master を引く

@@ -4,9 +4,8 @@ import { getProjects } from '~/entities/project'
 import { ProjectListView } from '~/views/ProjectListView'
 
 export const Route = createFileRoute('/_auth/projects/')({
-  loader: async ({ context }) => {
-    const { userId } = context
-    const [projects, kits] = await Promise.all([getProjects({ userId }), getKits()])
+  loader: async () => {
+    const [projects, kits] = await Promise.all([getProjects(), getKits()])
 
     // project.kitId → kit master を解決し、name と boxArt URL を map 化
     // (boxArt は ProjectList のサムネイルに使う、未紐付き / 画像なし時は null)
