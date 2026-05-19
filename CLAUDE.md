@@ -279,6 +279,9 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 - **UI 変更の push は機械強制で `pnpm verify:ui` 必須** (`.husky/pre-push` が `src/views|widgets|theme|styles|components/` 配下の変更を検出時、`.playwright-snapshots/` の鮮度をチェックして reject)
   - 撮った screenshot を **controller 自身が必ず目視確認** (run しただけで OK は禁止、それは harness の趣旨に反する)
 - **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
+- **DB 書込 mutation の spec/plan は UPSERT/batch × CHECK/UNIQUE/FK の相互作用を実機 SQL で再現確認必須** (FAIL-003 由来 / ADR-0007)
+  - 机上の SQL 設計を merge 前提にしない。特に `INSERT ... ON CONFLICT DO UPDATE`: **SQLite は DO UPDATE 切替前に INSERT 候補行の CHECK を評価する**ため、INSERT 候補値は生 delta でなく最終結果値 (`(既存値 or 0) + delta`) にそろえる
+  - **mutation PR は controller 自身がマージ前に制約違反系の手動 smoke を実施**してからユーザー確認に回す (ユーザー任せにしない)。必須境界ケース: 在庫 1→0 が成功 / 0→-1 が拒否され**台帳も増えない** (CHECK + batch rollback)
 - **新規ライブラリ採用は ADR 起票必須** (`docs/adr/`)
 - **UI コード変更前 (`.tsx` の styling / sx prop / 新規 component) は必ず `frontend-design` skill を invoke する**
   - 特に「**見た目に対する feedback**」(例: 「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず**、まず skill で Design Thinking (Tone / Differentiation / Constraints) を再適用する
