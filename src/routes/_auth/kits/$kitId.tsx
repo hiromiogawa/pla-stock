@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_auth/kits/$kitId')({
       getKit({ data: { kitId } }),
       getKitStock({ data: { kitId } }),
       getKitEvents({ data: { kitId } }),
-      getProjects({ userId }),
+      getProjects(),
     ])
 
     if (!kit) {

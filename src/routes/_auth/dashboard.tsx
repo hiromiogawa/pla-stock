@@ -5,12 +5,11 @@ import { getProjects } from '~/entities/project'
 import { DashboardView } from '~/views/DashboardView'
 
 export const Route = createFileRoute('/_auth/dashboard')({
-  loader: async ({ context }) => {
-    const { userId } = context
+  loader: async () => {
     const [kitStocks, paintStocks, projects, kitEvents, paintEvents] = await Promise.all([
       getKitStocksWithStock(),
       getPaintStocksWithStock(),
-      getProjects({ userId }),
+      getProjects(),
       getKitEventsAll(),
       getPaintEventsAll(),
     ])

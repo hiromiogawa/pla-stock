@@ -82,41 +82,6 @@ export const mockProjectPhotos: ProjectPhoto[] = [
   },
 ]
 
-// === Read accessors ===
-
-export async function getProjects(_input: { userId: string }): Promise<Project[]> {
-  return mockProjects.filter((project) => project.userId === MOCK_USER_ID)
-}
-
-export async function getProject(input: {
-  projectId: string
-  userId: string
-}): Promise<Project | null> {
-  return (
-    mockProjects.find(
-      (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
-    ) ?? null
-  )
-}
-
-/** project に紐付く project_paint_use 一覧 */
-export async function getProjectPaintUses(input: {
-  projectId: string
-}): Promise<ProjectPaintUse[]> {
-  return mockProjectPaintUses.filter((link) => link.projectId === input.projectId)
-}
-
-/** project に紐付く paint_id 一覧 (旧 getProjectPaintStockIds の後継) */
-export async function getProjectPaintIds(input: { projectId: string }): Promise<string[]> {
-  return mockProjectPaintUses
-    .filter((link) => link.projectId === input.projectId)
-    .map((link) => link.paintId)
-}
-
-export async function getProjectPhotos(input: { projectId: string }): Promise<ProjectPhoto[]> {
-  return mockProjectPhotos.filter((photo) => photo.projectId === input.projectId)
-}
-
 // === Mutations ===
 
 let projectIdCounter = mockProjects.length + 1

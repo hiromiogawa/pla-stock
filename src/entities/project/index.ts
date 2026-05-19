@@ -6,6 +6,8 @@ export {
   getProjectPaintUses,
   getProjectPaintIds,
   getProjectPhotos,
+} from './api/queries'
+export {
   addProject,
   updateProject,
   deleteProject,

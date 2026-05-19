@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
       getPaint({ data: { paintId } }),
       getPaintStock({ data: { paintId } }),
       getPaintEvents({ data: { paintId } }),
-      getProjects({ userId }),
+      getProjects(),
     ])
 
     if (!paint) {
@@ -22,7 +22,7 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
 
     // project_paint_use で paintId が使われているプロジェクトを逆引き
     const projectPaintIdsList = await Promise.all(
-      projects.map((project) => getProjectPaintIds({ projectId: project.id })),
+      projects.map((project) => getProjectPaintIds({ data: { projectId: project.id } })),
     )
     const linkedProjects = projects.filter((_, idx) => projectPaintIdsList[idx].includes(paintId))
 
