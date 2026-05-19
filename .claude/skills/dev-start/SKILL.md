@@ -25,16 +25,15 @@ master の場合は本スキルの Step 1-2 を必ず経由して feature ブラ
 
 ## 実行フロー
 
-### Step 1: memory-usage（コンテキスト把握）
+### Step 1: file memory でコンテキスト把握
 
-**REQUIRED SUB-SKILL:** memory-usage に従い、ファイル memory から関連する文脈を把握する:
+実装判断の前に harness ファイル memory を確認する (skill 起動は不要・本手順をインライン実行):
 
 - memory ディレクトリの `MEMORY.md`（索引）を読む
 - Issue のキーワード / 対象パッケージ名に関連する型別エントリ
   （`user`/`feedback`/`project`/`reference`）を開く
 
 過去の設計判断は ADR（`docs/adr/`）、失敗事例は ADR-0007 を併せて確認する。
-（本プロジェクトは claude-memory MCP 不使用。memory-usage skill 参照）
 
 ### Step 2: github-flow（Issue確認・ブランチ作成）
 

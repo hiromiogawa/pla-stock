@@ -13,18 +13,21 @@
 このプロジェクトは `.claude/skills/` 配下のスキルを **状況トリガー** で必ず起動する運用。
 「呼べる」ではなく「呼ばねばならない」。**Skill ツールで明示起動**することで手順省略を防ぐ。
 
-> **記憶機構について**: 本プロジェクトは **claude-memory MCP を使用しない**。
-> harness 組み込みのファイル memory（プロジェクト memory ディレクトリの
-> `MEMORY.md` 索引 + 型別エントリ）を使う。global `~/.claude/CLAUDE.md` の
-> "Memory" セクション（MCP 強制）は **本プロジェクトでは適用しない**
-> （指示優先順位: project CLAUDE.md が当該プロジェクトで global に優先）。
-> 詳細は `memory-usage` skill / ADR-0009。
+> **記憶 (file memory) ルール**: 本プロジェクトの記憶は skill ではなく本ルールに従う。
+> global `~/.claude/CLAUDE.md` の memory skill 起動指示は **本プロジェクトでは本節が優先**
+> （指示優先順位: project CLAUDE.md > global）。memory 操作のための skill 起動は不要。
+>
+> - 判断の前に file memory（memory ディレクトリの `MEMORY.md` 索引 + 型別エントリ
+>   `user`/`feedback`/`project`/`reference`）を確認する
+> - 保存基準: 「次セッションで同じ状況に遭遇したとき判断が速くなるか」が YES なら保存
+> - 設計判断は ADR 一本化（`docs/adr/`）。memory への二重保存はしない
+> - 詳細は `docs/harness-map.md`（ADR-0009）
 
 ### トリガー表（このトリガーに該当したら即 Skill 起動）
 
 | トリガー | 起動する Skill | 備考 |
 |---|---|---|
-| **セッション開始時** | `memory-usage` | 過去の決定・好み・失敗事例を MEMORY.md（ファイル memory）/ ADR から把握 |
+| **セッション開始時** | (自動) | 過去の決定・好み・失敗事例を MEMORY.md（ファイル memory）/ ADR から把握（skill 起動不要・本ルール参照） |
 | **Issue 着手前** | `dev-start` | memory 検索 → ブランチ作成 → 仕様確認をオーケストレート |
 | **新機能・新コンポーネントの設計開始時** | `superpowers:brainstorming` | ユーザー意図・要件・設計を発散→収束 |
 | **複数ステップの実装計画を立てる時** | `superpowers:writing-plans` | spec を実装計画に落とす |
@@ -42,7 +45,6 @@
 
 `.claude/skills/` 配下の全スキル:
 
-- **memory-usage** — harness 組み込みファイル memory（MEMORY.md + 型別エントリ）で記憶を保存・検索
 - **dev-start** — Issue 着手オーケストレーター
 - **dev-complete** — 実装完了オーケストレーター（self-review → docs-freshness → conventional-commits → PR）
 - **post-review** — レビュー後オーケストレーター（failure-record → rule-cycle）
