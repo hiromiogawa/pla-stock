@@ -1,6 +1,8 @@
 ---
 name: rule-explore
 description: 計測データに表れないボトルネック・スキル間の矛盾・未ルール化パターンを洗い出す（改善サイクルの探索ステップ）。Use when rule-measure の直後、計測数字に表れない問題を探したいとき
+kind: atomic
+trigger: rule-measure の直後、計測数字に表れない問題やスキル間の矛盾・未ルール化パターンを探したいとき
 ---
 
 # ルール探索
