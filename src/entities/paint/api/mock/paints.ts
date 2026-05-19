@@ -1,4 +1,4 @@
-import type { Paint, PaintStock, PaintEvent, PaintEventReason } from '../../model'
+import type { Paint, PaintStock, PaintEvent } from '../../model'
 
 /**
  * モック層: 塗料 master / paint_stock (count cache) / paint_events (ledger) の
@@ -273,61 +273,3 @@ export const mockPaintEvents: PaintEvent[] = [
     createdAt: new Date('2026-01-15T10:03:00Z'),
   },
 ]
-
-// === Mutations ===
-
-let paintEventIdCounter = mockPaintEvents.length + 1
-
-/**
- * paint_event を追加し、paint_stock の count を更新する。
- *
- * - delta=0 は禁止 (throw)。
- * - 結果 count < 0 は禁止 (throw)。
- * - paint_stock 行が未存在なら自動作成 (count = delta)。
- */
-export async function addPaintEvent(input: {
-  userId: string
-  paintId: string
-  delta: number
-  reason: PaintEventReason
-  purchasedAt?: string | null
-  priceYen?: number | null
-  purchaseLocation?: string | null
-  note?: string | null
-}): Promise<PaintEvent> {
-  if (input.delta === 0) {
-    throw new Error('addPaintEvent: delta must be non-zero')
-  }
-
-  let stock = mockPaintStocks.find(
-    (existing) => existing.userId === MOCK_USER_ID && existing.paintId === input.paintId,
-  )
-  if (!stock) {
-    stock = { userId: MOCK_USER_ID, paintId: input.paintId, count: 0 }
-    mockPaintStocks.push(stock)
-  }
-
-  const newCount = stock.count + input.delta
-  if (newCount < 0) {
-    throw new Error(
-      `addPaintEvent: result count would be ${newCount} (< 0). Current count: ${stock.count}, delta: ${input.delta}`,
-    )
-  }
-
-  stock.count = newCount
-
-  const newEvent: PaintEvent = {
-    id: `pe-${paintEventIdCounter++}`,
-    userId: MOCK_USER_ID,
-    paintId: input.paintId,
-    delta: input.delta,
-    reason: input.reason,
-    purchasedAt: input.purchasedAt ?? null,
-    priceYen: input.priceYen ?? null,
-    purchaseLocation: input.purchaseLocation ?? null,
-    note: input.note ?? null,
-    createdAt: new Date(),
-  }
-  mockPaintEvents.push(newEvent)
-  return newEvent
-}

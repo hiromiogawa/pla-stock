@@ -1,0 +1,68 @@
+import { createServerFn } from '@tanstack/react-start'
+import { auth } from '@clerk/tanstack-react-start/server'
+import { env } from 'cloudflare:workers'
+import { sql } from 'drizzle-orm'
+import { createDb } from '~/shared/lib/db/client'
+import { paintStocks, paintEvents } from '~/entities/paint/schema'
+import type { PaintEvent } from '~/entities/paint'
+import { addPaintEventInput } from './schemas'
+
+/**
+ * D1/SQLite の CHECK 制約違反を判定する。違反 message は
+ * `CHECK constraint failed` を含む。判定外れは元 error を re-throw する
+ * ため integrity は不変 (保証は DB の CHECK が持つ)。
+ */
+function isStockCheckViolation(err: unknown): boolean {
+  const message = err instanceof Error ? err.message : String(err)
+  return message.includes('CHECK constraint failed')
+}
+
+/**
+ * paint の入出庫記録 (mutation)。
+ *
+ * - userId は handler 内 auth() 由来 (client 入力に含めない = IDOR 防止)
+ * - paint_stocks の find-or-create + count 増減 と paint_events insert を
+ *   db.batch([...]) で atomic 実行 (D1 は interactive tx 非対応)
+ * - count < 0 は DB の CHECK(count>=0) で拒否 → batch 全体 rollback。
+ *   コードは事前チェックを持たず CHECK エラーを user-facing に翻訳するのみ
+ */
+export const addPaintEvent = createServerFn({ method: 'POST' })
+  .inputValidator(addPaintEventInput)
+  .handler(async ({ data }): Promise<PaintEvent> => {
+    const { userId } = await auth()
+    if (!userId) throw new Error('Unauthorized')
+    const db = createDb(env.DB)
+
+    const event: PaintEvent = {
+      id: crypto.randomUUID(),
+      userId,
+      paintId: data.paintId,
+      delta: data.delta,
+      reason: data.reason,
+      purchasedAt: data.purchasedAt ?? null,
+      priceYen: data.priceYen ?? null,
+      purchaseLocation: data.purchaseLocation ?? null,
+      note: data.note ?? null,
+      createdAt: new Date(),
+    }
+
+    try {
+      await db.batch([
+        db
+          .insert(paintStocks)
+          .values({ userId, paintId: data.paintId, count: data.delta })
+          .onConflictDoUpdate({
+            target: [paintStocks.userId, paintStocks.paintId],
+            set: { count: sql`${paintStocks.count} + ${data.delta}` },
+          }),
+        db.insert(paintEvents).values(event),
+      ])
+    } catch (err) {
+      if (isStockCheckViolation(err)) {
+        throw new Error('在庫が不足しています（在庫を負の数にはできません）', { cause: err })
+      }
+      throw err
+    }
+
+    return event
+  })

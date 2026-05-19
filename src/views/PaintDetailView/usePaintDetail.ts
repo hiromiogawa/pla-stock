@@ -2,14 +2,13 @@ import { useCallback, useState } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useSnackbar } from 'notistack'
 import type { Paint, PaintStock } from '~/entities/paint'
-import { addPaintEvent } from '~/entities/paint'
+import { addPaintEvent } from '~/features/paint-stock-add'
 import type { PaintPurchaseValues } from './PaintPurchaseDialog'
 import type { PaintReleaseValues } from './PaintReleaseDialog'
 
 interface UsePaintDetailInput {
   paint: Paint | null
   stock: PaintStock | null
-  userId: string
 }
 
 export interface UsePaintDetailReturn {
@@ -27,8 +26,9 @@ export interface UsePaintDetailReturn {
  *
  * 担当する state / 副作用:
  * - 購入ダイアログ / 出庫ダイアログの表示状態 (useState ×2)
- * - 購入記録: addPaintEvent({ delta: +1, reason: 'purchase' })
- * - 出庫記録: addPaintEvent({ delta: -1, reason: <release reason> })
+ * - 購入記録: addPaintEvent({ data: { delta: +1, reason: 'purchase' } })
+ * - 出庫記録: addPaintEvent({ data: { delta: -1, reason: <release reason> } })
+ *   (userId は server fn 内 auth() 由来、client 入力なし = IDOR 防止)
  * - mutation 後は router.invalidate() で loader 再実行 → 最新 stock/events を再取得
  * - 一覧へ戻る navigation
  * - mutation 失敗時は Snackbar (notistack) で error 通知
@@ -44,21 +44,22 @@ export function usePaintDetail(input: UsePaintDetailInput): UsePaintDetailReturn
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)
   const [showReleaseDialog, setShowReleaseDialog] = useState(false)
 
-  const { paint, userId } = input
+  const { paint } = input
 
   const handlePurchase = useCallback(
     async (values: PaintPurchaseValues) => {
       if (!paint) return
       try {
         await addPaintEvent({
-          userId,
-          paintId: paint.id,
-          delta: 1,
-          reason: 'purchase',
-          purchasedAt: values.purchasedAt,
-          priceYen: values.priceYen,
-          purchaseLocation: values.purchaseLocation,
-          note: values.note,
+          data: {
+            paintId: paint.id,
+            delta: 1,
+            reason: 'purchase',
+            purchasedAt: values.purchasedAt,
+            priceYen: values.priceYen,
+            purchaseLocation: values.purchaseLocation,
+            note: values.note,
+          },
         })
         setShowPurchaseDialog(false)
         await router.invalidate()
@@ -70,7 +71,7 @@ export function usePaintDetail(input: UsePaintDetailInput): UsePaintDetailReturn
         )
       }
     },
-    [paint, userId, router, enqueueSnackbar],
+    [paint, router, enqueueSnackbar],
   )
 
   const handleRelease = useCallback(
@@ -78,11 +79,12 @@ export function usePaintDetail(input: UsePaintDetailInput): UsePaintDetailReturn
       if (!paint) return
       try {
         await addPaintEvent({
-          userId,
-          paintId: paint.id,
-          delta: -1,
-          reason: values.reason,
-          note: values.note,
+          data: {
+            paintId: paint.id,
+            delta: -1,
+            reason: values.reason,
+            note: values.note,
+          },
         })
         setShowReleaseDialog(false)
         await router.invalidate()
@@ -94,7 +96,7 @@ export function usePaintDetail(input: UsePaintDetailInput): UsePaintDetailReturn
         )
       }
     },
-    [paint, userId, router, enqueueSnackbar],
+    [paint, router, enqueueSnackbar],
   )
 
   const handleBackToList = useCallback(() => {

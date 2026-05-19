@@ -5,8 +5,7 @@ import { PaintDetailView } from '~/views/PaintDetailView'
 import { usePaintDetail } from '~/views/PaintDetailView/usePaintDetail'
 
 export const Route = createFileRoute('/_auth/paints/$paintId')({
-  loader: async ({ params, context }) => {
-    const { userId } = context
+  loader: async ({ params }) => {
     const paintId = params.paintId
 
     const [paint, stock, events, projects] = await Promise.all([
@@ -17,7 +16,7 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
     ])
 
     if (!paint) {
-      return { stock: null, paint: null, events: [], linkedProjects: [], userId }
+      return { stock: null, paint: null, events: [], linkedProjects: [] }
     }
 
     // project_paint_use で paintId が使われているプロジェクトを逆引き
@@ -26,13 +25,13 @@ export const Route = createFileRoute('/_auth/paints/$paintId')({
     )
     const linkedProjects = projects.filter((_, idx) => projectPaintIdsList[idx].includes(paintId))
 
-    return { stock, paint, events, linkedProjects, userId }
+    return { stock, paint, events, linkedProjects }
   },
   component: PaintDetailRoute,
 })
 
 function PaintDetailRoute() {
-  const { userId, ...data } = Route.useLoaderData()
-  const hookProps = usePaintDetail({ paint: data.paint, stock: data.stock, userId })
+  const data = Route.useLoaderData()
+  const hookProps = usePaintDetail({ paint: data.paint, stock: data.stock })
   return <PaintDetailView {...data} {...hookProps} />
 }
