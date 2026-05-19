@@ -16,7 +16,7 @@ rule-measure → rule-explore → rule-improve → rule-audit を順次実行す
 
 ### 1. 閾値チェック（failure-record からの呼び出し時）
 
-1. memory-usage に従い、ファイル memory の `rule-cycle-meta` エントリを読む
+1. CLAUDE.md の記憶 (file memory) ルールに従い、ファイル memory の `rule-cycle-meta` エントリを読む
    （無ければ「前回 FAIL 総数 = 0」＝初回扱い）
 2. 現 FAIL 総数を取得:
    `grep -c "^### FAIL-" docs/adr/0007-agent-failure-rules.md`

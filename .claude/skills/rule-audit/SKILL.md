@@ -62,7 +62,7 @@ gh issue close [NUMBER] --comment "rule-audit: 却下。理由: [具体的な理
 
 ### 4. サイクルメタの更新
 
-memory-usage に従い、ファイル memory の `rule-cycle-meta` エントリを upsert する（無ければ新規作成し `MEMORY.md` 索引に 1 行追記）。フォーマット:
+CLAUDE.md の記憶 (file memory) ルールに従い、ファイル memory の `rule-cycle-meta` エントリを upsert する（無ければ新規作成し `MEMORY.md` 索引に 1 行追記）。フォーマット:
 
 ```markdown
 ---
