@@ -65,6 +65,24 @@
   - `CLAUDE.md` (AI 運用ルール節)
   - `.claude/skills/dev-complete/SKILL.md` (冒頭ガード)
 
+### FAIL-003: SQLite UPSERT が INSERT 候補行の CHECK を衝突解決前に評価する罠を spec/plan/code-review で見落とし (2026-05-19)
+
+- **事象**: PR #98 (paint-mutation) で `addPaintEvent` の在庫更新を `db.insert(paintStocks).values({ count: data.delta }).onConflictDoUpdate({ set: { count: sql\`count + delta\` } })` で実装。在庫1の塗料を出庫 (delta=-1、結果 0=合法) しても「在庫が不足しています」と誤って拒否された。在庫0→-1 の正常拒否ではなく、在庫1→0 の **正当な出庫が全て失敗**。購入 (+1) は動くため「出庫/廃棄だけ落ちる」症状。ユーザーが手動検証で発見・指摘。
+- **原因**:
+  1. **SQLite UPSERT の制約評価順の無理解**: `INSERT ... ON CONFLICT DO UPDATE` で SQLite は **INSERT 候補行の CHECK を、ユニーク衝突検知→DO UPDATE への切替より先に評価**する。INSERT 候補 count に生 delta (出庫時 -1) を渡したため、既存行で結果が 0 になる場合でも phantom 候補 -1 が `CHECK(count>=0)` 違反 → 誤判定。「-1 は DB に保存されないから問題ないはず」という直感が SQLite 実行手順とズレていた
+  2. **spec/plan で upsert + CHECK の相互作用を未検証**: 「CHECK + db.batch で atomic」までは brainstorming で詰めたが、`onConflictDoUpdate` の INSERT 候補値が CHECK 対象になる挙動を実機確認せず机上設計のまま plan 化
+  3. **code-review (opus) もすり抜け**: レビューは atomicity/IDOR/parity を検証し「rollback がテスト未カバー」は指摘したが、UPSERT の CHECK 評価順という具体的 SQLite 挙動までは踏み込めず「behavior-parity: YES」と誤判定。静的レビューの限界 (実 DB 挙動は実機 smoke でないと出ない)
+  4. **test 基盤なし (ADR-0001) で自動回帰が無く、手動 smoke 前提**だが、その手動 smoke を controller が実施せずユーザー任せにしていた (発見がユーザー検証まで遅延)
+- **対策**:
+  - **DB 書き込みを伴う mutation の spec/plan では、CHECK/UNIQUE/FK 制約と UPSERT/batch の相互作用を「実機 SQL で再現確認」する確認事項を必須化**。机上の SQL 設計を merge 前提にしない
+  - **mutation PR は controller 自身がマージ前に「制約違反系の手動 smoke」を実施**してからユーザー確認に回す (ユーザー任せにしない)。特に「境界値: 在庫1→0 が通る / 0→-1 が拒否され台帳も増えない」を必須ケース化
+  - **後続 kit/project mutation は同 upsert パターンを再利用予定 → 修正済パターン (INSERT 候補 count = `(既存 count or 0) + delta` の真の結果値) を踏襲**。生 delta を INSERT 候補に渡さない
+  - 一般則: 「SQLite UPSERT は DO UPDATE に切り替わる前に INSERT 候補行を制約チェックする。候補値は最終結果値と一致させよ」
+- **反映先**:
+  - `docs/adr/0007-agent-failure-rules.md` (本エントリ)
+  - `CLAUDE.md` (AI 運用ルール: mutation PR の制約 smoke 必須化を追記予定 — rule-cycle で要否判断)
+  - 修正実装: `src/features/paint-stock-add/addPaintEvent.ts` (commit 112983c、PR #98 に記録)
+
 ## 運用メモ
 
 - 新エントリ追加後は `failure-record` skill が指示する通り `rule-cycle` skill を呼び出す。閾値 (前回サイクル以降 3 件) 未満ならサイクルは空回りで報告のみ。
