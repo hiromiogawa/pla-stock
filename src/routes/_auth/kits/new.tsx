@@ -4,16 +4,15 @@ import { KitAddView } from '~/views/KitAddView'
 import { useKitAdd } from '~/views/KitAddView/useKitAdd'
 
 export const Route = createFileRoute('/_auth/kits/new')({
-  loader: async ({ context }) => {
-    const { userId } = context
+  loader: async () => {
     const kits = await getKits()
-    return { kits, userId }
+    return { kits }
   },
   component: KitAddRoute,
 })
 
 function KitAddRoute() {
-  const { kits, userId } = Route.useLoaderData()
-  const hookProps = useKitAdd({ userId })
+  const { kits } = Route.useLoaderData()
+  const hookProps = useKitAdd()
   return <KitAddView kits={kits} {...hookProps} />
 }
