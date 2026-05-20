@@ -13,27 +13,50 @@
       "Bash(git clean -f:*)",
       "Bash(git clean -fd:*)",
       "Bash(git branch -D:*)",
+
       "Bash(rm -rf /:*)",
       "Bash(rm -rf ~:*)",
       "Bash(rm -rf $HOME:*)",
+
+      "Edit(.env*)",
+      "Write(.env*)",
+      "Edit(.dev.vars*)",
+      "Write(.dev.vars*)",
+
       "Bash(wrangler deploy:*)",
       "Bash(wrangler secret put:*)",
       "Bash(wrangler secret delete:*)",
       "Bash(wrangler d1 execute * --remote:*)",
       "Bash(wrangler d1 migrations apply * --remote:*)",
-      "Edit(.env*)",
-      "Write(.env*)",
-      "Edit(.dev.vars*)",
-      "Write(.dev.vars*)"
+
+      "Edit(/Users/ogawahiromi/.claude/**)",
+      "Write(/Users/ogawahiromi/.claude/**)"
     ],
     "ask": [
       "Bash(rm -rf:*)",
       "Bash(rm -r:*)",
-      "Bash(pnpm remove:*)",
-      "Bash(pnpm uninstall:*)",
+
       "Bash(gh repo delete:*)",
       "Bash(gh release delete:*)",
-      "Bash(gh pr close:*)"
+      "Bash(gh pr close:*)",
+      "Bash(gh pr delete-branch:*)",
+      "Bash(gh issue delete:*)",
+
+      "Bash(pnpm add:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm uninstall:*)"
+    ],
+    "allow": [
+      "Bash(pnpm lint)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm knip)",
+      "Bash(pnpm depcruise)",
+      "Bash(pnpm format)",
+      "Bash(pnpm check)",
+      "Bash(pnpm check:parallel)",
+      "Bash(pnpm check:branch)",
+      "Bash(pnpm check:harness)"
     ]
   }
 }
