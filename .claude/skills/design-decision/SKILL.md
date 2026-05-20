@@ -1,6 +1,10 @@
 ---
 name: design-decision
 description: 設計判断を docs/adr/ の ADR に記録するオーケストレーター（adr 一本）。Use when ライブラリ選定・DB 設計・アーキテクチャ変更など、後から理由を問われうる設計判断が brainstorming 中に発生したとき
+metadata:
+  kind: orchestrator
+  subskills: [adr]
+  trigger: ライブラリ選定・DB 設計・アーキテクチャ変更など、後から理由を問われうる設計判断が brainstorming 中に発生したとき
 ---
 
 # 設計判断

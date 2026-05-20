@@ -1,6 +1,9 @@
 ---
 name: rule-audit
 description: rule-improve が起票した改善提案 Issue を精査し、承認かクローズかを判断する（改善サイクルの最終ステップ）。Use when rule-improve 直後、または `rule-improvement` ラベルの未精査 Issue があるとき
+metadata:
+  kind: atomic
+  trigger: rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき
 ---
 
 # ルール検証
@@ -62,7 +65,7 @@ gh issue close [NUMBER] --comment "rule-audit: 却下。理由: [具体的な理
 
 ### 4. サイクルメタの更新
 
-memory-usage に従い、ファイル memory の `rule-cycle-meta` エントリを upsert する（無ければ新規作成し `MEMORY.md` 索引に 1 行追記）。フォーマット:
+CLAUDE.md の記憶 (file memory) ルールに従い、ファイル memory の `rule-cycle-meta` エントリを upsert する（無ければ新規作成し `MEMORY.md` 索引に 1 行追記）。フォーマット:
 
 ```markdown
 ---

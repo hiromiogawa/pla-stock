@@ -13,52 +13,62 @@
 このプロジェクトは `.claude/skills/` 配下のスキルを **状況トリガー** で必ず起動する運用。
 「呼べる」ではなく「呼ばねばならない」。**Skill ツールで明示起動**することで手順省略を防ぐ。
 
-> **記憶機構について**: 本プロジェクトは **claude-memory MCP を使用しない**。
-> harness 組み込みのファイル memory（プロジェクト memory ディレクトリの
-> `MEMORY.md` 索引 + 型別エントリ）を使う。global `~/.claude/CLAUDE.md` の
-> "Memory" セクション（MCP 強制）は **本プロジェクトでは適用しない**
-> （指示優先順位: project CLAUDE.md が当該プロジェクトで global に優先）。
-> 詳細は `memory-usage` skill / ADR-0009。
+> **記憶 (file memory) ルール**: 本プロジェクトの記憶は skill ではなく本ルールに従う。
+> global `~/.claude/CLAUDE.md` の memory skill 起動指示は **本プロジェクトでは本節が優先**
+> （指示優先順位: project CLAUDE.md > global）。memory 操作のための skill 起動は不要。
+>
+> - 判断の前に file memory（memory ディレクトリの `MEMORY.md` 索引 + 型別エントリ
+>   `user`/`feedback`/`project`/`reference`）を確認する
+> - 保存基準: 「次セッションで同じ状況に遭遇したとき判断が速くなるか」が YES なら保存
+> - 設計判断は ADR 一本化（`docs/adr/`）。memory への二重保存はしない
+> - 詳細は `docs/harness-map.md`（ADR-0009）
 
+**セッション開始時**: file memory（memory ディレクトリの `MEMORY.md` + 型別エントリ）を確認し、過去の決定・好み・失敗事例を把握する（skill 起動不要・本ルール参照）。
+
+<!-- gen:skill-index start -->
 ### トリガー表（このトリガーに該当したら即 Skill 起動）
 
-| トリガー | 起動する Skill | 備考 |
+| トリガー | 起動する Skill | 種別 |
 |---|---|---|
-| **セッション開始時** | `memory-usage` | 過去の決定・好み・失敗事例を MEMORY.md（ファイル memory）/ ADR から把握 |
-| **Issue 着手前** | `dev-start` | memory 検索 → ブランチ作成 → 仕様確認をオーケストレート |
-| **新機能・新コンポーネントの設計開始時** | `superpowers:brainstorming` | ユーザー意図・要件・設計を発散→収束 |
-| **複数ステップの実装計画を立てる時** | `superpowers:writing-plans` | spec を実装計画に落とす |
-| **設計判断（ライブラリ選定・アーキ変更）した時** | `design-decision` | ADR 作成（ADR 一本化）|
-| **実装完了→コミット直前** | `dev-complete` → `self-review` → `conventional-commits` | 検証サイクル必須・省略不可 |
-| **PR 作成時** | `github-flow` | Issue 紐付け（`Closes #XX`）必須 |
-| **コードレビュー指摘を受けた時** | `post-review` | failure-record → rule-cycle |
-| **エージェントが同じミスを繰り返した時** | `failure-record` | ADR-0007 形式で記録 |
-| **「ルールを改善して」依頼時** | `rule-cycle` | measure → explore → improve → audit |
-| **ドキュメント追加・更新時** | `docs-freshness` | Why/What/How 分類、自動生成先か手動か判定 |
-| **Issue 起票時** | `writing-issues` | Type 別本文構成・親子紐付け・アンチパターン |
-| **新スキル作成・編集時** | `writing-project-skills` | プロジェクト skill 規約 |
+| 技術選定・アーキテクチャ変更・代替案比較の末に設計判断を下したとき、design-decision 外で単独記録する場合や既存 ADR を Supersede するとき | `adr` | atomic |
+| 品質ツールの設定・実行タイミングを決めるとき、または lint・未使用コード・依存違反エラーに遭遇したとき | `code-quality` | atomic |
+| コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき | `conventional-commits` | atomic |
+| ライブラリ選定・DB 設計・アーキテクチャ変更など、後から理由を問われうる設計判断が brainstorming 中に発生したとき | `design-decision` | orchestrator |
+| 実装が一段落し、コミット・PR 作成に向けて仕上げ作業を始めるとき | `dev-complete` | orchestrator |
+| Issue に着手する直前、ブランチ作成や仕様確認などのコンテキスト準備を始めるとき | `dev-start` | orchestrator |
+| ドキュメントを追加・更新するとき、生成物と手動ドキュメントの役割分担に迷ったとき、または CI の docs 差分チェックが失敗したとき | `docs-freshness` | atomic |
+| エージェントが同じミスを繰り返した・ユーザーに訂正された・レビューで指摘を受けたとき | `failure-record` | atomic |
+| Issue を作成・階層付けするとき、PR を立てるとき、または GitHub Projects のステータスを更新するとき | `github-flow` | atomic |
+| コードレビューの指摘を受け取った直後、対応と再発防止の流れを開始するとき | `post-review` | orchestrator |
+| 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき | `project-bootstrap` | orchestrator |
+| rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき | `rule-audit` | atomic |
+| failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき | `rule-cycle` | orchestrator |
+| rule-measure の直後、計測数字に表れない問題やスキル間の矛盾・未ルール化パターンを探したいとき | `rule-explore` | atomic |
+| rule-explore の直後、measure と explore の結果をもとに改善提案を Issue 化するとき | `rule-improve` | atomic |
+| ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき | `rule-measure` | atomic |
+| 新機能の設計を始めるとき、仕様書から実装へ移行するとき、または JSDoc / typedoc による仕様記述に迷ったとき | `sdd` | atomic |
+| 実装が完了しコミット前の検証を始めるとき、または PR 作成直前に push 差分を再検証するとき | `self-review` | atomic |
+| 新規 Issue を立てる時、既存 Issue を整える時、Epic に sub-issue をぶら下げる時 | `writing-issues` | atomic |
+| 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき | `writing-project-skills` | atomic |
 
-### 一覧（参照用）
+### オーケストレーション系（単一責務 skill を連鎖）
 
-`.claude/skills/` 配下の全スキル:
+- **design-decision** → adr
+- **dev-complete** → self-review, docs-freshness, conventional-commits, github-flow
+- **dev-start** → github-flow, sdd
+- **post-review** → dev-complete, failure-record
+- **project-bootstrap** → code-quality, conventional-commits, github-flow, sdd, adr
+- **rule-cycle** → rule-measure, rule-explore, rule-improve, rule-audit
 
-- **memory-usage** — harness 組み込みファイル memory（MEMORY.md + 型別エントリ）で記憶を保存・検索
-- **dev-start** — Issue 着手オーケストレーター
-- **dev-complete** — 実装完了オーケストレーター（self-review → docs-freshness → conventional-commits → PR）
-- **post-review** — レビュー後オーケストレーター（failure-record → rule-cycle）
-- **design-decision** — 設計判断オーケストレーター（adr 一本化、ADR が SSoT）
-- **self-review** — lint/test/dep-check/knip/build + コード re-read
-- **conventional-commits** — type(scope): description 規約（scope は `.project-config.yml`）
-- **github-flow** — Epic/Task/Story/Bug 階層、PR と Issue は 1:1
-- **sdd** — Markdown 仕様 → JSDoc に SSoT 移行
-- **adr** — `docs/adr/` の設計判断記録（不変・Supersede のみ）
-- **code-quality** — OXLint/Biome/knip/dep-cruiser の運用基準
-- **docs-freshness** — Why/What/How 分類、自動生成 vs 手動の判断
-- **failure-record** — エージェント失敗の記録と再発防止
-- **rule-measure / rule-explore / rule-improve / rule-audit / rule-cycle** — ルール改善サイクル
-- **project-bootstrap** — 新プロジェクト初期化オーケストレーター
-- **writing-issues** — Issue 本文構成・タイトル命名・親子紐付け・アンチパターンの規約
-- **writing-project-skills** — プロジェクト skill 規約
+### 単一責務系（atomic）
+
+`adr` `code-quality` `conventional-commits` `docs-freshness` `failure-record` `github-flow` `rule-audit` `rule-explore` `rule-improve` `rule-measure` `sdd` `self-review` `writing-issues` `writing-project-skills`
+
+> 実作業の主役の一部は superpowers **plugin** skill（`brainstorming` /
+> `writing-plans` / `subagent-driven-development` / `systematic-debugging` /
+> `requesting-code-review`）で、project frontmatter 管理外。plugin 参照は
+> orchestrator の subskills に `plugin:` 接頭辞で記す。
+<!-- gen:skill-index end -->
 
 > **注**: 移植元の st-cost は Next.js / pnpm 前提で書かれている skill が多い。pla-stock は TanStack Start + Cloudflare + Neon + Drizzle を採用予定のため、Phase 2（スキャフォールド時）に `code-quality`, `self-review`, `conventional-commits` などを本プロジェクトのスタックに合わせて更新すること。
 

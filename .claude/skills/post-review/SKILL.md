@@ -1,6 +1,10 @@
 ---
 name: post-review
 description: レビュー指摘への対応（failure-record で失敗記録 → rule-cycle でルール改善）を統括する。Use when コードレビューの指摘を受け取った直後、対応と再発防止の流れを開始するとき
+metadata:
+  kind: orchestrator
+  subskills: [dev-complete, failure-record]
+  trigger: コードレビューの指摘を受け取った直後、対応と再発防止の流れを開始するとき
 ---
 
 # レビュー後対応

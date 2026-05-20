@@ -13,6 +13,9 @@ architecture:
   # Phase 2 でスキャフォールド時に確定。FSD 類似構造を採用予定。
   type: tbd
 
+branch:
+  prefixes: [feat, fix, refactor, docs, chore, test]
+
 scopes:
   # Domain features (MVP)
   - kit              # プラモデル（キット）管理
