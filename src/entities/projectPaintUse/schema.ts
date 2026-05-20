@@ -15,7 +15,7 @@ export const projectPaintUse = sqliteTable(
   {
     projectId: text('project_id')
       .notNull()
-      .references(() => projects.id),
+      .references(() => projects.id, { onDelete: 'cascade' }),
     paintId: text('paint_id')
       .notNull()
       .references(() => paints.id),

@@ -6,8 +6,7 @@ import { ProjectDetailView } from '~/views/ProjectDetailView'
 import { useProjectDetail } from '~/views/ProjectDetailView/useProjectDetail'
 
 export const Route = createFileRoute('/_auth/projects/$id')({
-  loader: async ({ params, context }) => {
-    const { userId } = context
+  loader: async ({ params }) => {
     const project = await getProject({ data: { projectId: params.id } })
     if (!project) {
       return {
@@ -16,7 +15,6 @@ export const Route = createFileRoute('/_auth/projects/$id')({
         paintsForProject: [],
         allPaints: [],
         photos: [],
-        userId,
       }
     }
     const [kit, paintUses, photos, allPaints] = await Promise.all([
@@ -30,13 +28,13 @@ export const Route = createFileRoute('/_auth/projects/$id')({
     const paintsForProject = paintUses
       .map((link) => paintById.get(link.paintId))
       .filter((paint): paint is NonNullable<typeof paint> => paint !== undefined)
-    return { project, kit, paintsForProject, allPaints, photos, userId }
+    return { project, kit, paintsForProject, allPaints, photos }
   },
   component: ProjectDetailRoute,
 })
 
 function ProjectDetailRoute() {
-  const { userId, ...data } = Route.useLoaderData()
-  const hookProps = useProjectDetail({ project: data.project, userId })
+  const data = Route.useLoaderData()
+  const hookProps = useProjectDetail({ project: data.project })
   return <ProjectDetailView {...data} {...hookProps} />
 }

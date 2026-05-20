@@ -1,25 +1,22 @@
 import type { Project, ProjectPhoto } from '../../model'
 import type { ProjectPaintUse } from '~/entities/projectPaintUse'
-import { addKitEvent } from '~/entities/kit/api/mock/kits'
 
 /**
- * モック層: project / project_paint_use / project_photos の in-memory データと
- * CRUD アクセサ。
+ * モック層: project / project_paint_use / project_photos の **seed 用** in-memory データと
+ * **photo のみの CRUD アクセサ** (Phase C 移行期の残置)。
  *
- * 変更 (2026-04-27):
- * - Project.kitStockId 廃止 → Project.kitId (kit master 直リンク)
- * - project_paints → project_paint_use rename、paintStockId → paintId
- * - addProject が addKitEvent({delta:-1, reason:'project'}) を自動発火
- * - deleteProject で status='planning' なら count 戻す (+1 kit_event)
+ * Phase C 移行状況:
+ * - project mutation (add/update/delete) と project_paint_use add/remove は
+ *   `features/project-*` の Drizzle server fn に移行済み (#116)
+ * - kit_events 連鎖 (addProject -1 / deleteProject planning 戻し +1) も server fn 内 batch
+ * - photo (`addProjectPhoto` / `deleteProjectPhoto`) は **Phase D (#6, R2 統合)** で
+ *   一緒に server fn 化するため当面 mock のまま残置
  *
- * Phase A-2 mock 仕様: アクセサ関数は input.userId を受け取るが内部で
- * MOCK_USER_ID に固定。Clerk が実 userId を渡しても demo データに到達できる。
- * Phase C で Drizzle + D1 に置換する時点で実 userId フィルタに切替予定。
+ * mock 配列 (mockProjects / mockProjectPaintUses / mockProjectPhotos) は
+ * `src/shared/lib/db/seed.ts` で D1 への初期投入元として利用される (master の SSoT)。
  */
 
 const MOCK_USER_ID = 'mock-user-1'
-
-// ProjectPaintUse 型は entities/projectPaintUse から import (composite PK のため id なし)
 
 export const mockProjects: Project[] = [
   {
@@ -82,139 +79,9 @@ export const mockProjectPhotos: ProjectPhoto[] = [
   },
 ]
 
-// === Mutations ===
+// === Photo mutations (Phase D で server fn 化予定、当面 mock 残置) ===
 
-let projectIdCounter = mockProjects.length + 1
 let projectPhotoIdCounter = mockProjectPhotos.length + 1
-
-/**
- * プロジェクトを作成する。
- *
- * 前提: getKitStock(userId, kitId).count >= 1 をアプリ層で確認すること。
- * 内部で addKitEvent({delta: -1, reason: 'project', projectId}) を発火して
- * kit_stock.count を 1 減らす。
- * status は 'planning' で初期化。
- */
-export async function addProject(input: {
-  userId: string
-  kitId: string
-  name: string
-  description?: string | null
-}): Promise<Project> {
-  const newProject: Project = {
-    id: `project-${projectIdCounter++}`,
-    userId: MOCK_USER_ID,
-    kitId: input.kitId,
-    name: input.name,
-    description: input.description ?? null,
-    status: 'planning',
-    startedAt: null,
-    completedAt: null,
-  }
-  mockProjects.push(newProject)
-
-  // kit_event: count -1 (project 消費)
-  await addKitEvent({
-    userId: MOCK_USER_ID,
-    kitId: input.kitId,
-    delta: -1,
-    reason: 'project',
-    projectId: newProject.id,
-  })
-
-  return newProject
-}
-
-export async function updateProject(input: {
-  projectId: string
-  userId: string
-  patch: Partial<Pick<Project, 'name' | 'description' | 'status' | 'startedAt' | 'completedAt'>>
-}): Promise<Project | null> {
-  const idx = mockProjects.findIndex(
-    (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
-  )
-  if (idx === -1) return null
-  mockProjects[idx] = { ...mockProjects[idx], ...input.patch }
-  return mockProjects[idx]
-}
-
-/**
- * プロジェクトを削除する。
- *
- * - status='planning' なら addKitEvent({delta: +1, reason: 'project', note: 'returned'}) を発火。
- * - status='building' 以降は count を戻さない (既に開封済の前提)。
- * - 紐付く project_paint_use, project_photos は cascade 削除。
- */
-export async function deleteProject(input: {
-  projectId: string
-  userId: string
-}): Promise<boolean> {
-  const idx = mockProjects.findIndex(
-    (project) => project.id === input.projectId && project.userId === MOCK_USER_ID,
-  )
-  if (idx === -1) return false
-
-  const project = mockProjects[idx]
-
-  // planning 状態なら在庫を戻す
-  if (project.status === 'planning') {
-    await addKitEvent({
-      userId: project.userId,
-      kitId: project.kitId,
-      delta: +1,
-      reason: 'project',
-      projectId: project.id,
-      note: 'returned from cancelled planning',
-    })
-  }
-
-  mockProjects.splice(idx, 1)
-
-  // cascade: project_paint_use
-  for (let useIdx = mockProjectPaintUses.length - 1; useIdx >= 0; useIdx--) {
-    if (mockProjectPaintUses[useIdx].projectId === input.projectId) {
-      mockProjectPaintUses.splice(useIdx, 1)
-    }
-  }
-  // cascade: project_photos
-  for (let photoIdx = mockProjectPhotos.length - 1; photoIdx >= 0; photoIdx--) {
-    if (mockProjectPhotos[photoIdx].projectId === input.projectId) {
-      mockProjectPhotos.splice(photoIdx, 1)
-    }
-  }
-
-  return true
-}
-
-/**
- * project_paint_use を追加 (paint master 直リンク)。
- * count 変化なし。unique(projectId, paintId) をアプリ層で管理。
- */
-export async function addProjectPaintUse(input: {
-  projectId: string
-  paintId: string
-}): Promise<ProjectPaintUse> {
-  const newLink: ProjectPaintUse = {
-    projectId: input.projectId,
-    paintId: input.paintId,
-    createdAt: new Date(),
-  }
-  mockProjectPaintUses.push(newLink)
-  return newLink
-}
-
-/** project_paint_use を削除。count 変化なし。 */
-export async function removeProjectPaintUse(input: {
-  projectId: string
-  paintId: string
-}): Promise<boolean> {
-  const idx = mockProjectPaintUses.findIndex(
-    (link) => link.projectId === input.projectId && link.paintId === input.paintId,
-  )
-  if (idx === -1) return false
-  mockProjectPaintUses.splice(idx, 1)
-  return true
-}
 
 export async function addProjectPhoto(input: {
   projectId: string
