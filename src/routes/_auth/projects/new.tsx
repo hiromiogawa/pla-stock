@@ -4,8 +4,7 @@ import { ProjectCreateView } from '~/views/ProjectCreateView'
 import { useProjectCreate } from '~/views/ProjectCreateView/useProjectCreate'
 
 export const Route = createFileRoute('/_auth/projects/new')({
-  loader: async ({ context }) => {
-    const { userId } = context
+  loader: async () => {
     const [kits, stocksWithStock] = await Promise.all([getKits(), getKitStocksWithStock()])
 
     // count > 0 の kit_stock に対応する Kit master を抽出
@@ -18,14 +17,14 @@ export const Route = createFileRoute('/_auth/projects/new')({
       stockCountByKitId[stock.kitId] = stock.count
     }
 
-    return { selectableKits, stockCountByKitId, userId }
+    return { selectableKits, stockCountByKitId }
   },
   component: ProjectCreateRoute,
 })
 
 function ProjectCreateRoute() {
-  const { selectableKits, stockCountByKitId, userId } = Route.useLoaderData()
-  const hookProps = useProjectCreate({ userId })
+  const { selectableKits, stockCountByKitId } = Route.useLoaderData()
+  const hookProps = useProjectCreate()
   return (
     <ProjectCreateView
       selectableKits={selectableKits}

@@ -2,12 +2,7 @@ import { useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useSnackbar } from 'notistack'
 import { getKitStock } from '~/entities/kit'
-import { addProject } from '~/entities/project'
-import type { ProjectAddInput } from '~/features/project-add'
-
-interface UseProjectCreateInput {
-  userId: string
-}
+import { addProject, type ProjectAddInput } from '~/features/project-add'
 
 export interface UseProjectCreateReturn {
   handleSubmit: (values: ProjectAddInput) => Promise<void>
@@ -19,17 +14,18 @@ export interface UseProjectCreateReturn {
  *
  * 担当する state / 副作用:
  * - state なし (form state は ProjectCreateForm 側で完結)
- * - 提出前の前提チェック: getKitStock で count >= 1 を確認
- * - 作成: addProject (内部で addKitEvent({ delta: -1, reason: 'project' }) 自動発火 → kit_stock.count -= 1)
+ * - 提出前の前提チェック: getKitStock で count >= 1 を確認 (UX 優先のフロント先制チェック)
+ * - 作成: addProject server fn を呼ぶ ({ data: ... })
+ *   handler 内で projects insert + kit_stocks upsert + kit_events insert を atomic batch、
+ *   CHECK 違反 (在庫不足) は batch 全体 rollback で projects 行も巻き戻る
+ *   (userId は server fn 内 auth() 由来、client 入力なし = IDOR 防止)
  * - 成功時は /projects/:newId (詳細) へ navigation
- * - 在庫不足 / 失敗時は Snackbar (notistack) で通知 (Phase β-3d で window.alert から移行)
- * - 成功時にも Snackbar success を表示
+ * - 在庫不足 / 失敗時は Snackbar (notistack) で通知
  *
  * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
  * useState / 副作用 / mutation 呼び出しは持たない (#43 ルール)。
  */
-export function useProjectCreate(input: UseProjectCreateInput): UseProjectCreateReturn {
-  const { userId } = input
+export function useProjectCreate(): UseProjectCreateReturn {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -45,10 +41,11 @@ export function useProjectCreate(input: UseProjectCreateInput): UseProjectCreate
 
       try {
         const newProject = await addProject({
-          userId,
-          kitId: values.kitId,
-          name: values.name,
-          description: values.description ?? null,
+          data: {
+            kitId: values.kitId,
+            name: values.name,
+            description: values.description ?? null,
+          },
         })
         enqueueSnackbar('プロジェクトを作成しました', { variant: 'success' })
         void navigate({
@@ -62,7 +59,7 @@ export function useProjectCreate(input: UseProjectCreateInput): UseProjectCreate
         )
       }
     },
-    [userId, navigate, enqueueSnackbar],
+    [navigate, enqueueSnackbar],
   )
 
   const handleCancel = useCallback(() => {

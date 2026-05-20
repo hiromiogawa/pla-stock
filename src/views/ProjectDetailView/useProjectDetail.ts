@@ -2,20 +2,15 @@ import { useCallback, useState } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useSnackbar } from 'notistack'
 import type { Project } from '~/entities/project'
-import {
-  addProjectPaintUse,
-  addProjectPhoto,
-  deleteProject,
-  deleteProjectPhoto,
-  removeProjectPaintUse,
-  updateProject,
-} from '~/entities/project'
+import { addProjectPhoto, deleteProjectPhoto } from '~/entities/project'
+import { updateProject } from '~/features/project-edit'
+import { deleteProject } from '~/features/project-delete'
+import { addProjectPaintUse, removeProjectPaintUse } from '~/features/project-paint-use'
 import type { AddPhotoInput } from './AddPhotoDialog'
 import type { ProjectEditValues } from './ProjectEditForm'
 
 interface UseProjectDetailInput {
   project: Project | null
-  userId: string
 }
 
 export interface UseProjectDetailReturn {
@@ -37,9 +32,10 @@ export interface UseProjectDetailReturn {
  *
  * 担当する state / 副作用:
  * - 編集モード / 削除確認ダイアログの表示状態 (useState ×2)
- * - プロジェクト編集 (updateProject) / 削除 (deleteProject、planning なら kit 在庫戻し)
- * - 紐付け塗料の追加・削除 (addProjectPaintUse / removeProjectPaintUse、count 変化なし)
- * - 写真の追加・削除 (addProjectPhoto / deleteProjectPhoto)
+ * - プロジェクト編集 (updateProject server fn) / 削除 (deleteProject server fn、planning なら kit 在庫戻し)
+ *   (userId は server fn 内 auth() 由来、client 入力なし = IDOR 防止)
+ * - 紐付け塗料の追加・削除 (addProjectPaintUse / removeProjectPaintUse server fn、count 非影響)
+ * - 写真の追加・削除 (addProjectPhoto / deleteProjectPhoto — Phase D で server fn 化予定、当面 mock)
  * - mutation 後は router.invalidate() で loader 再実行 → 最新 paints/photos を再取得
  * - 削除成功時は一覧へ navigation
  * - mutation 失敗 / null 戻り時は Snackbar (notistack) で error 通知
@@ -55,15 +51,13 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
   const [editing, setEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
-  const { project, userId } = input
+  const { project } = input
 
   const handleSave = useCallback(
     async (values: ProjectEditValues) => {
       if (!project) return
       const updated = await updateProject({
-        projectId: project.id,
-        userId,
-        patch: values,
+        data: { projectId: project.id, patch: values },
       })
       if (updated) {
         setEditing(false)
@@ -73,24 +67,24 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
         enqueueSnackbar('プロジェクトの更新に失敗しました', { variant: 'error' })
       }
     },
-    [project, userId, router, enqueueSnackbar],
+    [project, router, enqueueSnackbar],
   )
 
   const handleDelete = useCallback(async () => {
     if (!project) return
-    const ok = await deleteProject({ projectId: project.id, userId })
+    const ok = await deleteProject({ data: { projectId: project.id } })
     if (ok) {
       enqueueSnackbar('プロジェクトを削除しました', { variant: 'success' })
       void navigate({ to: '/projects' })
     } else {
       enqueueSnackbar('プロジェクトの削除に失敗しました', { variant: 'error' })
     }
-  }, [project, userId, navigate, enqueueSnackbar])
+  }, [project, navigate, enqueueSnackbar])
 
   const handleAddPaint = useCallback(
     async (paintId: string) => {
       if (!project) return
-      await addProjectPaintUse({ projectId: project.id, paintId })
+      await addProjectPaintUse({ data: { projectId: project.id, paintId } })
       await router.invalidate()
       enqueueSnackbar('塗料を紐付けました', { variant: 'success' })
     },
@@ -100,7 +94,7 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
   const handleRemovePaint = useCallback(
     async (paintId: string) => {
       if (!project) return
-      await removeProjectPaintUse({ projectId: project.id, paintId })
+      await removeProjectPaintUse({ data: { projectId: project.id, paintId } })
       await router.invalidate()
       enqueueSnackbar('塗料を解除しました', { variant: 'success' })
     },

@@ -1,4 +1,4 @@
-import type { Kit, KitStock, KitEvent, KitEventReason } from '../../model'
+import type { Kit, KitStock, KitEvent } from '../../model'
 
 /**
  * モック層: キット master / kit_stock (count cache) / kit_events (ledger) の
@@ -161,64 +161,5 @@ export const mockKitEvents: KitEvent[] = [
   },
 ]
 
-// === Mutations (in-memory; Phase C では DB INSERT/UPDATE/DELETE) ===
-
-let kitEventIdCounter = mockKitEvents.length + 1
-
-/**
- * kit_event を追加し、kit_stock の count を更新する。
- *
- * - delta=0 は禁止 (throw)。
- * - 結果 count < 0 は禁止 (throw)。
- * - kit_stock 行が未存在なら自動作成 (count = delta)。
- */
-export async function addKitEvent(input: {
-  userId: string
-  kitId: string
-  delta: number
-  reason: KitEventReason
-  projectId?: string | null
-  purchasedAt?: string | null
-  priceYen?: number | null
-  purchaseLocation?: string | null
-  note?: string | null
-}): Promise<KitEvent> {
-  if (input.delta === 0) {
-    throw new Error('addKitEvent: delta must be non-zero')
-  }
-
-  // kit_stock を探すまたは作成
-  let stock = mockKitStocks.find(
-    (existing) => existing.userId === MOCK_USER_ID && existing.kitId === input.kitId,
-  )
-  if (!stock) {
-    stock = { userId: MOCK_USER_ID, kitId: input.kitId, count: 0 }
-    mockKitStocks.push(stock)
-  }
-
-  const newCount = stock.count + input.delta
-  if (newCount < 0) {
-    throw new Error(
-      `addKitEvent: result count would be ${newCount} (< 0). Current count: ${stock.count}, delta: ${input.delta}`,
-    )
-  }
-
-  // count 更新
-  stock.count = newCount
-
-  const newEvent: KitEvent = {
-    id: `ke-${kitEventIdCounter++}`,
-    userId: MOCK_USER_ID,
-    kitId: input.kitId,
-    delta: input.delta,
-    reason: input.reason,
-    projectId: input.projectId ?? null,
-    purchasedAt: input.purchasedAt ?? null,
-    priceYen: input.priceYen ?? null,
-    purchaseLocation: input.purchaseLocation ?? null,
-    note: input.note ?? null,
-    createdAt: new Date(),
-  }
-  mockKitEvents.push(newEvent)
-  return newEvent
-}
+// Mutations は `features/kit-stock-add` (#115) と `features/project-*` (#116) の
+// Drizzle server fn に完全移行済み。本ファイルは seed 用 mock 配列のみを保持する。

@@ -15,6 +15,13 @@
       "when": 1779179426165,
       "tag": "0001_special_azazel",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1779261414357,
+      "tag": "0002_flimsy_vivisector",
+      "breakpoints": true
     }
   ]
 }
