@@ -7,7 +7,7 @@ pla-stock の AI 運用ハーネスの全体像。skill 索引は `CLAUDE.md`
 
 | 層 | 役割 | 強制手段 | 既知負債 |
 |---|---|---|---|
-| 静的 | 決定的・安価な機械検証 | husky 3 hook / oxlint 3 config / dep-cruiser / knip / biome / settings.json deny / **check-branch** / **check-harness** | — |
+| 静的 | 決定的・安価な機械検証 | husky 3 hook / oxlint 3 config / dep-cruiser / knip / biome / **settings.json 権限ポリシー (ADR-0011)** / **check-branch** / **check-harness** | — |
 | 動的 | 振る舞いの正しさ | playwright verify:ui（**LandingView のみ**）+ controller 手動 smoke | verify:ui が Clerk 認証 gate を越えられない → spin-off (b)。unit test 基盤なし → spin-off (c) |
 | 振り返り | ルール改善 | rule-cycle（FAIL+3 / 手動） | 発火が反応的・signal 未集約 → spin-off (a) |
 | 統制 | skill 起動規律 | CLAUDE.md トリガー表（**frontmatter SSoT → 生成**）+ FAIL-002 規律 | proportionality / skill 内ループ遵守は未明文 |
@@ -29,6 +29,15 @@ pla-stock の AI 運用ハーネスの全体像。skill 索引は `CLAUDE.md`
   連鎖する場合 `subskills` に `plugin:` 接頭辞で明示
 - 生成索引は project 20 のみを写すため、本ドキュメントが plugin 主役の存在を
   補完する（「project 20 が全て」という誤読を防ぐ）
+
+## 権限ポリシー (ADR-0011)
+
+`.claude/settings.json` は **10 カテゴリ × {deny, ask, allow}** マトリクスで構成。
+destructive (git / fs / gh) と secret / prod / harness-config を **deny**、相対 `rm`・
+destructive gh・pkg 操作を **ask**、read-only verify (pnpm lint/typecheck/knip/check
+系) を **allow** に集約。global `~/.claude/**` 編集は機械保護される。詳細・選択肢の
+比較・拡張ルールは ADR-0011。新カテゴリの追加や read-only allow の拡張は
+`fewer-permission-prompts` skill 経由で行う。
 
 ## 記憶 (file memory)
 
