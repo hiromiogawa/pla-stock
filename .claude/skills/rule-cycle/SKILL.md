@@ -1,9 +1,10 @@
 ---
 name: rule-cycle
 description: ルール改善サイクル（rule-measure → rule-explore → rule-improve → rule-audit）を順次実行するオーケストレーター。Use when failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき
-kind: orchestrator
-subskills: [rule-measure, rule-explore, rule-improve, rule-audit]
-trigger: failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき
+metadata:
+  kind: orchestrator
+  subskills: [rule-measure, rule-explore, rule-improve, rule-audit]
+  trigger: failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき
 ---
 
 # ルール改善サイクル

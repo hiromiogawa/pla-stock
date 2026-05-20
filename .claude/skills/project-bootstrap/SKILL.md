@@ -1,9 +1,10 @@
 ---
 name: project-bootstrap
 description: .project-config.yml をもとに新リポジトリを dev-skills 標準（code-quality / conventional-commits / github-flow / sdd / docs-freshness）で初期化する。Use when 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき
-kind: orchestrator
-subskills: [code-quality, conventional-commits, github-flow, sdd, adr]
-trigger: 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき
+metadata:
+  kind: orchestrator
+  subskills: [code-quality, conventional-commits, github-flow, sdd, adr]
+  trigger: 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき
 ---
 
 # プロジェクトブートストラップ

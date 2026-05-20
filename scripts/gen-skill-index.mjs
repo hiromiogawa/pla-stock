@@ -9,19 +9,39 @@ const CLAUDE_MD = 'CLAUDE.md'
 const START = '<!-- gen:skill-index start -->'
 const END = '<!-- gen:skill-index end -->'
 
+function coerce(raw) {
+  let val = raw.trim()
+  if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+    val = val.slice(1, -1)
+  }
+  if (val.startsWith('[') && val.endsWith(']')) {
+    return val.slice(1, -1).split(',').map((segment) => segment.trim()).filter(Boolean)
+  }
+  return val
+}
+
 function parseFrontmatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---/)
   if (!match) return null
   const fm = {}
-  for (const line of match[1].split('\n')) {
-    const kv = line.match(/^([a-zA-Z_]+):\s*(.*)$/)
-    if (!kv) continue
-    const key = kv[1]
-    let val = kv[2].trim()
-    if (val.startsWith('[') && val.endsWith(']')) {
-      val = val.slice(1, -1).split(',').map((segment) => segment.trim()).filter(Boolean)
+  let inMeta = false
+  for (const rawLine of match[1].split('\n')) {
+    if (rawLine.trim() === '') continue
+    const top = rawLine.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/)
+    const sub = rawLine.match(/^\s+([a-zA-Z0-9_-]+):\s*(.*)$/)
+    if (top) {
+      const key = top[1]
+      const val = top[2]
+      if (key === 'metadata' && val.trim() === '') {
+        fm.metadata = {}
+        inMeta = true
+        continue
+      }
+      inMeta = false
+      fm[key] = coerce(val)
+    } else if (inMeta && sub) {
+      fm.metadata[sub[1]] = coerce(sub[2])
     }
-    fm[key] = val
   }
   return fm
 }
@@ -38,17 +58,17 @@ function collectSkills() {
 }
 
 function renderIndex(skills) {
-  const orchestrators = skills.filter((skill) => skill.kind === 'orchestrator')
-  const atomics = skills.filter((skill) => skill.kind === 'atomic')
+  const orchestrators = skills.filter((skill) => skill.metadata?.kind === 'orchestrator')
+  const atomics = skills.filter((skill) => skill.metadata?.kind === 'atomic')
   const lines = []
   lines.push('### トリガー表（このトリガーに該当したら即 Skill 起動）', '')
   lines.push('| トリガー | 起動する Skill | 種別 |', '|---|---|---|')
   for (const skill of skills) {
-    lines.push(`| ${skill.trigger ?? ''} | \`${skill.name}\` | ${skill.kind ?? '?'} |`)
+    lines.push(`| ${skill.metadata?.trigger ?? ''} | \`${skill.name}\` | ${skill.metadata?.kind ?? '?'} |`)
   }
   lines.push('', '### オーケストレーション系（単一責務 skill を連鎖）', '')
   for (const orchestrator of orchestrators) {
-    const subs = Array.isArray(orchestrator.subskills) ? orchestrator.subskills.join(', ') : ''
+    const subs = Array.isArray(orchestrator.metadata?.subskills) ? orchestrator.metadata.subskills.join(', ') : ''
     lines.push(`- **${orchestrator.name}** → ${subs}`)
   }
   lines.push('', '### 単一責務系（atomic）', '')

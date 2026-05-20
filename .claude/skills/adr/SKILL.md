@@ -1,8 +1,9 @@
 ---
 name: adr
 description: docs/adr/ に不変のアーキテクチャ決定記録（ADR）を作成・更新する。Use when 技術選定・アーキテクチャ変更・代替案比較の末に設計判断を下したとき、design-decision オーケストレーター外で単独記録する場合や既存 ADR を Supersede するとき
-kind: atomic
-trigger: 技術選定・アーキテクチャ変更・代替案比較の末に設計判断を下したとき、design-decision 外で単独記録する場合や既存 ADR を Supersede するとき
+metadata:
+  kind: atomic
+  trigger: 技術選定・アーキテクチャ変更・代替案比較の末に設計判断を下したとき、design-decision 外で単独記録する場合や既存 ADR を Supersede するとき
 ---
 
 # ADR（アーキテクチャ決定記録）

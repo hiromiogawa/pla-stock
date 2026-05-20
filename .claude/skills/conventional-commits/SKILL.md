@@ -1,8 +1,9 @@
 ---
 name: conventional-commits
 description: Conventional Commits のコミットメッセージとブランチ名規約を定める（scope は `.project-config.yml` の scopes フィールドを参照）。Use when コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき
-kind: atomic
-trigger: コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき
+metadata:
+  kind: atomic
+  trigger: コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき
 ---
 
 # Conventional Commits とブランチルール

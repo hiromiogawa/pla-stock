@@ -1,8 +1,9 @@
 ---
 name: writing-issues
 description: GitHub Issue を Type 別 (Epic/Task/Story/Bug/Subtask) に日本語で起票する規約。本文構成・タイトル命名・親子紐付け・アンチパターンを定める. Use when 新規 Issue を立てる時、既存 Issue を整える時、Epic に sub-issue をぶら下げる時
-kind: atomic
-trigger: 新規 Issue を立てる時、既存 Issue を整える時、Epic に sub-issue をぶら下げる時
+metadata:
+  kind: atomic
+  trigger: 新規 Issue を立てる時、既存 Issue を整える時、Epic に sub-issue をぶら下げる時
 ---
 
 # Issue 起票規約

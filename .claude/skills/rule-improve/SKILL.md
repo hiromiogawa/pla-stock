@@ -1,8 +1,9 @@
 ---
 name: rule-improve
 description: measure / explore の結果をもとにルール改善提案を GitHub Issue として起票する（ファイルは一切変更しない）。Use when rule-measure と rule-explore の結果をもとに改善提案を Issue 化するとき
-kind: atomic
-trigger: rule-explore の直後、measure と explore の結果をもとに改善提案を Issue 化するとき
+metadata:
+  kind: atomic
+  trigger: rule-explore の直後、measure と explore の結果をもとに改善提案を Issue 化するとき
 ---
 
 # ルール改善提案

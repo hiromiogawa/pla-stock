@@ -1,8 +1,9 @@
 ---
 name: self-review
 description: コミット前に lint・test・dep-check・knip の検証サイクルとコード re-read を必須で回し、全パスするまでコミットさせない。Use when 実装が完了しコミット前の検証を始めるとき、または PR 作成直前に push 差分を再検証するとき
-kind: atomic
-trigger: 実装が完了しコミット前の検証を始めるとき、または PR 作成直前に push 差分を再検証するとき
+metadata:
+  kind: atomic
+  trigger: 実装が完了しコミット前の検証を始めるとき、または PR 作成直前に push 差分を再検証するとき
 ---
 
 # セルフレビュー

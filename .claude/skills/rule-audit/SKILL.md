@@ -1,8 +1,9 @@
 ---
 name: rule-audit
 description: rule-improve が起票した改善提案 Issue を精査し、承認かクローズかを判断する（改善サイクルの最終ステップ）。Use when rule-improve 直後、または `rule-improvement` ラベルの未精査 Issue があるとき
-kind: atomic
-trigger: rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき
+metadata:
+  kind: atomic
+  trigger: rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき
 ---
 
 # ルール検証

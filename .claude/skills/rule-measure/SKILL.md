@@ -1,8 +1,9 @@
 ---
 name: rule-measure
 description: スキル・CLAUDE.md・エージェント定義の効果を定量計測する（改善サイクルの起点ステップ）。Use when ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき
-kind: atomic
-trigger: ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき
+metadata:
+  kind: atomic
+  trigger: ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき
 ---
 
 # ルール計測

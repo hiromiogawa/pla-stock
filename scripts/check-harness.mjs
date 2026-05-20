@@ -7,18 +7,39 @@ import { execSync } from 'node:child_process'
 const SKILLS_DIR = '.claude/skills'
 const errors = []
 
+function coerce(raw) {
+  let val = raw.trim()
+  if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+    val = val.slice(1, -1)
+  }
+  if (val.startsWith('[') && val.endsWith(']')) {
+    return val.slice(1, -1).split(',').map((segment) => segment.trim()).filter(Boolean)
+  }
+  return val
+}
+
 function parseFrontmatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---/)
   if (!match) return null
   const fm = {}
-  for (const line of match[1].split('\n')) {
-    const kv = line.match(/^([a-zA-Z_]+):\s*(.*)$/)
-    if (!kv) continue
-    let val = kv[2].trim()
-    if (val.startsWith('[') && val.endsWith(']')) {
-      val = val.slice(1, -1).split(',').map((segment) => segment.trim()).filter(Boolean)
+  let inMeta = false
+  for (const rawLine of match[1].split('\n')) {
+    if (rawLine.trim() === '') continue
+    const top = rawLine.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/)
+    const sub = rawLine.match(/^\s+([a-zA-Z0-9_-]+):\s*(.*)$/)
+    if (top) {
+      const key = top[1]
+      const val = top[2]
+      if (key === 'metadata' && val.trim() === '') {
+        fm.metadata = {}
+        inMeta = true
+        continue
+      }
+      inMeta = false
+      fm[key] = coerce(val)
+    } else if (inMeta && sub) {
+      fm.metadata[sub[1]] = coerce(sub[2])
     }
-    fm[kv[1]] = val
   }
   return fm
 }
@@ -33,19 +54,20 @@ const skills = names.map((name) => ({
 }))
 
 for (const skill of skills) {
-  if (skill.kind !== 'orchestrator' && skill.kind !== 'atomic') {
-    errors.push(`[1] ${skill.name}: kind は orchestrator|atomic 必須 (got ${skill.kind})`)
+  const kind = skill.metadata?.kind
+  if (kind !== 'orchestrator' && kind !== 'atomic') {
+    errors.push(`[1] ${skill.name}: kind は orchestrator|atomic 必須 (got ${kind})`)
   }
-  if (!skill.trigger) errors.push(`[4] ${skill.name}: trigger 必須`)
-  if (skill.kind === 'orchestrator') {
-    const subs = Array.isArray(skill.subskills) ? skill.subskills : []
+  if (!skill.metadata?.trigger) errors.push(`[4] ${skill.name}: trigger 必須`)
+  if (kind === 'orchestrator') {
+    const subs = Array.isArray(skill.metadata?.subskills) ? skill.metadata.subskills : []
     if (subs.length === 0) errors.push(`[2] ${skill.name}: orchestrator は subskills 必須`)
     for (const sub of subs) {
       if (sub.startsWith('plugin:')) continue
       if (!skillSet.has(sub)) errors.push(`[2] ${skill.name}: subskill '${sub}' が実在しない`)
     }
-  } else if (skill.kind === 'atomic') {
-    if (skill.subskills) errors.push(`[3] ${skill.name}: atomic は subskills を持てない`)
+  } else if (kind === 'atomic') {
+    if (skill.metadata?.subskills) errors.push(`[3] ${skill.name}: atomic は subskills を持てない`)
   }
 }
 
