@@ -40,10 +40,10 @@ export const kitStocks = sqliteTable(
       .references(() => kits.id),
     count: integer('count').notNull().default(0),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.kitId] }),
-    countNonNegative: check('kit_stocks_count_non_negative', sql`${table.count} >= 0`),
-  }),
+  (table) => [
+    primaryKey({ columns: [table.userId, table.kitId] }),
+    check('kit_stocks_count_non_negative', sql`${table.count} >= 0`),
+  ],
 )
 
 export const kitEvents = sqliteTable(
@@ -66,9 +66,7 @@ export const kitEvents = sqliteTable(
     /** instant timestamp (epoch ms) → boundary は Date。 */
     createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   },
-  (table) => ({
-    userCreatedIdx: index('kit_events_user_created_idx').on(table.userId, table.createdAt),
-  }),
+  (table) => [index('kit_events_user_created_idx').on(table.userId, table.createdAt)],
 )
 
 export type Kit = typeof kits.$inferSelect
