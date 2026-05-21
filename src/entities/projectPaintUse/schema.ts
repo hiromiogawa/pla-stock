@@ -21,9 +21,7 @@ export const projectPaintUse = sqliteTable(
       .references(() => paints.id),
     createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.projectId, table.paintId] }),
-  }),
+  (table) => [primaryKey({ columns: [table.projectId, table.paintId] })],
 )
 
 export type ProjectPaintUse = typeof projectPaintUse.$inferSelect

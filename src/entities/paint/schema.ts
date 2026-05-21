@@ -55,10 +55,10 @@ export const paintStocks = sqliteTable(
       .references(() => paints.id),
     count: integer('count').notNull().default(0),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.paintId] }),
-    countNonNegative: check('paint_stocks_count_non_negative', sql`${table.count} >= 0`),
-  }),
+  (table) => [
+    primaryKey({ columns: [table.userId, table.paintId] }),
+    check('paint_stocks_count_non_negative', sql`${table.count} >= 0`),
+  ],
 )
 
 export const paintEvents = sqliteTable(
@@ -78,9 +78,7 @@ export const paintEvents = sqliteTable(
     note: text('note'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
   },
-  (table) => ({
-    userCreatedIdx: index('paint_events_user_created_idx').on(table.userId, table.createdAt),
-  }),
+  (table) => [index('paint_events_user_created_idx').on(table.userId, table.createdAt)],
 )
 
 export type Paint = typeof paints.$inferSelect
