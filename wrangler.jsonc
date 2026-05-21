@@ -11,5 +11,11 @@
       "database_id": "af1d3c77-5112-43c7-b9d6-e6d5ac7b3942",
       "migrations_dir": "drizzle/migrations"
     }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "pla-stock-images"
+    }
   ]
 }
