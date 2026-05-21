@@ -83,6 +83,22 @@
   - `CLAUDE.md` (AI 運用ルール: mutation PR の制約 smoke 必須化を追記予定 — rule-cycle で要否判断)
   - 修正実装: `src/features/paint-stock-add/addPaintEvent.ts` (commit 112983c、PR #98 に記録)
 
+### FAIL-004: drizzle `sqliteTable` 第3引数の deprecated 形式 (object 返却) をレビューで見落とし (2026-05-21)
+
+- **事象**: PR #117 (project mutation) で `entities/projectPaintUse/schema.ts` を編集 (`onDelete: 'cascade'` 追加) した際、`sqliteTable` 第3引数 callback が **object を返す deprecated 形式** (`(table) => ({ pk: ... })`) のまま放置した。同形式は kit/paint schema にも以前から存在 (計 5 テーブル)。self-review のコード re-read でも検出できず、後日ユーザーが IDE 上の TS6387 (`非推奨です`) 警告を見て指摘。PR #119 で array 返却形式に一括移行。
+- **原因**:
+  1. **drizzle deprecated API の知識欠落**: `sqliteTable` 第3引数が「object 返却 → array 返却」に変わった事実を認識しておらず、`projectPaintUse` schema 編集時に既存の object-style を「既存パターン」として無批判に踏襲した (FAIL-001 と同じ「既存パターン踏襲」バイアス)
+  2. **TS6387 が `check:parallel` をすり抜ける**: `tsc --noEmit` は deprecated (TS6387) を **error ではなく suggestion 扱い**にするため、`pnpm typecheck` / `check:parallel` が pass してしまう。静的層 (ADR-0009 ハーネス地図) の機械検証が deprecated を捕捉しない死角
+  3. **self-review コード re-read の限界**: re-read は「差分の論理・副作用」を見る観点で、外部ライブラリの API 新旧までは射程外。レビュアー (人間/AI) が当該ライブラリの deprecation を知らないと気づけない
+- **対策**:
+  - 即時修正 PR #119 で全 5 テーブル (`kitStocks` / `kitEvents` / `paintStocks` / `paintEvents` / `projectPaintUse`) を array 返却形式に移行。`pnpm db:generate` の migration 差分ゼロで意味不変を証明
+  - **schema / 外部ライブラリ API を編集するときは「既存パターン踏襲」で済ませず、当該 API の最新仕様 (deprecation 含む) を確認する**規律
+  - deprecated の機械検出強化 (例: oxlint の `no-deprecated` 系ルール、`tsc` の deprecated を error 化する手段、editor 非依存の検出) の要否は `rule-cycle` で判断
+- **反映先**:
+  - `docs/adr/0007-agent-failure-rules.md` (本エントリ)
+  - 修正実装: PR #119 (`entities/{kit,paint,projectPaintUse}/schema.ts`)
+  - 機械検出ルールの追加要否は `rule-cycle` 経由で判断 (本エントリ追記が改善サイクルのトリガー)
+
 ## 運用メモ
 
 - 新エントリ追加後は `failure-record` skill が指示する通り `rule-cycle` skill を呼び出す。閾値 (前回サイクル以降 3 件) 未満ならサイクルは空回りで報告のみ。
