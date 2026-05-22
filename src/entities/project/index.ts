@@ -7,4 +7,3 @@ export {
   getProjectPaintIds,
   getProjectPhotos,
 } from './api/queries'
-export { addProjectPhoto, deleteProjectPhoto } from './api/mock/projects'

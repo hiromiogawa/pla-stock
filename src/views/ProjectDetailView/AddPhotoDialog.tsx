@@ -2,22 +2,18 @@ import Box from '@mui/material/Box'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
-import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
+import FormHelperText from '@mui/material/FormHelperText'
 import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
 import { useForm } from '@tanstack/react-form'
-import { z } from 'zod'
 import { Button } from '~/shared/ui/button'
 import { FormTextField } from '~/shared/ui/FormTextField'
-
-const photoAddSchema = z.object({
-  url: z.string().trim().min(1, '画像 URL は必須です'),
-  caption: z.string().max(200).optional().nullable(),
-  takenAt: z.string().optional().nullable(),
-})
+import { extractFieldErrorMessage } from '~/shared/lib/form-error'
+import { MAX_PHOTO_BYTES } from '~/features/project-photo-add'
 
 export interface AddPhotoInput {
-  url: string
+  file: File
   caption?: string
   takenAt?: string
 }
@@ -29,30 +25,35 @@ interface AddPhotoDialogProps {
 }
 
 interface AddPhotoFormDefaults {
-  url: string
+  file: File | null
   caption: string
   takenAt: string
 }
 
 const ADD_PHOTO_FORM_DEFAULTS: AddPhotoFormDefaults = {
-  url: '',
+  file: null,
   caption: '',
   takenAt: '',
+}
+
+/** File を選んでいない / 画像でない / 空 / 10MB 超 のときエラー文言を返す。 */
+function validatePhotoFile(file: File | null): string | undefined {
+  if (!file) return '画像ファイルを選択してください'
+  if (!file.type.startsWith('image/')) return '画像ファイルを選択してください'
+  if (file.size === 0) return '空のファイルです'
+  if (file.size > MAX_PHOTO_BYTES) return 'ファイルサイズは 10MB までです'
+  return undefined
 }
 
 export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogProps) {
   const form = useForm({
     defaultValues: ADD_PHOTO_FORM_DEFAULTS,
     onSubmit: async ({ value }) => {
-      const parsed = photoAddSchema.parse({
-        url: value.url,
-        caption: value.caption.trim() === '' ? null : value.caption.trim(),
-        takenAt: value.takenAt === '' ? null : value.takenAt,
-      })
+      if (value.file === null || validatePhotoFile(value.file) !== undefined) return
       await onSubmit({
-        url: parsed.url,
-        caption: parsed.caption ?? undefined,
-        takenAt: parsed.takenAt ?? undefined,
+        file: value.file,
+        caption: value.caption.trim() === '' ? undefined : value.caption.trim(),
+        takenAt: value.takenAt === '' ? undefined : value.takenAt,
       })
       form.reset()
     },
@@ -75,20 +76,41 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
         }}
       >
         <DialogContent>
-          <DialogContentText>
-            Phase A-2 は URL 文字列を直接入力する mock 実装です。Phase D で R2
-            アップロードに置換予定。
-          </DialogContentText>
-          <Stack spacing={2} sx={{ pt: 2 }}>
+          <Stack spacing={2} sx={{ pt: 1 }}>
             <form.Field
-              name="url"
+              name="file"
               validators={{
-                onChange: ({ value }) => (value.trim() === '' ? '画像 URL は必須です' : undefined),
+                onChange: ({ value }) => validatePhotoFile(value),
+                onSubmit: ({ value }) => validatePhotoFile(value),
               }}
             >
-              {(field) => (
-                <FormTextField field={field} label="画像 URL" placeholder="https://..." required />
-              )}
+              {(field) => {
+                const errorText =
+                  field.state.meta.errors.length > 0
+                    ? extractFieldErrorMessage(field.state.meta.errors[0])
+                    : undefined
+                return (
+                  <Box>
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                      <Button type="button" variant="outline" component="label">
+                        画像を選択
+                        <input
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          onChange={(event) => field.handleChange(event.target.files?.[0] ?? null)}
+                        />
+                      </Button>
+                      {field.state.value && (
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          {field.state.value.name}
+                        </Typography>
+                      )}
+                    </Stack>
+                    {errorText && <FormHelperText error>{errorText}</FormHelperText>}
+                  </Box>
+                )
+              }}
             </form.Field>
             <form.Field name="caption">
               {(field) => <FormTextField field={field} label="キャプション" />}

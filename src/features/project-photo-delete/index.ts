@@ -1,0 +1,1 @@
+export { deleteProjectPhoto } from './deleteProjectPhoto'
