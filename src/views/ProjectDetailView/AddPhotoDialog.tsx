@@ -38,22 +38,9 @@ const ADD_PHOTO_FORM_DEFAULTS: AddPhotoFormDefaults = {
   takenAt: '',
 }
 
-interface PreviewState {
-  url: string
-  originalSize: number
-  compressedSize: number
-}
-
-/** バイト数を人間可読にする（例: 5452000 → "5.2 MB"）。 */
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
-  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
-}
-
 export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogProps) {
   const [processing, setProcessing] = useState(false)
-  const [preview, setPreview] = useState<PreviewState | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [processError, setProcessError] = useState<string | null>(null)
 
   const form = useForm({
@@ -66,7 +53,7 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
         takenAt: value.takenAt === '' ? undefined : value.takenAt,
       })
       form.reset()
-      setPreview(null)
+      setPreviewUrl(null)
       setProcessError(null)
     },
   })
@@ -74,13 +61,13 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
   // preview objectURL のリーク防止: preview 差し替え時 / unmount 時に revoke
   useEffect(() => {
     return () => {
-      if (preview) URL.revokeObjectURL(preview.url)
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
     }
-  }, [preview])
+  }, [previewUrl])
 
   const handleClose = () => {
     form.reset()
-    setPreview(null)
+    setPreviewUrl(null)
     setProcessError(null)
     setProcessing(false)
     onOpenChange(false)
@@ -92,16 +79,12 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
     setProcessing(true)
     form.setFieldValue('file', null)
     try {
-      const result = await processImageForUpload(rawFile)
-      setPreview({
-        url: URL.createObjectURL(result.file),
-        originalSize: result.originalSize,
-        compressedSize: result.compressedSize,
-      })
-      form.setFieldValue('file', result.file)
+      const compressed = await processImageForUpload(rawFile)
+      setPreviewUrl(URL.createObjectURL(compressed))
+      form.setFieldValue('file', compressed)
     } catch (error) {
       setProcessError(error instanceof Error ? error.message : '画像の処理に失敗しました')
-      setPreview(null)
+      setPreviewUrl(null)
     } finally {
       setProcessing(false)
     }
@@ -141,32 +124,22 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
               {processError && <FormHelperText error>{processError}</FormHelperText>}
             </Box>
 
-            {preview && (
-              <Box>
-                <Box
-                  component="img"
-                  src={preview.url}
-                  alt="プレビュー"
-                  sx={{
-                    width: '100%',
-                    maxHeight: 240,
-                    objectFit: 'contain',
-                    borderRadius: 1,
-                    border: 1,
-                    borderColor: 'divider',
-                    display: 'block',
-                    bgcolor: 'background.default',
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: 0.5, display: 'block' }}
-                >
-                  {formatBytes(preview.originalSize)} → {formatBytes(preview.compressedSize)}（WebP
-                  に圧縮）
-                </Typography>
-              </Box>
+            {previewUrl && (
+              <Box
+                component="img"
+                src={previewUrl}
+                alt="プレビュー"
+                sx={{
+                  width: '100%',
+                  maxHeight: 240,
+                  objectFit: 'contain',
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'divider',
+                  display: 'block',
+                  bgcolor: 'background.default',
+                }}
+              />
             )}
 
             <form.Field name="caption">
@@ -183,7 +156,7 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
           </Button>
           <form.Subscribe selector={(state) => state.isSubmitting}>
             {(isSubmitting) => (
-              <Button type="submit" disabled={processing || preview === null || isSubmitting}>
+              <Button type="submit" disabled={processing || previewUrl === null || isSubmitting}>
                 {isSubmitting ? <CircularProgress size={16} /> : '追加'}
               </Button>
             )}

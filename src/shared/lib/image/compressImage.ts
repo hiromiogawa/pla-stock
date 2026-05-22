@@ -2,17 +2,6 @@ import imageCompression, { type Options } from 'browser-image-compression'
 import { MAX_ORIGINAL_BYTES, isAcceptedImageType } from './constants'
 
 /**
- * 圧縮処理の結果。
- * - file: アップロード対象の WebP File
- * - originalSize / compressedSize: 圧縮前後のバイト数（UI のサイズ表示用）
- */
-interface ProcessedImage {
-  file: File
-  originalSize: number
-  compressedSize: number
-}
-
-/**
  * browser-image-compression のオプション（ADR-0013 準拠）。
  * - maxWidthOrHeight: 長辺 1600px にリサイズ
  * - fileType: WebP に変換
@@ -34,9 +23,10 @@ const COMPRESSION_OPTIONS: Options = {
  * - allowlist 外の type → Error（HEIC 等。呼び出し側が拒否メッセージ表示）
  * - 原本が MAX_ORIGINAL_BYTES 超 → Error
  * - browser-image-compression で WebP 変換 + 長辺 1600px リサイズ
- * - 戻り値の File は `.webp` 拡張子・`image/webp` 型に正規化する
+ *
+ * @returns 圧縮済みの WebP File（`.webp` 名・`image/webp` 型に正規化済み）
  */
-export async function processImageForUpload(file: File): Promise<ProcessedImage> {
+export async function processImageForUpload(file: File): Promise<File> {
   if (!isAcceptedImageType(file.type)) {
     throw new Error('この形式は非対応です（JPEG / PNG / WebP をご利用ください）')
   }
@@ -54,11 +44,5 @@ export async function processImageForUpload(file: File): Promise<ProcessedImage>
   // browser-image-compression は fileType 指定時も元の name を保つため
   // `.webp` 名・image/webp 型の File に作り直す
   const webpName = `${file.name.replace(/\.[^.]+$/, '')}.webp`
-  const webpFile = new File([compressed], webpName, { type: 'image/webp' })
-
-  return {
-    file: webpFile,
-    originalSize: file.size,
-    compressedSize: webpFile.size,
-  }
+  return new File([compressed], webpName, { type: 'image/webp' })
 }
