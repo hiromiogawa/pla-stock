@@ -23,6 +23,7 @@
     "class-variance-authority",
     "lucide-react",
     "@tanstack/react-virtual",
-    "cloudflare"
+    "cloudflare",
+    "browser-image-compression"
   ]
 }
