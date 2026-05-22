@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -9,8 +11,8 @@ import Typography from '@mui/material/Typography'
 import { useForm } from '@tanstack/react-form'
 import { Button } from '~/shared/ui/button'
 import { FormTextField } from '~/shared/ui/FormTextField'
-import { extractFieldErrorMessage } from '~/shared/lib/form-error'
-import { MAX_PHOTO_BYTES } from '~/features/project-photo-add'
+import { ACCEPTED_IMAGE_TYPES } from '~/shared/lib/image/constants'
+import { processImageForUpload } from '~/shared/lib/image/compressImage'
 
 export interface AddPhotoInput {
   file: File
@@ -36,32 +38,56 @@ const ADD_PHOTO_FORM_DEFAULTS: AddPhotoFormDefaults = {
   takenAt: '',
 }
 
-/** File を選んでいない / 画像でない / 空 / 10MB 超 のときエラー文言を返す。 */
-function validatePhotoFile(file: File | null): string | undefined {
-  if (!file) return '画像ファイルを選択してください'
-  if (!file.type.startsWith('image/')) return '画像ファイルを選択してください'
-  if (file.size === 0) return '空のファイルです'
-  if (file.size > MAX_PHOTO_BYTES) return 'ファイルサイズは 10MB までです'
-  return undefined
-}
-
 export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogProps) {
+  const [processing, setProcessing] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [processError, setProcessError] = useState<string | null>(null)
+
   const form = useForm({
     defaultValues: ADD_PHOTO_FORM_DEFAULTS,
     onSubmit: async ({ value }) => {
-      if (value.file === null || validatePhotoFile(value.file) !== undefined) return
+      if (value.file === null) return
       await onSubmit({
         file: value.file,
         caption: value.caption.trim() === '' ? undefined : value.caption.trim(),
         takenAt: value.takenAt === '' ? undefined : value.takenAt,
       })
       form.reset()
+      setPreviewUrl(null)
+      setProcessError(null)
     },
   })
 
+  // preview objectURL のリーク防止: preview 差し替え時 / unmount 時に revoke
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+  }, [previewUrl])
+
   const handleClose = () => {
     form.reset()
+    setPreviewUrl(null)
+    setProcessError(null)
+    setProcessing(false)
     onOpenChange(false)
+  }
+
+  const handleFileSelected = async (rawFile: File | undefined) => {
+    if (!rawFile) return
+    setProcessError(null)
+    setProcessing(true)
+    form.setFieldValue('file', null)
+    try {
+      const compressed = await processImageForUpload(rawFile)
+      setPreviewUrl(URL.createObjectURL(compressed))
+      form.setFieldValue('file', compressed)
+    } catch (error) {
+      setProcessError(error instanceof Error ? error.message : '画像の処理に失敗しました')
+      setPreviewUrl(null)
+    } finally {
+      setProcessing(false)
+    }
   }
 
   return (
@@ -77,41 +103,45 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
       >
         <DialogContent>
           <Stack spacing={2} sx={{ pt: 1 }}>
-            <form.Field
-              name="file"
-              validators={{
-                onChange: ({ value }) => validatePhotoFile(value),
-                onSubmit: ({ value }) => validatePhotoFile(value),
-              }}
-            >
-              {(field) => {
-                const errorText =
-                  field.state.meta.errors.length > 0
-                    ? extractFieldErrorMessage(field.state.meta.errors[0])
-                    : undefined
-                return (
-                  <Box>
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                      <Button type="button" variant="outline" component="label">
-                        画像を選択
-                        <input
-                          type="file"
-                          accept="image/*"
-                          hidden
-                          onChange={(event) => field.handleChange(event.target.files?.[0] ?? null)}
-                        />
-                      </Button>
-                      {field.state.value && (
-                        <Typography variant="caption" color="text.secondary" noWrap>
-                          {field.state.value.name}
-                        </Typography>
-                      )}
-                    </Stack>
-                    {errorText && <FormHelperText error>{errorText}</FormHelperText>}
-                  </Box>
-                )
-              }}
-            </form.Field>
+            <Box>
+              <Button type="button" variant="outline" component="label" disabled={processing}>
+                画像を選択
+                <input
+                  type="file"
+                  accept={ACCEPTED_IMAGE_TYPES.join(',')}
+                  hidden
+                  onChange={(event) => void handleFileSelected(event.target.files?.[0])}
+                />
+              </Button>
+              {processing && (
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
+                  <CircularProgress size={16} />
+                  <Typography variant="caption" color="text.secondary">
+                    圧縮中…
+                  </Typography>
+                </Stack>
+              )}
+              {processError && <FormHelperText error>{processError}</FormHelperText>}
+            </Box>
+
+            {previewUrl && (
+              <Box
+                component="img"
+                src={previewUrl}
+                alt="プレビュー"
+                sx={{
+                  width: '100%',
+                  maxHeight: 240,
+                  objectFit: 'contain',
+                  borderRadius: 1,
+                  border: 1,
+                  borderColor: 'divider',
+                  display: 'block',
+                  bgcolor: 'background.default',
+                }}
+              />
+            )}
+
             <form.Field name="caption">
               {(field) => <FormTextField field={field} label="キャプション" />}
             </form.Field>
@@ -124,7 +154,13 @@ export function AddPhotoDialog({ open, onOpenChange, onSubmit }: AddPhotoDialogP
           <Button type="button" variant="outline" onClick={handleClose}>
             キャンセル
           </Button>
-          <Button type="submit">追加</Button>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(isSubmitting) => (
+              <Button type="submit" disabled={processing || previewUrl === null || isSubmitting}>
+                {isSubmitting ? <CircularProgress size={16} /> : '追加'}
+              </Button>
+            )}
+          </form.Subscribe>
         </DialogActions>
       </Box>
     </Dialog>
