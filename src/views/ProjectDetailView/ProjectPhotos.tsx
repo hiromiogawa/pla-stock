@@ -8,6 +8,7 @@ import { Plus, X } from 'lucide-react'
 import { useState } from 'react'
 import type { ProjectPhoto } from '~/entities/project'
 import { AddPhotoDialog, type AddPhotoInput } from './AddPhotoDialog'
+import { PhotoDeleteDialog } from './PhotoDeleteDialog'
 
 interface ProjectPhotosProps {
   photos: ProjectPhoto[]
@@ -19,6 +20,8 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
   const [showAddDialog, setShowAddDialog] = useState(false)
   // 画像クリックで lightbox dialog 表示
   const [lightboxPhoto, setLightboxPhoto] = useState<ProjectPhoto | null>(null)
+  // 削除ボタン押下で確認ダイアログに渡す削除対象
+  const [photoPendingDelete, setPhotoPendingDelete] = useState<ProjectPhoto | null>(null)
 
   return (
     <Box
@@ -57,10 +60,7 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
           }}
         >
           {photos.map((photo) => (
-            <Box
-              key={photo.id}
-              sx={{ position: 'relative', '&:hover .remove-overlay': { opacity: 1 } }}
-            >
+            <Box key={photo.id} sx={{ position: 'relative' }}>
               <Box
                 component="img"
                 src={photo.url}
@@ -95,12 +95,11 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
                 </Typography>
               )}
               <IconButton
-                className="remove-overlay"
                 size="small"
                 aria-label="写真を削除"
                 onClick={(event) => {
                   event.stopPropagation()
-                  void onRemove(photo.id)
+                  setPhotoPendingDelete(photo)
                 }}
                 sx={{
                   position: 'absolute',
@@ -108,8 +107,7 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
                   right: 4,
                   bgcolor: 'background.paper',
                   color: 'error.main',
-                  opacity: 0,
-                  transition: 'opacity 120ms ease',
+                  boxShadow: 1,
                   '&:hover': { bgcolor: 'background.paper' },
                 }}
               >
@@ -125,6 +123,15 @@ export function ProjectPhotos({ photos, onAdd, onRemove }: ProjectPhotosProps) {
         onSubmit={async (input) => {
           await onAdd(input)
           setShowAddDialog(false)
+        }}
+      />
+      <PhotoDeleteDialog
+        open={photoPendingDelete !== null}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) setPhotoPendingDelete(null)
+        }}
+        onConfirm={async () => {
+          if (photoPendingDelete) await onRemove(photoPendingDelete.id)
         }}
       />
       {/* Lightbox: 画像クリックで full-size 表示 */}
