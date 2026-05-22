@@ -2,7 +2,8 @@ import { useCallback, useState } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useSnackbar } from 'notistack'
 import type { Project } from '~/entities/project'
-import { addProjectPhoto, deleteProjectPhoto } from '~/entities/project'
+import { addProjectPhoto } from '~/features/project-photo-add'
+import { deleteProjectPhoto } from '~/features/project-photo-delete'
 import { updateProject } from '~/features/project-edit'
 import { deleteProject } from '~/features/project-delete'
 import { addProjectPaintUse, removeProjectPaintUse } from '~/features/project-paint-use'
@@ -35,7 +36,7 @@ export interface UseProjectDetailReturn {
  * - プロジェクト編集 (updateProject server fn) / 削除 (deleteProject server fn、planning なら kit 在庫戻し)
  *   (userId は server fn 内 auth() 由来、client 入力なし = IDOR 防止)
  * - 紐付け塗料の追加・削除 (addProjectPaintUse / removeProjectPaintUse server fn、count 非影響)
- * - 写真の追加・削除 (addProjectPhoto / deleteProjectPhoto — Phase D で server fn 化予定、当面 mock)
+ * - 写真の追加・削除 (project-photo-add / project-photo-delete server fn、R2 put/delete + D1)
  * - mutation 後は router.invalidate() で loader 再実行 → 最新 paints/photos を再取得
  * - 削除成功時は一覧へ navigation
  * - mutation 失敗 / null 戻り時は Snackbar (notistack) で error 通知
@@ -104,12 +105,12 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
   const handleAddPhoto = useCallback(
     async (photoInput: AddPhotoInput) => {
       if (!project) return
-      await addProjectPhoto({
-        projectId: project.id,
-        url: photoInput.url,
-        caption: photoInput.caption ?? null,
-        takenAt: photoInput.takenAt ?? null,
-      })
+      const formData = new FormData()
+      formData.append('file', photoInput.file)
+      formData.append('projectId', project.id)
+      formData.append('caption', photoInput.caption ?? '')
+      formData.append('takenAt', photoInput.takenAt ?? '')
+      await addProjectPhoto({ data: formData })
       await router.invalidate()
       enqueueSnackbar('写真を追加しました', { variant: 'success' })
     },
@@ -118,7 +119,7 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
 
   const handleRemovePhoto = useCallback(
     async (photoId: string) => {
-      const ok = await deleteProjectPhoto({ photoId })
+      const ok = await deleteProjectPhoto({ data: { photoId } })
       if (ok) {
         await router.invalidate()
         enqueueSnackbar('写真を削除しました', { variant: 'success' })

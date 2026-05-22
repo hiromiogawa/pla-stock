@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PhotosSplatRouteImport } from './routes/photos/$'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthProjectsIndexRouteImport } from './routes/_auth/projects/index'
 import { Route as AuthPaintsIndexRouteImport } from './routes/_auth/paints/index'
@@ -29,6 +30,11 @@ const AuthRoute = AuthRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PhotosSplatRoute = PhotosSplatRouteImport.update({
+  id: '/photos/$',
+  path: '/photos/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
@@ -85,6 +91,7 @@ const AuthKitsKitIdRoute = AuthKitsKitIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/photos/$': typeof PhotosSplatRoute
   '/kits/$kitId': typeof AuthKitsKitIdRoute
   '/kits/new': typeof AuthKitsNewRoute
   '/paints/$paintId': typeof AuthPaintsPaintIdRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/photos/$': typeof PhotosSplatRoute
   '/kits/$kitId': typeof AuthKitsKitIdRoute
   '/kits/new': typeof AuthKitsNewRoute
   '/paints/$paintId': typeof AuthPaintsPaintIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_auth/dashboard': typeof AuthDashboardRoute
+  '/photos/$': typeof PhotosSplatRoute
   '/_auth/kits/$kitId': typeof AuthKitsKitIdRoute
   '/_auth/kits/new': typeof AuthKitsNewRoute
   '/_auth/paints/$paintId': typeof AuthPaintsPaintIdRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
+    | '/photos/$'
     | '/kits/$kitId'
     | '/kits/new'
     | '/paints/$paintId'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/photos/$'
     | '/kits/$kitId'
     | '/kits/new'
     | '/paints/$paintId'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_auth'
     | '/_auth/dashboard'
+    | '/photos/$'
     | '/_auth/kits/$kitId'
     | '/_auth/kits/new'
     | '/_auth/paints/$paintId'
@@ -169,6 +181,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRouteWithChildren
+  PhotosSplatRoute: typeof PhotosSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/photos/$': {
+      id: '/photos/$'
+      path: '/photos/$'
+      fullPath: '/photos/$'
+      preLoaderRoute: typeof PhotosSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth/dashboard': {
@@ -291,6 +311,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRouteWithChildren,
+  PhotosSplatRoute: PhotosSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
