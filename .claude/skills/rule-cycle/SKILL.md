@@ -1,11 +1,12 @@
 ---
 name: rule-cycle
-description: ルール改善サイクル（rule-measure → rule-explore → rule-improve → rule-audit）を順次実行するオーケストレーター。Use when failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき
+description: ルール改善サイクル（rule-measure → rule-explore → rule-improve → rule-audit）を順次実行する slash command (/rule-cycle)。ユーザーが failure-record 追記直後 or 「ルールを改善して」と明示依頼するときに叩いて起動する。AI auto-trigger は無効化済 (#190)
+disable-model-invocation: true
 metadata:
   kind: orchestrator
   subskills: [rule-improve, rule-audit]
   subagents: [rule-measure, rule-explore]
-  trigger: failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき
+  trigger: ユーザーが /rule-cycle で明示起動するとき (failure-record 追記直後 or 「ルールを改善して」依頼時)
 ---
 
 # ルール改善サイクル

@@ -1,10 +1,11 @@
 ---
 name: post-review
-description: レビュー指摘への対応（failure-record で失敗記録 → rule-cycle でルール改善）を統括する。Use when コードレビューの指摘を受け取った直後、対応と再発防止の流れを開始するとき
+description: レビュー指摘への対応（failure-record で失敗記録 → rule-cycle でルール改善）を統括する slash command (/post-review)。ユーザーがレビュー指摘受領直後に明示的に叩いて起動する。AI auto-trigger は無効化済 (#190)
+disable-model-invocation: true
 metadata:
   kind: orchestrator
   subskills: [dev-complete, failure-record]
-  trigger: コードレビューの指摘を受け取った直後、対応と再発防止の流れを開始するとき
+  trigger: ユーザーが /post-review で明示起動するとき (コードレビュー指摘受領直後)
 ---
 
 # レビュー後対応
@@ -30,7 +31,7 @@ metadata:
 
 指摘に対応し、**REQUIRED SUB-SKILL:** dev-complete の Step 1-3（self-review subagent dispatch → docs-freshness → conventional-commits）を再実行する。Step 1 の self-review は Agent tool で subagent dispatch される (詳細は dev-complete skill / `.claude/agents/self-review.md`)。
 
-> **注 (#177 slash 化後)**: `dev-complete` は `disable-model-invocation: true` で slash 化済 (AI 直接起動不可)。post-review からの sub-skill 呼出は、**ユーザーに `/dev-complete` 入力を依頼** して skill 内容を context に展開させてから順次実行する。post-review 自体の slash 化は将来検討 (#158 Step 2.1 候補)。
+> **注 (slash 化整合)**: `dev-complete` は slash 化済 (AI 直接起動不可、#177)。post-review からの sub-skill 呼出は、**ユーザーに `/dev-complete` 入力を依頼** して skill 内容を context に展開させてから順次実行する。post-review 自体も #190 で slash 化済のため、本 skill 全体が「ユーザー明示で起動した後、内部から更にユーザーに `/dev-complete` を依頼」する 2 段階フロー。
 
 ### Step 3: failure-record（失敗記録）
 

@@ -1,10 +1,11 @@
 ---
 name: design-decision
-description: 設計判断を docs/adr/ の ADR に記録するオーケストレーター（adr 一本）。Use when ライブラリ選定・DB 設計・アーキテクチャ変更など、後から理由を問われうる設計判断が brainstorming 中に発生したとき
+description: 設計判断を docs/adr/ の ADR に記録する slash command (/design-decision、adr 一本)。ユーザーが設計判断確定時に明示的に叩いて起動する。AI auto-trigger は無効化済 (#190)
+disable-model-invocation: true
 metadata:
   kind: orchestrator
   subskills: [adr]
-  trigger: ライブラリ選定・DB 設計・アーキテクチャ変更など、後から理由を問われうる設計判断が brainstorming 中に発生したとき
+  trigger: ユーザーが /design-decision で明示起動するとき (ライブラリ選定・DB 設計・アーキテクチャ変更など、設計判断確定時)
 ---
 
 # 設計判断
