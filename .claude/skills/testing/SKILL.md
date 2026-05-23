@@ -43,7 +43,7 @@ metadata:
 - `src/features/*/*ToDb.ts` の export 関数のうち、引数→戻り値が DB に触れない純粋部分
 - 上記以外の `src/features/*/` `src/shared/lib/*/` 内の export 関数で **条件分岐を持つ純粋関数**
 
-**機械強制**: `pnpm check:test-coverage` (CI matrix の `test-coverage` job)。`src/features/*/schemas.ts` の `*Input` Zod export と `*/*ToDb.ts` の併設は script で検出 (`src/entities/*/model.ts` 派生関数 / 純粋関数判定は機械化困難なため人間レビューで補完)。
+**機械強制**: `pnpm check:test-coverage` (CI matrix の `test-coverage` job、strict モード = 違反 1 件以上で CI fail)。`src/features/*/schemas.ts` の `*Input` Zod export と `*/*ToDb.ts` の併設は script で検出 (`src/entities/*/model.ts` 派生関数 / 純粋関数判定は機械化困難なため人間レビューで補完)。
 
 ### ルール 3: Integration テストを必ず併設する対象 (漏れなく)
 
@@ -51,7 +51,7 @@ metadata:
 - `src/features/*/*ToDb.ts` の export 関数 (in-memory DB で全エラーパスを含めて)
 - Zod schema を持つ form の submit フロー
 
-**機械強制**: `pnpm check:test-coverage` (CI matrix の `test-coverage` job)。`src/views/*/use*.ts` と `*/*ToDb.ts` の併設は script で検出 (form submit フローの統合判定は機械化困難なため人間レビューで補完)。
+**機械強制**: `pnpm check:test-coverage` (CI matrix の `test-coverage` job、strict モード = 違反 1 件以上で CI fail)。`src/views/*/use*.ts` と `*/*ToDb.ts` の併設は script で検出 (form submit フローの統合判定は機械化困難なため人間レビューで補完)。
 
 ### ルール 4: テストを書かない対象 (漏れなく排除)
 
