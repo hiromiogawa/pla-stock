@@ -52,7 +52,15 @@
     // 1 文字変数禁止 (PR #56 追加レビュー指摘 / button.tsx:106 の `p` / `i` 等)。
     // 代替: 文脈に応じた意味のある名前 (`event` / `paint` / `option` 等)。
     // 例外: `_` (意図的に未使用な destructured 変数: `const [_unused, x] = ...`)。
-    "id-length": ["error", { "min": 2, "exceptions": ["_"] }]
+    "id-length": ["error", { "min": 2, "exceptions": ["_"] }],
+
+    // 明示的 any 禁止 (ユーザーレビュー指摘 (b))。
+    // 代替: 正確な型注釈、unknown + type narrowing、generics、型 import
+    // (例: React の children は ReactNode)。
+    // どうしても外せない unknown context は
+    // `// oxlint-disable-next-line typescript/no-explicit-any -- 理由` で
+    // 1 行 disable + 理由コメント。
+    "typescript/no-explicit-any": "error"
 
     // NOTE: deprecated API 検出 (`typescript/no-deprecated`) は type-aware ルールのため
     // この設定ファイルではなく専用スクリプト `pnpm lint:deprecated` で実行する (#121 / ADR-0015)。
