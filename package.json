@@ -27,6 +27,7 @@
     "check:parallel": "concurrently -n typecheck,depcruise,knip,harness,deprecated -c blue,green,magenta,cyan,yellow \"pnpm run typecheck\" \"pnpm run depcruise\" \"pnpm run knip\" \"pnpm run check:harness\" \"pnpm run lint:deprecated\"",
     "check": "pnpm lint && pnpm lint:deprecated && pnpm format && pnpm typecheck && pnpm depcruise && pnpm knip && pnpm check:harness",
     "gen:skill-index": "node scripts/gen-skill-index.mjs",
+    "gen:adr-index": "node scripts/gen-adr-index.mjs",
     "verify:ui": "node scripts/verify-ui.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply pla-stock --local",
