@@ -35,6 +35,7 @@ jobs:
           - { name: knip, cmd: pnpm knip }
           - { name: harness, cmd: pnpm check:harness }
           - { name: workflow-pins, cmd: pnpm check:workflow-pins }
+          - { name: test-coverage, cmd: pnpm check:test-coverage }
           - { name: test, cmd: pnpm test }
           - { name: build, cmd: pnpm build }
     steps:

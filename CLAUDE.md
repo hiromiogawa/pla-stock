@@ -139,8 +139,9 @@ Phase 2 で以下を整備予定：
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm depcruise` | dependency-cruiser で FSD レイヤー違反/循環依存を検出 |
 | `pnpm knip` | knip strict で未使用 export/file を検出 |
-| `pnpm check:parallel` | typecheck + depcruise + knip + harness + deprecated を並列実行 (pre-commit 用) |
-| `pnpm check` | lint → lint:deprecated → format → typecheck → depcruise → knip → harness を直列実行 (CI 用) |
+| `pnpm check:test-coverage` | testing skill ルール 2/3 対象に `*.test.{ts,tsx}` 併設があるか機械検証 (warning モード、`--strict` で error 化) |
+| `pnpm check:parallel` | typecheck + depcruise + knip + harness + deprecated + test-coverage を並列実行 (pre-commit 用) |
+| `pnpm check` | lint → lint:deprecated → format → typecheck → depcruise → knip → harness → test-coverage を直列実行 (CI 用) |
 | `pnpm db:generate` | drizzle-kit で schema から migration SQL を生成 (`drizzle/migrations/`) |
 | `pnpm db:migrate:local` | local D1 (`.wrangler/state/...`) に migration を適用 |
 | `pnpm db:migrate:remote` | prod D1 に migration を適用 (`--remote`) |
