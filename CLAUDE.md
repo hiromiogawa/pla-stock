@@ -292,6 +292,14 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 - 文脈に応じて意味のある名前を付ける (`event` / `paint` / `option` 等)
 - 例外は `_` (意図的未使用の destructured 変数) のみ
 
+### 明示的 any 禁止 (ユーザーレビュー指摘 (b) 由来)
+
+`typescript/no-explicit-any: error` で機械強制 (`lint-config/oxlint-base.jsonc`)。
+
+- 関数引数 / 戻り値 / 変数注釈で `any` を使うのは禁止
+- 代替: 正確な型注釈、`unknown` + type narrowing、generics、型 import (React の `children` は `ReactNode` 等)
+- 真にやむを得ない箇所は `// oxlint-disable-next-line typescript/no-explicit-any -- 理由` で 1 行 disable + 理由コメント
+
 ## AI 運用ルール
 
 物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は **機械強制できない判断系 + 半機械強制 (hook で run を強制) の規律**:
