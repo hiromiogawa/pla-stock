@@ -19,3 +19,4 @@
 | [ADR-0012](./0012-server-state-management.md) | server state は TanStack Router loader を維持する (TanStack Query 併用は見送り) | 承認 | 2026-05-21 |
 | [ADR-0013](./0013-image-storage.md) | Phase D 画像ストレージ — R2 + server fn proxy + クライアント圧縮 | 承認 | 2026-05-21 |
 | [ADR-0014](./0014-photo-upload-formats.md) | 写真アップロードの受け入れ形式 | 承認 | 2026-05-22 |
+| [ADR-0015](./0015-deprecated-api-static-detection.md) | deprecated API の静的検出 (oxlint type-aware) | 承認 | 2026-05-22 |
