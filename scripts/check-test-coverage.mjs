@@ -9,10 +9,12 @@
 // 既知の paper tiger (#173 / FAIL-006) の機械強制実装。
 //
 // 動作モード:
-//   warning モード (default):  違反一覧を stderr に出して exit 0 (CI を落とさない、段階移行用)
-//   strict モード (--strict):  違反 1 件以上で exit 1 (#172 で既存 12 違反解消後の最終形)
+//   strict モード (--strict):  違反 1 件以上で exit 1 (= CI gate、default は本モード)
+//   warning モード:            違反一覧を stderr に出して exit 0 (新規違反を一気に
+//                              可視化したいとき用の安全弁、--strict 無しで起動)
 //
-// CI: `.github/workflows/ci.yml` の matrix で `pnpm check:test-coverage` を起動。
+// CI: `.github/workflows/ci.yml` の matrix で `pnpm check:test-coverage` を起動
+// (package.json で --strict 付き)。
 
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -95,7 +97,7 @@ if (violations.length === 0) {
 
 const header = STRICT
   ? `check-test-coverage: ${violations.length} violation(s) — STRICT mode`
-  : `check-test-coverage: ${violations.length} pending — WARNING mode (段階移行中、--strict で error 化)`
+  : `check-test-coverage: ${violations.length} pending — WARNING mode (--strict で error 化、CI default は strict)`
 
 const out = STRICT ? console.error : console.warn
 out(header)
