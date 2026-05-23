@@ -3,7 +3,7 @@ if command -v mise >/dev/null 2>&1; then
 fi
 
 # ============================================================================
-# Step 1: test (Vitest、約 2 秒で 14 file / 68 case 完走)
+# Step 1: test (Vitest、約 2 秒で全 case 完走)
 # ============================================================================
 # pre-commit (check:parallel) では test が走らないため、push 前に最終 gate。
 # 失敗時は push reject、CI で検出するより早いフィードバックループ。
@@ -15,8 +15,8 @@ pnpm test || exit 1
 # ============================================================================
 # typecheck (tsc --noEmit) は pre-commit でも走るが、vite bundling 段階 (Cloudflare
 # Workers 変換) は pre-commit では検証されない。push 前に最終確認。
-# dev server (pnpm dev) 動作中だと port 競合の可能性あり → dev server を止めるか
-# CI 任せに留めるか開発者判断 (CI でも build job が走るため二重 gate)。
+# dev server (pnpm dev) 動作中だと CPU / メモリのリソース競合で build が遅くなる
+# 可能性あり (port 競合ではなく resource 競合)。CI でも build job が走るため二重 gate。
 echo "▶ pnpm build (push 前 gate、#195)"
 pnpm build || exit 1
 

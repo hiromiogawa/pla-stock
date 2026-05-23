@@ -92,7 +92,7 @@ metadata:
 
 | Layer | 何が走る | 失敗時 |
 |---|---|---|
-| `pre-commit` | `check:parallel` (typecheck / depcruise / knip / harness / deprecated / pins / **test-coverage**)、test 本体は含まない | commit reject |
+| `pre-commit` | `check:parallel` (typecheck / depcruise / knip / harness / deprecated / workflow-pins / **test-coverage**)、test 本体は含まない | commit reject |
 | `pre-push` | `pnpm test` (Vitest、約 2 秒) → `pnpm build` (vite + tsc、約 30-60 秒) → verify:ui (UI 変更時) | push reject |
 | CI matrix | 上記全部 + `lint` / `format` / `lint:deprecated` を独立 job (約 10 job 並列) | PR check fail |
 
