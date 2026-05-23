@@ -58,3 +58,41 @@ jobs:
 
       - name: Run ${{ matrix.check.name }}
         run: ${{ matrix.check.cmd }}
+
+  coverage-report:
+    # ADR-0016 (2026-05-23 update / #198): coverage は **閾値 gate に採用しない**。
+    # 本 job は coverage を計測して PR に参考値コメントを投稿するのみ。
+    # threshold は未設定 (vitest.config / action 双方とも) なので job 自体は常に pass する。
+    # 「触った箇所に test が無いか」のヒントとして PR review 時に参照する想定。
+    name: coverage report (参考値、gate ではない)
+    runs-on: ubuntu-latest
+    # PR でのみ走る (main への push では comment 先がないため skip)
+    if: github.event_name == 'pull_request'
+    permissions:
+      # davelosert/vitest-coverage-report-action が PR にコメント投稿するため
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run coverage
+        # vitest.config の coverage 設定 (v8 / json-summary / json reporter) で
+        # ./coverage/coverage-summary.json と ./coverage/coverage-final.json を生成。
+        run: pnpm test:coverage
+
+      - name: Report coverage to PR
+        # 3rd-party action は commit SHA pin 必須 (check:workflow-pins で機械強制)。
+        uses: davelosert/vitest-coverage-report-action@02f3c2e641286b7fa308cd3e430783103ce6103b # v2.12.0
