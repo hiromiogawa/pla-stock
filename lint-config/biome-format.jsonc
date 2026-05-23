@@ -21,6 +21,7 @@
   // format / lint 対象から除外するパス。
   // - routeTree.gen.ts / worker-configuration.d.ts : auto-generated
   // - dist / .wrangler / .tanstack / node_modules : 出力ディレクトリ
+  // - coverage : vitest --coverage の出力 (HTML report 内の auto-generated JS)
   // - pnpm-lock.yaml : pnpm 管理
   // - **/*.css : Tailwind v4 @apply / @theme 構文を Biome がパース不可
   "files": {
@@ -32,6 +33,7 @@
       "!.wrangler",
       "!.tanstack",
       "!node_modules",
+      "!coverage",
       "!pnpm-lock.yaml",
       "!**/*.css"
     ]

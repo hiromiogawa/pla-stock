@@ -24,7 +24,7 @@ metadata:
 | In-memory SQLite | https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md#new-databasepath-options + https://orm.drizzle.team/docs/get-started-sqlite |
 | Factory pattern | factory_bot: https://github.com/thoughtbot/factory_bot / fishery: https://github.com/thoughtbot/fishery |
 | Co-location | Kent C. Dodds: https://kentcdodds.com/blog/colocation |
-| Coverage 不採用 | Trophy の論理的帰結 + Martin Fowler "TestCoverage": https://martinfowler.com/bliki/TestCoverage.html |
+| Coverage を gate にしない (参考値計測は許容) | Kent C. Dodds (Trophy 原典) + Martin Fowler "TestCoverage": https://martinfowler.com/bliki/TestCoverage.html — 両者とも **閾値 gate にするな / 主要メトリックにするな** が論旨。計測自体は否定していない |
 
 ## ルール (操作可能、判断を要求しない)
 
@@ -82,11 +82,12 @@ metadata:
 - 既存の `createTestDb` を使わず raw `new Database(...)` するのを禁止
 - raw SQL を test 内に書かない (Drizzle 経由)
 
-### ルール 9: coverage を上げるためのテストを書かない
+### ルール 9: coverage は閾値 gate にせず、数字のためのテストを書かない
 
-- `@vitest/coverage-v8` / `--coverage` フラグ / `test:coverage` script を追加禁止
-- 「coverage 数値のため」のテストを追加禁止
-- 採用根拠: ADR-0016 (Trophy の論理的帰結)
+- **coverage を CI 閾値 gate に採用禁止** (threshold 設定禁止、PR を coverage 数値で reject しない)
+- **「coverage 数値のため」のテストを追加禁止** (1 行カバーするためだけの assertion-less test 等)
+- 計測自体は OK: `@vitest/coverage-v8` での計測 / PR comment への参考値表示 / 「触った箇所に test が無いかのヒント」としての利用は許容
+- 採用根拠: Kent C. Dodds "Testing Trophy" + Martin Fowler "TestCoverage" — 両者とも **閾値 gate にするな / 主要メトリックにするな** が論旨で、計測自体を禁じてはいない
 
 ## test 実行 layer (どこで何が走るか)
 
@@ -112,6 +113,6 @@ metadata:
 |---|---|
 | 「軽微なテストだから skill 起動不要」 | skill 起動で checklist と起動証跡が残る。手作業は省略が混入する |
 | 「`vi.mock` で entity も差し替えれば早い」 | entity model は純粋。実物を使う方が drift しない。ルール 7 違反 |
-| 「coverage 数字が低いから追加 test を」 | ルール 9 違反。Trophy の論理的帰結として測らない |
+| 「coverage 数字が低いから追加 test を」 | ルール 9 違反。閾値 gate にしない方針なので「数字を上げるためだけ」の test を書く理由はない (計測は OK、参考値として「触った箇所に test が無い」シグナルに使う) |
 | 「factory を作るのが面倒だから inline」 | ルール 6 違反。factory を経由しないと共有不能 |
 | 「raw SQL の方が早い」 | ルール 8 違反。Drizzle 経由でないと schema 変更追随が壊れる |
