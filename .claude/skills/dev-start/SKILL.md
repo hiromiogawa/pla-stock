@@ -1,10 +1,11 @@
 ---
 name: dev-start
-description: Issue 着手前のコンテキスト準備（memory 検索 → github-flow でブランチ作成 → sdd で仕様確認）を統括する。Use when Issue に着手する直前、ブランチ作成や仕様確認などのコンテキスト準備を始めるとき
+description: Issue 着手前のコンテキスト準備（memory 検索 → github-flow でブランチ作成 → sdd で仕様確認）を統括する slash command (/dev-start)。ユーザーが Issue 着手時に明示的に叩いて起動する。AI auto-trigger は無効化済 (#177)
+disable-model-invocation: true
 metadata:
   kind: orchestrator
   subskills: [github-flow, sdd]
-  trigger: Issue に着手する直前、ブランチ作成や仕様確認などのコンテキスト準備を始めるとき
+  trigger: ユーザーが /dev-start で明示起動するとき (Issue 着手直前)
 ---
 
 # 開発開始

@@ -30,6 +30,8 @@ metadata:
 
 指摘に対応し、**REQUIRED SUB-SKILL:** dev-complete の Step 1-3（self-review subagent dispatch → docs-freshness → conventional-commits）を再実行する。Step 1 の self-review は Agent tool で subagent dispatch される (詳細は dev-complete skill / `.claude/agents/self-review.md`)。
 
+> **注 (#177 slash 化後)**: `dev-complete` は `disable-model-invocation: true` で slash 化済 (AI 直接起動不可)。post-review からの sub-skill 呼出は、**ユーザーに `/dev-complete` 入力を依頼** して skill 内容を context に展開させてから順次実行する。post-review 自体の slash 化は将来検討 (#158 Step 2.1 候補)。
+
 ### Step 3: failure-record（失敗記録）
 
 エージェントのミスに該当する指摘があった場合、**REQUIRED SUB-SKILL:** failure-record を実行する:

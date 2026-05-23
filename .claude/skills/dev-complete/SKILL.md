@@ -1,11 +1,12 @@
 ---
 name: dev-complete
-description: 実装完了時の仕上げ（self-review subagent dispatch → docs-freshness → conventional-commits → PR 作成）を統括する。Use when 実装が一段落し、コミット・PR 作成に向けて仕上げ作業を始めるとき
+description: 実装完了時の仕上げ（self-review subagent dispatch → docs-freshness → conventional-commits → PR 作成）を統括する slash command (/dev-complete)。ユーザーが実装一段落時に明示的に叩いて起動する。AI auto-trigger は無効化済 (#177)
+disable-model-invocation: true
 metadata:
   kind: orchestrator
   subskills: [docs-freshness, conventional-commits, github-flow]
   subagents: [self-review]
-  trigger: 実装が一段落し、コミット・PR 作成に向けて仕上げ作業を始めるとき
+  trigger: ユーザーが /dev-complete で明示起動するとき (実装一段落、コミット・PR 作成前)
 ---
 
 # 開発完了
@@ -14,11 +15,11 @@ metadata:
 
 ## ⚠ 起動規律 (FAIL-002 由来 / ADR-0007)
 
-**この skill の内容が context に表示された = Skill tool で起動された証跡**。手順を最初から省略せず踏むこと。
+**この skill の内容が context に表示された = ユーザー明示 `/dev-complete` で起動された証跡**。手順を最初から省略せず踏むこと。
 
-skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせるだけでは **本 skill 起動の代替にならない**。本 skill は Step 1 で `self-review` **subagent を Agent tool で dispatch** し、Step 2-4 で docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。Skill / Agent tool 経由で起動しないと連鎖が起きず工程が抜ける。
+skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせるだけでは **本 skill 起動の代替にならない**。本 skill は Step 1 で `self-review` **subagent を Agent tool で dispatch** し、Step 2-4 で docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。`/dev-complete` 起動経由でないと連鎖が起きず工程が抜ける。
 
-「コマンドは走らせたから手順は把握してる」「軽微な変更だから略式で OK」は省略合理化のサイン。Red Flag が浮かんだら STOP し、Skill tool で `dev-complete` を起動 (内部で `self-review` subagent を Agent dispatch) する。
+「コマンドは走らせたから手順は把握してる」「軽微な変更だから略式で OK」は省略合理化のサイン。Red Flag が浮かんだら STOP し、ユーザーに `/dev-complete` 再入力を依頼 (内部で `self-review` subagent を Agent dispatch) する。
 
 ## いつ使うか
 
