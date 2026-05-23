@@ -1,4 +1,5 @@
-# pnpm check 相当のチェックを PR ごと + main への push で実行する基本 CI。
+# pnpm check 相当のチェックを matrix で並列・独立実行する CI ワークフロー。
+# 各 check が個別の job として表示され、1 つ落ちても他は最後まで走る (fail-fast: false)。
 # Node / pnpm のバージョンは .nvmrc / package.json の packageManager から取得し
 # ローカルと CI の差を SSoT に寄せる。テストは #110 unit test 基盤完了後に追加。
 # 詳細 #151。
@@ -16,8 +17,22 @@ concurrency:
 
 jobs:
   check:
-    name: pnpm check
+    # PR 上に "CI / pnpm lint" "CI / pnpm typecheck" 等の個別 status として並ぶ。
+    name: pnpm ${{ matrix.check.name }}
     runs-on: ubuntu-latest
+    strategy:
+      # 1 つの check が落ちても他の check を中断しない。
+      # 「lint で落ちたから typecheck の結果がわからない」を避け、全失敗を一覧で把握する。
+      fail-fast: false
+      matrix:
+        check:
+          - { name: lint, cmd: pnpm lint }
+          - { name: lint:deprecated, cmd: pnpm lint:deprecated }
+          - { name: format, cmd: pnpm format }
+          - { name: typecheck, cmd: pnpm typecheck }
+          - { name: depcruise, cmd: pnpm depcruise }
+          - { name: knip, cmd: pnpm knip }
+          - { name: harness, cmd: pnpm check:harness }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,23 +49,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Lint (oxlint)
-        run: pnpm lint
-
-      - name: Lint deprecated API (oxlint type-aware)
-        run: pnpm lint:deprecated
-
-      - name: Format check (biome)
-        run: pnpm format
-
-      - name: Typecheck (tsc)
-        run: pnpm typecheck
-
-      - name: Dependency rules (dependency-cruiser)
-        run: pnpm depcruise
-
-      - name: Unused code (knip)
-        run: pnpm knip
-
-      - name: Harness check
-        run: pnpm check:harness
+      - name: Run ${{ matrix.check.name }}
+        run: ${{ matrix.check.cmd }}
