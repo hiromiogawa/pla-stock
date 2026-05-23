@@ -88,6 +88,19 @@ metadata:
 - 「coverage 数値のため」のテストを追加禁止
 - 採用根拠: ADR-0016 (Trophy の論理的帰結)
 
+## test 実行 layer (どこで何が走るか)
+
+| Layer | 何が走る | 失敗時 |
+|---|---|---|
+| `pre-commit` | `check:parallel` (typecheck / depcruise / knip / harness / deprecated / workflow-pins / **test-coverage**)、test 本体は含まない | commit reject |
+| `pre-push` | `pnpm test` (Vitest、約 2 秒) → `pnpm build` (vite + tsc、約 30-60 秒) → verify:ui (UI 変更時) | push reject |
+| CI matrix | 上記全部 + `lint` / `format` / `lint:deprecated` を独立 job (約 10 job 並列) | PR check fail |
+
+設計意図:
+- `pre-commit`: 頻度高い・軽量 gate (摩擦最小化、test 本体は遅延なくても許容)
+- `pre-push`: 重め gate (push 前検出で CI fail による手戻り防止)
+- CI matrix: 最後の砦、fail-fast: false で全 job を完走させ「lint が落ちたから他が見えない」を防ぐ
+
 ## プロジェクト固有運用 (textbook 外と明示)
 
 - AI UI review (screenshot を AI が画像認識でレビュー) — #109 で実装、emerging practice。本 skill では言及のみ

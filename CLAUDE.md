@@ -155,8 +155,14 @@ Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta p
 
 | Hook | 内容 |
 |---|---|
-| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip + harness + deprecated) |
+| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip + harness + deprecated + workflow-pins + test-coverage) — **test は含まない** (頻度高い軽量 gate) |
+| `pre-push` | `pnpm test` → `pnpm build` → (UI 変更時のみ) verify:ui snapshot 鮮度チェック — push 前の重め gate、test/build 失敗で reject |
 | `commit-msg` | `commitlint --edit` で Conventional Commits 検証（scope は `.project-config.yml` と同期） |
+
+**test 実行 layer の役割分担** (#195):
+- `pre-commit`: 軽量 gate (typecheck / lint / dep-check / 未使用 / test 併設チェック)、test 本体は走らない (頻度に対する摩擦最小)
+- `pre-push`: 重め gate (`pnpm test` 2 秒 + `pnpm build` 30-60 秒)、push 前検出で CI fail による手戻り防止
+- CI matrix: pre-commit + pre-push の全部 + lint / format / lint:deprecated を独立 job、最後の砦
 
 設定ファイル:
 - `.oxlintrc.json` — oxlint
