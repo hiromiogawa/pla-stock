@@ -28,7 +28,7 @@ metadata:
 
 ### Step 2: 修正の実施
 
-指摘に対応し、**REQUIRED SUB-SKILL:** dev-complete の Step 1-3（self-review → docs-freshness → conventional-commits）を再実行する。
+指摘に対応し、**REQUIRED SUB-SKILL:** dev-complete の Step 1-3（self-review subagent dispatch → docs-freshness → conventional-commits）を再実行する。Step 1 の self-review は Agent tool で subagent dispatch される (詳細は dev-complete skill / `.claude/agents/self-review.md`)。
 
 ### Step 3: failure-record（失敗記録）
 
@@ -45,5 +45,5 @@ metadata:
 ### 完了条件
 
 - [ ] レビュー指摘に全て対応済み
-- [ ] self-review 再実行パス
+- [ ] self-review subagent dispatch 再実行パス (Markdown 要約を確認、findings 修正済)
 - [ ] エージェントのミスがあれば failure-record 済み
