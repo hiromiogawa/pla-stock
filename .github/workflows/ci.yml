@@ -1,8 +1,9 @@
-# pnpm check 相当のチェックを matrix で並列・独立実行する CI ワークフロー。
-# 各 check が個別の job として表示され、1 つ落ちても他は最後まで走る (fail-fast: false)。
-# Node / pnpm のバージョンは .nvmrc / package.json の packageManager から取得し
-# ローカルと CI の差を SSoT に寄せる。テストは #110 unit test 基盤完了後に追加。
-# 詳細 #151。
+# pnpm check 相当のチェック + test + production build を matrix で並列・独立実行する
+# CI ワークフロー。各 check が個別の job として表示され、1 つ落ちても他は最後まで走る
+# (fail-fast: false)。Node / pnpm のバージョンは .nvmrc / package.json の packageManager
+# から取得しローカルと CI の差を SSoT に寄せる。
+# 詳細: #151 (基盤) / #110 (test 追加) / #160 (build 追加 = typecheck だけでは捕まらない
+# vite bundling / Cloudflare Workers 変換時の runtime issue を CI でも検出)。
 name: CI
 
 on:
@@ -35,6 +36,7 @@ jobs:
           - { name: harness, cmd: pnpm check:harness }
           - { name: workflow-pins, cmd: pnpm check:workflow-pins }
           - { name: test, cmd: pnpm test }
+          - { name: build, cmd: pnpm build }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
