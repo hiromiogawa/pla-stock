@@ -2,8 +2,9 @@ if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate bash --shims)" 2>/dev/null || true
 fi
 
-# UI 変更検出: src/views, src/widgets, src/theme, src/styles, src/components が変更された commit が含まれているか
-ui_changed=$(git diff origin/main...HEAD --name-only 2>/dev/null | grep -E '^src/(views|widgets|theme|styles|components)/' | head -1)
+# UI 変更検出: src/views, src/widgets, src/theme, src/styles, src/components の
+# 実装ファイル (*.test.ts(x) を除く) が変更された commit が含まれているか
+ui_changed=$(git diff origin/main...HEAD --name-only 2>/dev/null | grep -E '^src/(views|widgets|theme|styles|components)/' | grep -vE '\.test\.(ts|tsx)$' | head -1)
 
 if [ -z "$ui_changed" ]; then
   exit 0

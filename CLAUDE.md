@@ -295,7 +295,7 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 
 物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は **機械強制できない判断系 + 半機械強制 (hook で run を強制) の規律**:
 
-- **UI 変更の push は機械強制で `pnpm verify:ui` 必須** (`.husky/pre-push` が `src/views|widgets|theme|styles|components/` 配下の変更を検出時、`.playwright-snapshots/` の鮮度をチェックして reject)
+- **UI 変更の push は機械強制で `pnpm verify:ui` 必須** (`.husky/pre-push` が `src/views|widgets|theme|styles|components/` 配下の実装ファイル変更 = `*.test.{ts,tsx}` 除く を検出時、`.playwright-snapshots/` の鮮度をチェックして reject)
   - 撮った screenshot を **controller 自身が必ず目視確認** (run しただけで OK は禁止、それは harness の趣旨に反する)
 - **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
 - **DB 書込 mutation の spec/plan は UPSERT/batch × CHECK/UNIQUE/FK の相互作用を実機 SQL で再現確認必須** (FAIL-003 由来 / ADR-0007)
