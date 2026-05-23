@@ -117,6 +117,31 @@
   - `CLAUDE.md` (コード規約 #43 セクションの「機械強制」記述を訂正)
   - Task #155 (lint ルール再実装、別途実施)
 
+### FAIL-006: testing skill ルール 2/3 を機械強制せず paper tiger を再発 (2026-05-23)
+
+- **事象**: PR #159 (#110 testing 基盤導入) で `testing` skill にルール 2 (Unit test 併設対象) / ルール 3 (Integration test 併設対象) を明文化したが、対象の併設有無を検証する機械強制スクリプト (`check:test-coverage` 相当) を同 PR に含めなかった。結果、PR マージ後の確認で **12 ファイル分のルール 2/3 対象が test 未対応** のまま放置されていることが判明 (ユーザー指摘)。さらにルール側にも「`pnpm test` は書かれた test を実行するだけで、未着手は detect できない」という構造的欠陥が放置されていた。FAIL-005 と同型の paper tiger を **同日内に** 再発させた。
+- **原因**:
+  1. **「ルール記述 = 機械強制」と無意識に錯覚した**。skill にルール 2/3 を明文化した時点で「強制されている」と扱ってしまった (FAIL-005 で警告された認知バイアスの再発)
+  2. **scope creep 自制が過剰**。#110 を「Trophy 基盤 + 例題 3 件 + skill 記述」に絞り、対応する機械強制スクリプト (check:test-coverage) を「別 task」と判断したが、ルール導入と機械強制は不可分で本来同梱必須だった
+  3. **skill 起動による human (AI agent) discipline 依存**。`testing` skill を invoke すれば test を書く、という前提に頼った設計そのものが paper tiger の構造
+  4. **既存 paper tiger 学習の活用漏れ**。同日中に FAIL-005 を ADR-0007 に記録したにもかかわらず、同じ落とし穴を見抜けなかった
+- **対策**:
+  - **`writing-project-skills` SKILL.md に「機械強制併設原則」セクションを追加**:
+    - 「機械強制」と書く時の必須チェック (合成違反テスト / CI or pre-commit hook 配線 / ルール導入と機械強制スクリプトの同 PR 実装)
+    - 機械強制不可能なルールは「convention 運用」「人間判断」と明示
+  - **`self-review` SKILL.md の re-read 観点に「paper tiger チェック」を追加**:
+    - 本 PR で「機械強制」と書いた場所があれば、合成違反で実機検証したか
+    - 機械強制スクリプトが本 PR に含まれているか
+    - FAIL-005 / FAIL-006 と同型の paper tiger を作っていないか
+  - **#173 (check:test-coverage 実装)** を起票、testing 規約の paper tiger を機械強制化
+  - **#172 (testing 横展開、12 ファイル分の test 追加)** を起票、ルール 2/3 の対象を埋める
+  - **棚卸し実施**: 「機械強制」と謳う全箇所を grep で抽出し、各々の実機強制有無を判定。新規 paper tiger は発見なし、既知の 2 件 (#155 / #173) のみ
+- **反映先**:
+  - `docs/adr/0007-agent-failure-rules.md` (本エントリ)
+  - `.claude/skills/writing-project-skills/SKILL.md` (「機械強制併設原則」セクション追加)
+  - `.claude/skills/self-review/SKILL.md` (re-read 観点に「paper tiger チェック」追加)
+  - Issue #174 (本対策 PR の追跡)、#173 (具体的機械強制実装)、#172 (test 横展開)
+
 ## 運用メモ
 
 - 新エントリ追加後は `failure-record` skill が指示する通り `rule-cycle` skill を呼び出す。閾値 (前回サイクル以降 3 件) 未満ならサイクルは空回りで報告のみ。

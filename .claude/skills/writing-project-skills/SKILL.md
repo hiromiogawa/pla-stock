@@ -77,3 +77,29 @@ description: <動作を一文>. Use when <トリガー条件>
 採用根拠: AI assist 開発で skill の挙動が判断語で揺れるのを防ぐため。判断を要する場面は呼び出し元 orchestrator skill / 上位 ADR に責任を移譲する。
 
 既存 skill (self-review / dev-complete / code-quality / 他) の retrofit は本原則に従って漸進的に進める (一括 retrofit は別 Issue・Tier 3 で扱う)。`testing` skill (ADR-0016) が最初の準拠例。
+
+## 機械強制併設原則 (FAIL-005 / FAIL-006 由来)
+
+skill / CLAUDE.md / lint-config / docs に「機械強制」と書く規約は、以下を **同 PR で同時に実装** する。後追いで機械強制を別 PR / 別 task に切り出すのは **禁止**。「ルール文書を書いたが機械強制は別 task」は paper tiger を作る行為 (FAIL-005 / FAIL-006 で 2 回再発済)。
+
+### 「機械強制」と書く前のチェック (必須)
+
+- [ ] **合成違反コードを 1 行書いて lint / depcruise / script が止まる** ことを実機検証 (= 合成違反テストで red を確認、その後 cleanup)
+- [ ] **CI / pre-commit hook で実際に走る配線** がある (ローカル `pnpm xxx` だけでなく、`.github/workflows/ci.yml` の matrix or `.husky/*` に組み込み済み)
+- [ ] **ルール導入と機械強制スクリプトは同 PR で実装**。先にルール文書を書いて機械強制は次 PR、は禁止
+- [ ] PR 本文に検証エビデンス (合成違反 → red、CI 配線箇所) を明記
+
+### 機械強制不可能なルールの扱い
+
+機械強制できないルール (人間判断 / convention 運用) は **「機械強制」と書かない**。代わりに以下のいずれかで明示する:
+
+- 「convention 運用」「人間レビューで確認」と skill / docs に明記 (例: 既存の JSDoc 必須対象 / Domain schema enum 規約 / ADR-0008)
+- skill の起動規律で AI に守らせる (ただし起動忘れリスクは残る、機械強制ではない)
+- 違反例があれば ADR-0007 に FAIL として記録、別 Issue で機械強制化を起票
+
+### 採用根拠
+
+- FAIL-005: View 純粋性 lint を「機械強制」と謳ったが `paths + importNames` 形式が機能しておらず paper tiger だった
+- FAIL-006: testing skill ルール 2/3 を「必ず併設」と謳ったが機械強制スクリプトを同梱せず、12 ファイル分が放置された
+
+両 FAIL とも **「ルール記述 = 機械強制」と無意識に錯覚** したことが共通原因。本原則は同型再発を skill 規約レベルで予防する。
