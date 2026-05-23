@@ -3,7 +3,8 @@ name: dev-complete
 description: 実装完了時の仕上げ（self-review → docs-freshness → conventional-commits → PR 作成）を統括する。Use when 実装が一段落し、コミット・PR 作成に向けて仕上げ作業を始めるとき
 metadata:
   kind: orchestrator
-  subskills: [self-review, docs-freshness, conventional-commits, github-flow]
+  subskills: [docs-freshness, conventional-commits, github-flow]
+  subagents: [self-review]
   trigger: 実装が一段落し、コミット・PR 作成に向けて仕上げ作業を始めるとき
 ---
 
@@ -26,14 +27,23 @@ skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせる
 
 ## 実行フロー
 
-### Step 1: self-review（検証サイクル） — **必須・省略不可**
+### Step 1: self-review subagent dispatch — **必須・省略不可**
 
-**REQUIRED SUB-SKILL:** self-review を **必ず Skill ツールで明示的に起動する**。
+**REQUIRED SUBAGENT:** Agent tool で `self-review` subagent を dispatch する。親 context で diff を Read しない (subagent が独立 context で再読することで「新鮮な目」を担保するのが本機構の核心)。
 
-- 検証コマンド（lint → test → dep-check → knip → build）を順に全部走らせる
-- **差分ファイルを新鮮な目で再読して** コードレビュー（想定外の副作用・リグレッション・未考慮のエッジケースを探す）
-- 全パスするまでコミットしない
-- **PR 作成前にもう一度フルサイクルを必ず走らせる**（commit → push の間に追加編集が入る可能性があるため）
+#### 親 prompt の構成
+
+1. `git diff origin/main...HEAD` の出力 (Bash で取得して prompt に注入)
+2. PR コンテキスト (Issue # / 主旨)
+3. 本 PR で導入した「機械強制」言及箇所のリスト (paper tiger チェック用、無ければ「該当なし」と明示)
+4. 期待する出力: subagent 側の出力フォーマット (Markdown 要約) に従う
+
+#### 結果の取り扱い
+
+- subagent が返した Markdown 要約を確認
+- findings あれば親が修正を実施 → commit → 再度 subagent dispatch (= 修正後の差分で再検証)
+- 全 pass したら次の Step に進む
+- subagent 要約は最終的に `gh pr comment` で PR に記録 (= 監査 trail)
 
 この Step を省略することは許されない。CI が落ちる / レビュアーが気づくより前に自分で気づくのがセルフレビューの目的。「時間がない」「小さい変更」「CI が走るから」は全て無効な言い訳。
 
@@ -63,7 +73,7 @@ skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせる
 
 ### 完了条件
 
-- [ ] self-review skill を **Skill ツールで明示的に起動** し、全パスを確認
+- [ ] self-review subagent を **Agent ツールで dispatch** し、全パスを確認 (親 context で diff Read 禁止)
 - [ ] 差分ファイルを自分の目で再読し、コードレビューで懸念点を報告（問題なしの場合もその旨を明言）
 - [ ] ドキュメント更新確認済み
 - [ ] Conventional Commits でコミット済み
@@ -81,3 +91,5 @@ skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせる
 | 「さっき走らせたから PR 直前は不要」 | commit → push の間に追加 edit が入りうる。push 時点の差分で再検証する |
 | 「ユーザーに確認されるから後で直せる」 | ユーザーが検出する前に自分で検出するのがセルフレビューの定義 |
 | 「self-review skill を呼ばなくても手でコマンド打てば同じ」 | skill を明示起動することで「やった証拠」と次のチェックリストが残る。手作業だと省略が混入する |
+| 「親 context で diff を Read してから dispatch すれば速い」 | 新鮮な目が崩れる。親は diff を Bash で取って prompt に注入するだけ、Read しない |
+| 「subagent dispatch なしで Skill 起動した self-review でも十分」 | 親 context のバイアスが残る、新鮮な目が成立しない (本機構導入の趣旨に反する) |
