@@ -33,16 +33,16 @@
 | 技術選定・アーキテクチャ変更・代替案比較の末に設計判断を下したとき、design-decision 外で単独記録する場合や既存 ADR を Supersede するとき | `adr` | atomic |
 | 品質ツールの設定・実行タイミングを決めるとき、または lint・未使用コード・依存違反エラーに遭遇したとき | `code-quality` | atomic |
 | コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき | `conventional-commits` | atomic |
-| ライブラリ選定・DB 設計・アーキテクチャ変更など、後から理由を問われうる設計判断が brainstorming 中に発生したとき | `design-decision` | orchestrator |
+| ユーザーが /design-decision で明示起動するとき (ライブラリ選定・DB 設計・アーキテクチャ変更など、設計判断確定時) | `design-decision` | orchestrator |
 | ユーザーが /dev-complete で明示起動するとき (実装一段落、コミット・PR 作成前) | `dev-complete` | orchestrator |
 | ユーザーが /dev-start で明示起動するとき (Issue 着手直前) | `dev-start` | orchestrator |
 | ドキュメントを追加・更新するとき、生成物と手動ドキュメントの役割分担に迷ったとき、または CI の docs 差分チェックが失敗したとき | `docs-freshness` | atomic |
 | エージェントが同じミスを繰り返した・ユーザーに訂正された・レビューで指摘を受けたとき | `failure-record` | atomic |
 | Issue を作成・階層付けするとき、PR を立てるとき、または GitHub Projects のステータスを更新するとき | `github-flow` | atomic |
-| コードレビューの指摘を受け取った直後、対応と再発防止の流れを開始するとき | `post-review` | orchestrator |
+| ユーザーが /post-review で明示起動するとき (コードレビュー指摘受領直後) | `post-review` | orchestrator |
 | 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき | `project-bootstrap` | orchestrator |
 | rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき | `rule-audit` | atomic |
-| failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき | `rule-cycle` | orchestrator |
+| ユーザーが /rule-cycle で明示起動するとき (failure-record 追記直後 or 「ルールを改善して」依頼時) | `rule-cycle` | orchestrator |
 | rule-cycle オーケストレーターから rule-measure 直後に subagent dispatch する直前 | `rule-explore` | atomic |
 | rule-explore の直後、measure と explore の結果をもとに改善提案を Issue 化するとき | `rule-improve` | atomic |
 | rule-cycle オーケストレーターから subagent dispatch する直前 | `rule-measure` | atomic |
