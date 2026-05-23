@@ -76,4 +76,32 @@ description: <動作を一文>. Use when <トリガー条件>
 
 採用根拠: AI assist 開発で skill の挙動が判断語で揺れるのを防ぐため。判断を要する場面は呼び出し元 orchestrator skill / 上位 ADR に責任を移譲する。
 
-既存 skill (self-review / dev-complete / code-quality / 他) の retrofit は本原則に従って漸進的に進める (一括 retrofit は別 Issue・Tier 3 で扱う)。`testing` skill (ADR-0016) が最初の準拠例。
+既存 skill の retrofit は本原則に従って漸進的に進める (一括 retrofit は別 Issue で扱う)。
+
+## 機械強制併設原則
+
+skill / docs / lint-config 等に「機械強制」と書く規約は、以下を **同 PR で同時に実装** する。後追いで機械強制を別 PR / 別 task に切り出すのは **禁止**。「ルール文書を書いたが機械強制は別 task」は paper tiger を作る行為であり、過去複数回観測されている再発バイアス (「ルール記述 = 機械強制」と無意識に錯覚) を skill 規約レベルで予防する。
+
+### 「機械強制」と書く前のチェック (必須)
+
+- [ ] **合成違反コードを 1 行書いて lint / depcruise / script が止まる** ことを実機検証 (= 合成違反テストで red を確認、その後 cleanup)
+- [ ] **CI / pre-commit hook で実際に走る配線** がある (ローカル実行コマンドだけでなく、CI workflow の matrix or git hook に組み込み済み)
+- [ ] **ルール導入と機械強制スクリプトは同 PR で実装**。先にルール文書を書いて機械強制は次 PR、は禁止
+- [ ] PR 本文に検証エビデンス (合成違反 → red、CI 配線箇所) を明記
+
+### 機械強制不可能なルールの扱い
+
+機械強制できないルール (人間判断 / convention 運用) は **「機械強制」と書かない**。代わりに以下のいずれかで明示する:
+
+- 「convention 運用」「人間レビューで確認」と skill / docs に明記
+- skill の起動規律で AI に守らせる (ただし起動忘れリスクは残る、機械強制ではない)
+- 違反例があれば `failure-record` skill で記録し、別 Issue で機械強制化を起票
+
+### 採用根拠
+
+「ルール記述 = 機械強制」と無意識に錯覚するバイアスが繰り返し観測されている。典型パターン:
+
+- lint 設定だけ書いて合成違反テストで実機検証を忘れ、設定が functional でないまま paper tiger 化
+- skill にルールを明文化したが対応する機械強制スクリプトを別 task に切り出し、結果として未実装のまま放置
+
+両パターンは「ルール文書 ≠ 機械強制」を明示的に意識しないと再発する。本原則のチェックリストはこの認知バイアスへの structural 対策。
