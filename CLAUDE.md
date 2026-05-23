@@ -43,9 +43,9 @@
 | 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき | `project-bootstrap` | orchestrator |
 | rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき | `rule-audit` | atomic |
 | failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき | `rule-cycle` | orchestrator |
-| rule-measure の直後、計測数字に表れない問題やスキル間の矛盾・未ルール化パターンを探したいとき | `rule-explore` | atomic |
+| rule-cycle オーケストレーターから rule-measure 直後に subagent dispatch する直前 | `rule-explore` | atomic |
 | rule-explore の直後、measure と explore の結果をもとに改善提案を Issue 化するとき | `rule-improve` | atomic |
-| ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき | `rule-measure` | atomic |
+| rule-cycle オーケストレーターから subagent dispatch する直前 | `rule-measure` | atomic |
 | 新機能の設計を始めるとき、仕様書から実装へ移行するとき、または JSDoc / typedoc による仕様記述に迷ったとき | `sdd` | atomic |
 | dev-complete オーケストレーターから subagent dispatch する直前 | `self-review` | atomic |
 | 新規 test file (*.test.ts / *.test.tsx) を作成するとき、または既存 test を更新するとき | `testing` | atomic |
@@ -59,7 +59,7 @@
 - **dev-start** → github-flow, sdd
 - **post-review** → dev-complete, failure-record
 - **project-bootstrap** → code-quality, conventional-commits, github-flow, sdd, adr
-- **rule-cycle** → rule-measure, rule-explore, rule-improve, rule-audit
+- **rule-cycle** → rule-improve, rule-audit
 
 ### 単一責務系（atomic）
 

@@ -1,67 +1,24 @@
 ---
 name: rule-explore
-description: 計測データに表れないボトルネック・スキル間の矛盾・未ルール化パターンを洗い出す（改善サイクルの探索ステップ）。Use when rule-measure の直後、計測数字に表れない問題を探したいとき
+description: rule-explore subagent (.claude/agents/rule-explore.md) の dispatch reference。探索本体は subagent に集約。Use when rule-cycle オーケストレーターから rule-measure 直後に subagent dispatch する手順を確認するとき
 metadata:
   kind: atomic
-  trigger: rule-measure の直後、計測数字に表れない問題やスキル間の矛盾・未ルール化パターンを探したいとき
+  trigger: rule-cycle オーケストレーターから rule-measure 直後に subagent dispatch する直前
 ---
 
-# ルール探索
+# rule-explore (dispatch reference)
 
-計測データだけでは見えないボトルネック、未知のパターン、ルール間の矛盾を探す。
+探索本体 (skill / agent 間の矛盾・重複 / 依存ルールのスコープ漏れ / 未ルール化パターン / アーカイブ候補) は `.claude/agents/rule-explore.md` subagent に集約済。本 skill は **dispatch 手順の参考書**。
 
-## いつ使うか
+## dispatch 方法
 
-- rule-measure の直後（改善サイクルの2番目のステップ）
-- 手動で「ルールの問題点を洗い出したい」とき
+`rule-cycle` skill の Step 2 が Agent tool 経由で自動 dispatch するのが正規。手動で叩く場合の手順:
 
-## 探索手順
+1. 親 prompt に **rule-measure subagent の計測要約 (Markdown)** を注入
+2. Agent tool を起動、`subagent_type: rule-explore`
+3. 返却された Markdown 要約 (探索結果) を次ステップ rule-improve に渡す
 
-### 1. 前ステップの出力を受け取る
+## なぜ subagent か
 
-直前の rule-measure がコンテキストに出力した計測要約を入力として受け取る（同一セッション順次実行のため memory/ファイル読取は不要）。
-
-### 2. スキル間の矛盾・重複を探す
-
-全スキルファイルを読み、以下を確認する:
-
-```
-ls .claude/skills/*/SKILL.md
-```
-
-- 2つのスキルが同じことを違う言い方で指示していないか
-- あるスキルの指示が別のスキルと矛盾していないか
-- 1つのスキルに統合すべき重複がないか
-
-### 4. エージェント定義のスコープ漏れを探す
-
-```
-ls .claude/agents/*.md
-```
-
-- 依存方向ルールが実際のコードの import と合っているか
-- 新しく追加されたファイルやパッケージがスコープから漏れていないか
-
-### 5. ルール化されていないパターンを探す
-
-直近の PR レビューコメントやコミット履歴から、繰り返し指摘されるがルール化されていないパターンを探す:
-
-```
-# 直近のマージ済みPRを確認
-gh pr list --state merged --limit 10
-
-# 直近のコミットメッセージからfixパターンを確認
-git log --oneline --grep="fix" -20
-```
-
-### 6. 効果スコアが低いルールを特定
-
-Measure の出力（コンテキスト要約）から効果スコアが 0.0 のルールを抽出し、アーカイブ候補として記録する。
-
-### 7. 出力の受け渡し
-
-探索結果（スキル間の矛盾/重複、未ルール化パターン、アーカイブ候補）をコンテキストに要約出力する。次ステップ rule-improve が同一セッションで受け取る。
-
-## 出力
-
-このスキルの出力はコンテキスト要約のみ。次に rule-improve を実行する。
+- 全 skill / agent ファイル grep + PR / commit history 調査は重く、親 context を圧迫する
+- 数値で見えない問題の発見は「新鮮な目」で skill 同士を読み比べる subagent context が有効
