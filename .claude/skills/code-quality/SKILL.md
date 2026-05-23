@@ -39,10 +39,7 @@ metadata:
 
 ## カバレッジ閾値
 
-閾値は `.project-config.yml` の `coverage`（`minimum` / `target`）を唯一の SSoT とする。skill 側に数値を併記しない（数字の二重管理を構造的に排除するため）。
-
-- パッケージごとに計測（unit + integration）
-- E2E はカバレッジ対象外
+本プロジェクトでは coverage を採用しない（Testing Trophy 採用の論理的帰結。詳細 ADR-0016 / `testing` skill）。
 
 ## deprecated API 検出（type-aware）
 

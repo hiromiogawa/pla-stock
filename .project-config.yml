@@ -5,10 +5,6 @@ project:
   name: pla-stock
   type: single-package
 
-coverage:
-  minimum: 60
-  target: 75
-
 architecture:
   # Phase 2 でスキャフォールド時に確定。FSD 類似構造を採用予定。
   type: tbd

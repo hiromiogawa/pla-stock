@@ -7,8 +7,10 @@
     "worker-configuration.d.ts",
     "vite.config.ts",
     "drizzle.config.ts",
+    "vitest.config.ts",
     "src/shared/lib/db/client.ts",
-    "src/shared/lib/db/seed.ts"
+    "src/shared/lib/db/seed.ts",
+    "src/test-utils/**"
   ],
   "ignoreBinaries": ["wrangler"],
   "ignoreDependencies": [
@@ -23,6 +25,10 @@
     "class-variance-authority",
     "lucide-react",
     "@tanstack/react-virtual",
-    "cloudflare"
+    "cloudflare",
+    "vitest",
+    "jsdom",
+    "@testing-library/react",
+    "@testing-library/user-event"
   ]
 }

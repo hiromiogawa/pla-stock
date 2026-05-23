@@ -59,3 +59,21 @@ description: <動作を一文>. Use when <トリガー条件>
 
 1. skill ファイルを作成/編集したら `CLAUDE.md` の `## Skills` セクションに 1 行ポインタを追加（または既存ポインタを更新）
 2. `conventional-commits` に従い `docs(skills): add <name> skill` または `docs(skills): update <name> skill` でコミット
+
+## 操作可能ルール原則（全 skill 共通）
+
+本プロジェクトの全 skill のルール記述は **判断を要求する表現** を使わない。
+
+**禁止語**: 「重要」「適切」「必要に応じて」「迷ったら」「望ましい」「適宜」「考慮する」「判断する」など。
+
+**強制形式**:
+- 「<x> の場合は <y> する」
+- 「<a> は禁止」
+- 「<b> を必ず併設」
+- 「<c> 以外のとき <d> する」
+
+ルール対象を**列挙して書く**（漏れなく / 漏れなく排除）。「重要なロジック」のような判断対象は **どのファイル / どの API / どの分岐** に該当するかを具体名で示す。
+
+採用根拠: AI assist 開発で skill の挙動が判断語で揺れるのを防ぐため。判断を要する場面は呼び出し元 orchestrator skill / 上位 ADR に責任を移譲する。
+
+既存 skill (self-review / dev-complete / code-quality / 他) の retrofit は本原則に従って漸進的に進める (一括 retrofit は別 Issue・Tier 3 で扱う)。`testing` skill (ADR-0016) が最初の準拠例。

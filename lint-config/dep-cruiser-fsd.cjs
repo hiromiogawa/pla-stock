@@ -130,6 +130,23 @@ module.exports = {
       from: { path: '^src/views/' },
       to: { path: '^src/routes/' },
     },
+
+    // ------------------------------------------------------------------------
+    // test-utils → production 依存禁止 (ADR-0016)
+    // ------------------------------------------------------------------------
+    {
+      name: 'no-test-utils-from-production',
+      severity: 'error',
+      comment:
+        'production code (test 以外の src/**) が src/test-utils/** を import するのを禁止する。test fixture / helper は test ファイルからのみ使用すること',
+      from: {
+        path: '^src/',
+        pathNot: '\\.test\\.(ts|tsx)$',
+      },
+      to: {
+        path: '^src/test-utils/',
+      },
+    },
   ],
 
   options: {

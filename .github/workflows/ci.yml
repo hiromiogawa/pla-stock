@@ -34,6 +34,7 @@ jobs:
           - { name: knip, cmd: pnpm knip }
           - { name: harness, cmd: pnpm check:harness }
           - { name: workflow-pins, cmd: pnpm check:workflow-pins }
+          - { name: test, cmd: pnpm test }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
