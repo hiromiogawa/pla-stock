@@ -2,11 +2,32 @@ if command -v mise >/dev/null 2>&1; then
   eval "$(mise activate bash --shims)" 2>/dev/null || true
 fi
 
-# UI 変更検出: src/views, src/widgets, src/theme, src/styles, src/components の
-# 実装ファイル (*.test.ts(x) を除く) が変更された commit が含まれているか
-ui_changed=$(git diff origin/main...HEAD --name-only 2>/dev/null | grep -E '^src/(views|widgets|theme|styles|components)/' | grep -vE '\.test\.(ts|tsx)$' | head -1)
+# UI 変更検出 (画面に出る要素の変更のみ verify:ui の対象とする):
+#
+# - 検出対象:
+#   - src/(views|widgets|components)/ 配下の .tsx / .css / .scss
+#     (Presenter component と style。hook の .ts や utility は対象外)
+#   - src/(theme|styles)/ 配下の全変更
+#     (design token / global style は .ts でも UI に直接影響する)
+#
+# - 除外対象 (UI 変更ではない):
+#   - *.test.{ts,tsx} (hook integration test 等、co-located test)
+#   - useXxx.ts のような hook の純粋 logic (画面に出ない)
+#   - 型定義 / utility / ドキュメント
+#
+# - 検出 0 件なら exit 0 (verify:ui 不要)
+ui_in_components=$(git diff origin/main...HEAD --name-only 2>/dev/null \
+  | grep -E '^src/(views|widgets|components)/' \
+  | grep -vE '\.test\.(ts|tsx)$' \
+  | grep -E '\.(tsx|css|scss)$' \
+  | head -1)
 
-if [ -z "$ui_changed" ]; then
+ui_in_design_system=$(git diff origin/main...HEAD --name-only 2>/dev/null \
+  | grep -E '^src/(theme|styles)/' \
+  | grep -vE '\.test\.(ts|tsx)$' \
+  | head -1)
+
+if [ -z "$ui_in_components" ] && [ -z "$ui_in_design_system" ]; then
   exit 0
 fi
 
