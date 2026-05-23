@@ -27,13 +27,14 @@ tools: [Bash, Read, Grep, Glob]
 
 すべて Bash で実行、各コマンドの exit / output を確認:
 
-1. `pnpm lint` (OXLint + Biome、warning は許容、error は要対処)
-2. `pnpm test` (Vitest、失敗したテストは要対処)
-3. `pnpm depcruise` (FSD 単方向依存 + no-test-utils-from-production / no-seed-from-production)
-4. `pnpm knip` (未使用 export / file / 依存)
-5. `pnpm check:test-coverage` (testing skill ルール 2/3 の併設チェック、strict モード)
-6. `pnpm typecheck` (`tsc --noEmit`)
-7. `pnpm build` (`vite build && tsc --noEmit`、production 相当 bundling 検証)
+1. `pnpm lint` (OXLint、warning は許容、error は要対処)
+2. `pnpm format` (Biome formatter、差分検出時は親 context で `format:write` 推奨)
+3. `pnpm test` (Vitest、失敗したテストは要対処)
+4. `pnpm depcruise` (FSD 単方向依存 + no-test-utils-from-production / no-seed-from-production)
+5. `pnpm knip` (未使用 export / file / 依存)
+6. `pnpm check:test-coverage` (testing skill ルール 2/3 の併設チェック、strict モード)
+7. `pnpm typecheck` (`tsc --noEmit`)
+8. `pnpm build` (`vite build && tsc --noEmit`、production 相当 bundling 検証)
 
 いずれかが失敗したら出力に該当を明記。すべて pass したら次の re-read へ。
 
