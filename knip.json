@@ -10,8 +10,7 @@
     "vitest.config.ts",
     "src/shared/lib/db/client.ts",
     "src/shared/lib/db/seed.ts",
-    "src/test-utils/__stubs__/cloudflare-workers.ts",
-    "src/test-utils/factories/**"
+    "src/test-utils/**"
   ],
   "ignoreBinaries": ["wrangler"],
   "ignoreDependencies": [
