@@ -36,7 +36,7 @@ export function AddPaintDialog({ open, candidates, onOpenChange, onSelect }: Add
       onClose={() => onOpenChange(false)}
       fullWidth
       maxWidth="sm"
-      PaperProps={{ sx: { maxHeight: '80vh' } }}
+      slotProps={{ paper: { sx: { maxHeight: '80vh' } } }}
     >
       <DialogTitle>塗料を追加</DialogTitle>
       <DialogContent>

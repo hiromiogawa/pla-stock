@@ -53,6 +53,11 @@
     // 代替: 文脈に応じた意味のある名前 (`event` / `paint` / `option` 等)。
     // 例外: `_` (意図的に未使用な destructured 変数: `const [_unused, x] = ...`)。
     "id-length": ["error", { "min": 2, "exceptions": ["_"] }]
+
+    // NOTE: deprecated API 検出 (`typescript/no-deprecated`) は type-aware ルールのため
+    // この設定ファイルではなく専用スクリプト `pnpm lint:deprecated` で実行する (#121 / ADR-0015)。
+    // oxlint の `--type-aware` フラグは type-aware ルール全体を一括有効化するため、
+    // スコープを deprecated 検出のみに保つ目的で `-A all -D typescript/no-deprecated` で限定する。
   },
 
   // lint 対象から外すパス。

@@ -131,13 +131,14 @@ Phase 2 で以下を整備予定：
 | `pnpm install` | 依存インストール（postinstall で cf-typegen 自動実行） |
 | `pnpm lint` | oxlint で静的解析 |
 | `pnpm lint:fix` | oxlint の自動修正 |
+| `pnpm lint:deprecated` | oxlint type-aware で deprecated API 使用を検出 (ADR-0015) |
 | `pnpm format` | biome で format チェック (no-write) |
 | `pnpm format:write` | biome で全ファイル整形 |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm depcruise` | dependency-cruiser で FSD レイヤー違反/循環依存を検出 |
 | `pnpm knip` | knip strict で未使用 export/file を検出 |
-| `pnpm check:parallel` | typecheck + depcruise + knip を並列実行 (pre-commit 用) |
-| `pnpm check` | lint → format → typecheck → depcruise → knip を直列実行 (CI 用) |
+| `pnpm check:parallel` | typecheck + depcruise + knip + harness + deprecated を並列実行 (pre-commit 用) |
+| `pnpm check` | lint → lint:deprecated → format → typecheck → depcruise → knip → harness を直列実行 (CI 用) |
 | `pnpm db:generate` | drizzle-kit で schema から migration SQL を生成 (`drizzle/migrations/`) |
 | `pnpm db:migrate:local` | local D1 (`.wrangler/state/...`) に migration を適用 |
 | `pnpm db:migrate:remote` | prod D1 に migration を適用 (`--remote`) |
@@ -151,7 +152,7 @@ Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta p
 
 | Hook | 内容 |
 |---|---|
-| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip) |
+| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip + harness + deprecated) |
 | `commit-msg` | `commitlint --edit` で Conventional Commits 検証（scope は `.project-config.yml` と同期） |
 
 設定ファイル:

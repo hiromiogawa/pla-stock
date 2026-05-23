@@ -28,6 +28,7 @@ metadata:
 |--------|-----------|----------|-----|
 | Biome (format) | o | | o |
 | OXLint (lint) | o | | o |
+| OXLint (deprecated, type-aware) | o | | o |
 | knip (変更分) | o | | |
 | knip (全体) | | o | o |
 | dependency-cruiser | o | | o (+ SVG) |
@@ -38,11 +39,19 @@ metadata:
 
 ## カバレッジ閾値
 
-プロジェクト固有の値は `.project-config.yml` を参照。デフォルト:
-- **最低:** 75%
-- **目標:** 80%
+閾値は `.project-config.yml` の `coverage`（`minimum` / `target`）を唯一の SSoT とする。skill 側に数値を併記しない（数字の二重管理を構造的に排除するため）。
+
 - パッケージごとに計測（unit + integration）
 - E2E はカバレッジ対象外
+
+## deprecated API 検出（type-aware）
+
+ライブラリ（drizzle / MUI 等）の `@deprecated` タグ付き API の使用を静的層で検出する（#121 / ADR-0015）。
+
+- `tsc --noEmit` は deprecated を TS6387 = suggestion 扱いにするため `pnpm typecheck` をすり抜ける。この死角を埋めるための専用パス。
+- 実行: `pnpm lint:deprecated`（= `oxlint --type-aware -A all -D typescript/no-deprecated`）
+- type-aware ルールは型情報を要するため `oxlint-tsgolint` パッケージと `--type-aware` フラグが必須。
+- `--type-aware` は type-aware ルール全体を一括有効化するため、`-A all -D typescript/no-deprecated` でスコープを deprecated 検出のみに限定する。他の type-aware ルールの採用は別途検討する（ADR-0015 参照）。
 
 ## dependency-cruiser ルール
 
