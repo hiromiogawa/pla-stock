@@ -58,11 +58,11 @@ metadata:
 - 過剰設計・未来想定のための abstraction
 - ネーミングとドキュメントの整合性
 - **「既存パターン踏襲」の検証**: 周囲のコードや既存ファイルと同じ書き方をしている箇所は、それが「正しいパターン」か「古い / deprecated なパターンの惰性」かを区別する。特に schema・外部ライブラリ API・ドメイン規約を編集するときは、既存コードのコピーで済ませず当該 API / 規約の最新仕様（deprecation 含む）を確認する
-- **paper tiger チェック (FAIL-005 / FAIL-006 由来)**: 本 PR で skill / CLAUDE.md / lint-config / docs に「機械強制」と書いた箇所があるか? あれば次を確認:
+- **paper tiger チェック**: 本 PR で skill / docs / lint-config 等に「機械強制」と書いた箇所があるか? あれば次を確認:
   1. **合成違反コードで実機検証したか** (lint / depcruise / script が止まることを確認、cleanup 済み)
   2. **CI / pre-commit hook の配線** が同 PR に含まれているか (ローカル実行だけで終わっていない)
   3. **機械強制スクリプト自体が本 PR に含まれているか** (含まれていないなら scope 内で追加 or 別 Issue 起票 + 本 PR 制限を本文に明示)
-  4. FAIL-005 (View 純粋性 lint) / FAIL-006 (testing skill ルール 2/3) と同型の paper tiger を作っていないか
+  4. 過去 (`failure-record` skill 等で記録された事例) と同型の paper tiger を作っていないか
   - 検証エビデンス (合成違反コマンドと結果) を PR 本文または PR コメントに残す
   - 詳細は `writing-project-skills` skill の「機械強制併設原則」セクション
 
