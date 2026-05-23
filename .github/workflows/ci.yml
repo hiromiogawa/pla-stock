@@ -1,0 +1,56 @@
+# pnpm check 相当のチェックを matrix で並列・独立実行する CI ワークフロー。
+# 各 check が個別の job として表示され、1 つ落ちても他は最後まで走る (fail-fast: false)。
+# Node / pnpm のバージョンは .nvmrc / package.json の packageManager から取得し
+# ローカルと CI の差を SSoT に寄せる。テストは #110 unit test 基盤完了後に追加。
+# 詳細 #151。
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# 同じ ref で新しい push が来たら古い実行をキャンセル (PR の連続 push で無駄を出さない)。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    # PR 上に "CI / pnpm lint" "CI / pnpm typecheck" 等の個別 status として並ぶ。
+    name: pnpm ${{ matrix.check.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      # 1 つの check が落ちても他の check を中断しない。
+      # 「lint で落ちたから typecheck の結果がわからない」を避け、全失敗を一覧で把握する。
+      fail-fast: false
+      matrix:
+        check:
+          - { name: lint, cmd: pnpm lint }
+          - { name: lint:deprecated, cmd: pnpm lint:deprecated }
+          - { name: format, cmd: pnpm format }
+          - { name: typecheck, cmd: pnpm typecheck }
+          - { name: depcruise, cmd: pnpm depcruise }
+          - { name: knip, cmd: pnpm knip }
+          - { name: harness, cmd: pnpm check:harness }
+          - { name: workflow-pins, cmd: pnpm check:workflow-pins }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        # サードパーティ製 action は supply chain 攻撃対策で commit SHA pin
+        # (v タグは author が差し替え可能)。バージョン上げ時は新 SHA を再取得して差し替える。
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ${{ matrix.check.name }}
+        run: ${{ matrix.check.cmd }}

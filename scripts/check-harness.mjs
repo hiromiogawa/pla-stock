@@ -13,7 +13,11 @@ function coerce(raw) {
     val = val.slice(1, -1)
   }
   if (val.startsWith('[') && val.endsWith(']')) {
-    return val.slice(1, -1).split(',').map((segment) => segment.trim()).filter(Boolean)
+    return val
+      .slice(1, -1)
+      .split(',')
+      .map((segment) => segment.trim())
+      .filter(Boolean)
   }
   return val
 }
@@ -79,10 +83,9 @@ try {
 
 const grepPattern = 'claude-memory\\|memory_search\\|memory_save\\|memory-usage'
 try {
-  const hit = execSync(
-    `grep -rIl "${grepPattern}" .claude/skills CLAUDE.md 2>/dev/null || true`,
-    { encoding: 'utf8' },
-  ).trim()
+  const hit = execSync(`grep -rIl "${grepPattern}" .claude/skills CLAUDE.md 2>/dev/null || true`, {
+    encoding: 'utf8',
+  }).trim()
   if (hit) errors.push(`[6] claude-memory/memory-usage 残存: ${hit.replace(/\n/g, ', ')}`)
 } catch {}
 
