@@ -3,7 +3,8 @@ name: rule-cycle
 description: ルール改善サイクル（rule-measure → rule-explore → rule-improve → rule-audit）を順次実行するオーケストレーター。Use when failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき
 metadata:
   kind: orchestrator
-  subskills: [rule-measure, rule-explore, rule-improve, rule-audit]
+  subskills: [rule-improve, rule-audit]
+  subagents: [rule-measure, rule-explore]
   trigger: failure-record に FAIL エントリを追記した直後、またはユーザーから「ルールを改善して」と依頼されたとき
 ---
 
@@ -32,13 +33,21 @@ rule-measure → rule-explore → rule-improve → rule-audit を順次実行す
 
 以下を **この順番で** 実行する。各ステップの完了を確認してから次に進む。
 
-#### Step 1: rule-measure（計測）
+#### Step 1: rule-measure（計測） — subagent dispatch
 
-**REQUIRED SUB-SKILL:** rule-measure を実行する。ADR-0007 の失敗履歴、Git ログ、ルール総数を集計し、効果スコアを算出。結果は本セッションのコンテキストで次ステップに引き継がれる。
+**REQUIRED SUBAGENT:** Agent tool で `rule-measure` subagent を dispatch する。親 prompt 構成:
 
-#### Step 2: rule-explore（探索）
+1. 前回サイクル基準値 (file memory `rule-cycle-meta`、無ければ「初回」)
 
-**REQUIRED SUB-SKILL:** rule-explore を実行する。Measure の結果を踏まえ、スキル間の矛盾・重複、未ルール化パターン、アーカイブ候補を探す。結果は本セッションのコンテキストで次ステップに引き継がれる。
+subagent が ADR-0007 の失敗履歴、git log、skill / agent 総数を独立 context で集計し、効果スコアを算出。返却された Markdown 要約を Step 2 の親 prompt に引き継ぐ (= 連鎖型 dispatch)。
+
+#### Step 2: rule-explore（探索） — subagent dispatch
+
+**REQUIRED SUBAGENT:** Agent tool で `rule-explore` subagent を dispatch する。親 prompt 構成:
+
+1. **Step 1 で取得した rule-measure 計測要約** (Markdown を全文注入)
+
+subagent が skill / agent 間の矛盾・重複、依存ルールのスコープ漏れ、未ルール化パターン、アーカイブ候補を独立 context で探索。返却された Markdown 要約を Step 3 の親 prompt に引き継ぐ。
 
 #### Step 3: rule-improve（改善提案）
 

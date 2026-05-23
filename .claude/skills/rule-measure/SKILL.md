@@ -1,75 +1,28 @@
 ---
 name: rule-measure
-description: スキル・CLAUDE.md・エージェント定義の効果を定量計測する（改善サイクルの起点ステップ）。Use when ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき
+description: rule-measure subagent (.claude/agents/rule-measure.md) の dispatch reference。計測本体は subagent に集約。Use when rule-cycle オーケストレーターから subagent dispatch する手順を確認するとき
 metadata:
   kind: atomic
-  trigger: ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき
+  trigger: rule-cycle オーケストレーターから subagent dispatch する直前
 ---
 
-# ルール計測
+# rule-measure (dispatch reference)
 
-エージェントのルール（スキル、CLAUDE.md、エージェント定義）の効果を定量的に集計する。
+計測本体 (FAIL 集計 / 効果スコア / git log 傾向 / skill 数) は `.claude/agents/rule-measure.md` subagent に集約済。本 skill は **dispatch 手順の参考書**。
 
-## いつ使うか
+## dispatch 方法
 
-- failure-record スキルで FAIL エントリが 3 件蓄積したとき（rule-explore → rule-improve → rule-audit と連鎖する）
-- 手動で「ルールの効果を確認したい」とき
+`rule-cycle` skill の Step 1 が Agent tool 経由で自動 dispatch するのが正規。手動で叩く場合の手順:
 
-## 計測手順
+1. 親 prompt に「前回サイクル基準値」(file memory `rule-cycle-meta`、無ければ「初回」と明示) を含める
+2. Agent tool を起動、`subagent_type: rule-measure`
+3. 返却された Markdown 要約 (計測結果) を次ステップ rule-explore に渡す (rule-cycle が自動連鎖)
 
-### 1. 前回サイクルの基準値を読む
+## なぜ subagent か
 
-CLAUDE.md の記憶 (file memory) ルールに従い、ファイル memory の `rule-cycle-meta` エントリ（あれば）を読む。
-無ければ「前回 FAIL 総数 = 0（初回）」として扱う。前回計測値との差分を意識する。
+- 大量の grep / git log 出力を独立 context に閉じ込め、親 context のサイズを節約
+- 計測の中立性 (親の編集 context のバイアスから分離)
 
-### 2. 失敗履歴を集計
+## file memory との関係
 
-`docs/adr/0007-agent-failure-rules.md` を読み、以下を集計する:
-
-- FAIL エントリの総数
-- 前回計測以降の新規エントリ数
-- 失敗の分類（ルール不足 / コンテキスト不足 / 判断ミス）ごとの件数
-- 同種の失敗の再発有無（対策済みの失敗が再び発生していないか）
-
-### 3. Git ログから傾向を収集
-
-```
-git log --oneline -20
-```
-
-以下を集計する:
-- pre-commit hook の失敗回数（revert や fix コミットの頻度から推定）
-- commitlint 失敗の有無
-
-### 4. ルール総数を集計
-
-```
-# スキル数
-ls .claude/skills/*/SKILL.md | wc -l
-
-# エージェント定義数
-ls .claude/agents/*.md | wc -l
-
-# ADR-0007 の FAIL エントリ数
-grep -c "^### FAIL-" docs/adr/0007-agent-failure-rules.md
-```
-
-前回計測からの増減を記録する。
-
-### 5. 効果スコアを算出
-
-各 FAIL エントリの「対策」について:
-- **効果あり**: 対策後に同種の失敗が再発していない → スコア 1.0
-- **効果不明**: まだ十分な期間が経過していない → スコア N/A
-- **効果なし**: 対策後も同種の失敗が再発している → スコア 0.0
-
-### 6. 出力の受け渡し
-
-計測結果（FAIL 総数 / 新規件数 / 分類 / 再発有無 / skill 数 / 効果スコア /
-hook 失敗傾向）を **本セッションのコンテキストに要約として出力**する。次ステップ
-rule-explore が同一セッションで直接受け取る（ファイル/memory への保存は不要）。
-cycle-meta の更新はサイクル完走時に rule-audit が行う。
-
-## 出力
-
-このスキルの出力はコンテキスト要約のみ。ファイル変更や Issue 起票は行わない。次に rule-explore を実行する。
+`rule-cycle-meta` の **更新は rule-audit が行う**。本 skill / subagent は読むだけ。
