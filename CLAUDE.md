@@ -48,6 +48,7 @@
 | ルール改善サイクルを始めるとき、またはルールの効果を数値で把握したいとき | `rule-measure` | atomic |
 | 新機能の設計を始めるとき、仕様書から実装へ移行するとき、または JSDoc / typedoc による仕様記述に迷ったとき | `sdd` | atomic |
 | 実装が完了しコミット前の検証を始めるとき、または PR 作成直前に push 差分を再検証するとき | `self-review` | atomic |
+| 新規 test file (*.test.ts / *.test.tsx) を作成するとき、または既存 test を更新するとき | `testing` | atomic |
 | 新規 Issue を立てる時、既存 Issue を整える時、Epic に sub-issue をぶら下げる時 | `writing-issues` | atomic |
 | 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき | `writing-project-skills` | atomic |
 
@@ -62,7 +63,7 @@
 
 ### 単一責務系（atomic）
 
-`adr` `code-quality` `conventional-commits` `docs-freshness` `failure-record` `github-flow` `rule-audit` `rule-explore` `rule-improve` `rule-measure` `sdd` `self-review` `writing-issues` `writing-project-skills`
+`adr` `code-quality` `conventional-commits` `docs-freshness` `failure-record` `github-flow` `rule-audit` `rule-explore` `rule-improve` `rule-measure` `sdd` `self-review` `testing` `writing-issues` `writing-project-skills`
 
 > 実作業の主役の一部は superpowers **plugin** skill（`brainstorming` /
 > `writing-plans` / `subagent-driven-development` / `systematic-debugging` /
