@@ -33,12 +33,15 @@ jobs:
           - { name: depcruise, cmd: pnpm depcruise }
           - { name: knip, cmd: pnpm knip }
           - { name: harness, cmd: pnpm check:harness }
+          - { name: workflow-pins, cmd: pnpm check:workflow-pins }
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        # サードパーティ製 action は supply chain 攻撃対策で commit SHA pin
+        # (v タグは author が差し替え可能)。バージョン上げ時は新 SHA を再取得して差し替える。
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
