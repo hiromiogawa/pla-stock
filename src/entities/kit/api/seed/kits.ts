@@ -1,22 +1,21 @@
 import type { Kit, KitStock, KitEvent } from '../../model'
 
 /**
- * モック層: キット master / kit_stock (count cache) / kit_events (ledger) の
- * in-memory データと CRUD アクセサ。
+ * seed 層: キット master / kit_stock (count cache) / kit_events (ledger) の
+ * 初期投入用 in-memory データ。`src/shared/lib/db/seed.ts` から D1 への
+ * truncate-then-insert で利用される (dev seed、production runtime 非対象)。
  *
- * 在庫モデルを per-unit → count + event log pattern に統一 (2026-04-27)。
- * Phase C で実 server fn (createServerFn + Drizzle + D1) に差し替える前提。
- * 関数 signature は server fn 互換形 (async, 入力は1引数オブジェクト) にしておくと
- * 差し替え時の差分が最小になる。
- *
- * mutation は配列を破壊的に書き換える (Phase C では DB INSERT/UPDATE 相当)。
+ * 在庫モデルは count + event log pattern (2026-04-27 統一)。
+ * production の read query / mutation は Phase C で Drizzle + D1 server fn に完全移行済み。
+ * test fixture とは別系統 (test は `src/test-utils/factories/kit.ts` の
+ * `createTestKit(overrides)` を使う、ADR-0016)。
  *
  * マスターは admin curated only（private item 概念廃止 2026-04-24）。
  */
 
-const MOCK_USER_ID = 'mock-user-1'
+const SEED_USER_ID = 'seed-user-1'
 
-export const mockKits: Kit[] = [
+export const seedKits: Kit[] = [
   {
     id: 'kit-1',
     name: 'RX-78-2 Gundam',
@@ -63,22 +62,22 @@ export const mockKits: Kit[] = [
  * kit_stocks: (userId, kitId) per 1 行のカウント。
  * kit-2, kit-3 はプロジェクトが消費して count=0。
  */
-export const mockKitStocks: KitStock[] = [
-  { userId: MOCK_USER_ID, kitId: 'kit-1', count: 1 },
-  { userId: MOCK_USER_ID, kitId: 'kit-2', count: 0 }, // project-2 (シャアザク) が消費
-  { userId: MOCK_USER_ID, kitId: 'kit-3', count: 0 }, // project-1 (Sazabi) が消費
-  { userId: MOCK_USER_ID, kitId: 'kit-5', count: 1 },
+export const seedKitStocks: KitStock[] = [
+  { userId: SEED_USER_ID, kitId: 'kit-1', count: 1 },
+  { userId: SEED_USER_ID, kitId: 'kit-2', count: 0 }, // project-2 (シャアザク) が消費
+  { userId: SEED_USER_ID, kitId: 'kit-3', count: 0 }, // project-1 (Sazabi) が消費
+  { userId: SEED_USER_ID, kitId: 'kit-5', count: 1 },
 ]
 
 /**
  * kit_events: 入出庫の audit ledger。
  * SUM(delta) で kitStocks.count が再計算できることを保証する。
  */
-export const mockKitEvents: KitEvent[] = [
+export const seedKitEvents: KitEvent[] = [
   // kit-1: 購入 +1 → count=1
   {
     id: 'ke-1',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-1',
     delta: 1,
     reason: 'purchase',
@@ -92,7 +91,7 @@ export const mockKitEvents: KitEvent[] = [
   // kit-2: 購入 +1
   {
     id: 'ke-2',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-2',
     delta: 1,
     reason: 'purchase',
@@ -106,7 +105,7 @@ export const mockKitEvents: KitEvent[] = [
   // kit-2: project-2 (シャアザク) に消費 -1 → count=0
   {
     id: 'ke-3',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-2',
     delta: -1,
     reason: 'project',
@@ -120,7 +119,7 @@ export const mockKitEvents: KitEvent[] = [
   // kit-3: 購入 +1
   {
     id: 'ke-4',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-3',
     delta: 1,
     reason: 'purchase',
@@ -134,7 +133,7 @@ export const mockKitEvents: KitEvent[] = [
   // kit-3: project-1 (Sazabi) に消費 -1 → count=0
   {
     id: 'ke-5',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-3',
     delta: -1,
     reason: 'project',
@@ -148,7 +147,7 @@ export const mockKitEvents: KitEvent[] = [
   // kit-5: 購入 +1 → count=1
   {
     id: 'ke-6',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-5',
     delta: 1,
     reason: 'purchase',
@@ -162,4 +161,4 @@ export const mockKitEvents: KitEvent[] = [
 ]
 
 // Mutations は `features/kit-stock-add` (#115) と `features/project-*` (#116) の
-// Drizzle server fn に完全移行済み。本ファイルは seed 用 mock 配列のみを保持する。
+// Drizzle server fn に完全移行済み。本ファイルは seed 用配列のみを保持する。

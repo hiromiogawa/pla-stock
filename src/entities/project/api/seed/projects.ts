@@ -2,22 +2,23 @@ import type { Project } from '../../model'
 import type { ProjectPaintUse } from '~/entities/projectPaintUse'
 
 /**
- * モック層: project / project_paint_use の **seed 用** in-memory データ。
+ * seed 層: project / project_paint_use の初期投入用 in-memory データ。
+ * `src/shared/lib/db/seed.ts` から D1 への truncate-then-insert で利用される
+ * (dev seed、production runtime 非対象)。
  *
  * Phase C/D 移行状況:
  * - project mutation (add/update/delete) / project_paint_use add/remove /
  *   photo add/delete はすべて `features/project-*` の Drizzle server fn に移行済み
  *   (#116 / #135)。本ファイルに CRUD アクセサは残っていない
- * - 残る mock 配列 (mockProjects / mockProjectPaintUses) は
- *   `src/shared/lib/db/seed.ts` で D1 への初期投入元として利用される (master の SSoT)
+ * - test fixture とは別系統 (test は `src/test-utils/factories/project.ts` を使う、ADR-0016)
  */
 
-const MOCK_USER_ID = 'mock-user-1'
+const SEED_USER_ID = 'seed-user-1'
 
-export const mockProjects: Project[] = [
+export const seedProjects: Project[] = [
   {
     id: 'project-1',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-3', // Sazabi Ver.Ka (旧 kit-stock-3 → kit-3 に変換)
     name: 'Sazabi Ver.Ka 塗装計画',
     description: 'シャア専用カラーをガイア赤系で塗装、つや消しで仕上げる',
@@ -27,7 +28,7 @@ export const mockProjects: Project[] = [
   },
   {
     id: 'project-2',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     kitId: 'kit-2', // Char's Zaku II (旧 kit-stock-2 → kit-2 に変換)
     name: 'シャアザク 製作中',
     description: 'RG Char Zaku II をベースに少しディテールアップ',
@@ -46,7 +47,7 @@ export const mockProjects: Project[] = [
  *   paint-stock-7 → paint-8 (ガイア フレームレッド)
  *   paint-stock-1 → paint-1 (ホワイト)
  */
-export const mockProjectPaintUses: ProjectPaintUse[] = [
+export const seedProjectPaintUses: ProjectPaintUse[] = [
   // project-1 (Sazabi) で使った塗料
   { projectId: 'project-1', paintId: 'paint-5', createdAt: new Date('2026-01-05T10:00:00Z') },
   { projectId: 'project-1', paintId: 'paint-2', createdAt: new Date('2026-01-05T10:01:00Z') },
