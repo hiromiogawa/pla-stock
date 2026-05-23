@@ -3,15 +3,15 @@ import { kits, kitStocks, kitEvents } from '~/entities/kit/schema'
 import { paints, paintStocks, paintEvents } from '~/entities/paint/schema'
 import { projects, projectPhotos } from '~/entities/project/schema'
 import { projectPaintUse } from '~/entities/projectPaintUse/schema'
-import { mockKits, mockKitStocks, mockKitEvents } from '~/entities/kit/api/mock/kits'
-import { mockPaints, mockPaintStocks, mockPaintEvents } from '~/entities/paint/api/mock/paints'
-import { mockProjects, mockProjectPaintUses } from '~/entities/project/api/mock/projects'
+import { seedKits, seedKitStocks, seedKitEvents } from '~/entities/kit/api/seed/kits'
+import { seedPaints, seedPaintStocks, seedPaintEvents } from '~/entities/paint/api/seed/paints'
+import { seedProjects, seedProjectPaintUses } from '~/entities/project/api/seed/projects'
 
 /**
- * 全ドメインの mock データを D1 (better-sqlite3 経由) に投入する dev seed。
+ * 全ドメインの seed データを D1 (better-sqlite3 経由) に投入する dev seed。
  *
  * - master (kits/paints) は userId 非依存でそのまま
- * - per-user (stocks/events/projects) は mock の MOCK_USER_ID を seedUserId に差し替え
+ * - per-user (stocks/events/projects) は seed の SEED_USER_ID を seedUserId に差し替え
  * - junction は projectId 経由のため userId 差し替え不要
  * - project_photos は seed しない (R2 実体が無いため。アプリ上で実アップロードする)。
  *   reseed で既存アップロード写真を消すため delete のみ残す
@@ -31,24 +31,24 @@ export function seedDatabase(
   db.delete(kits).run()
   db.delete(paints).run()
 
-  db.insert(kits).values(mockKits).run()
-  db.insert(paints).values(mockPaints).run()
+  db.insert(kits).values(seedKits).run()
+  db.insert(paints).values(seedPaints).run()
   db.insert(kitStocks)
-    .values(mockKitStocks.map((stock) => ({ ...stock, userId: seedUserId })))
+    .values(seedKitStocks.map((stock) => ({ ...stock, userId: seedUserId })))
     .run()
   db.insert(kitEvents)
-    .values(mockKitEvents.map((event) => ({ ...event, userId: seedUserId })))
+    .values(seedKitEvents.map((event) => ({ ...event, userId: seedUserId })))
     .run()
   db.insert(paintStocks)
-    .values(mockPaintStocks.map((stock) => ({ ...stock, userId: seedUserId })))
+    .values(seedPaintStocks.map((stock) => ({ ...stock, userId: seedUserId })))
     .run()
   db.insert(paintEvents)
-    .values(mockPaintEvents.map((event) => ({ ...event, userId: seedUserId })))
+    .values(seedPaintEvents.map((event) => ({ ...event, userId: seedUserId })))
     .run()
   db.insert(projects)
-    .values(mockProjects.map((project) => ({ ...project, userId: seedUserId })))
+    .values(seedProjects.map((project) => ({ ...project, userId: seedUserId })))
     .run()
-  db.insert(projectPaintUse).values(mockProjectPaintUses).run()
+  db.insert(projectPaintUse).values(seedProjectPaintUses).run()
 
-  return { kits: mockKits.length, paints: mockPaints.length, projects: mockProjects.length }
+  return { kits: seedKits.length, paints: seedPaints.length, projects: seedProjects.length }
 }

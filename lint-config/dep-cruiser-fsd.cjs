@@ -147,6 +147,27 @@ module.exports = {
         path: '^src/test-utils/',
       },
     },
+
+    // ------------------------------------------------------------------------
+    // seed → production 依存禁止 (#148)
+    // ------------------------------------------------------------------------
+    // src/entities/<x>/api/seed/** は dev seed 専用 (src/shared/lib/db/seed.ts から
+    // のみ参照される)。production の read query / mutation が seed データに依存
+    // すると Phase C で実 DB に移行した意味が無くなる。例外は src/shared/lib/db/
+    // seed.ts と test ファイル (test 用 fixture として流用可)。
+    {
+      name: 'no-seed-from-production',
+      severity: 'error',
+      comment:
+        'production code (src/shared/lib/db/seed.ts と test を除く) が src/entities/*/api/seed/** を import するのを禁止する',
+      from: {
+        path: '^src/',
+        pathNot: ['^src/shared/lib/db/seed\\.ts$', '\\.test\\.(ts|tsx)$'],
+      },
+      to: {
+        path: '^src/entities/[^/]+/api/seed/',
+      },
+    },
   ],
 
   options: {

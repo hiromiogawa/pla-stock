@@ -1,18 +1,19 @@
 import type { Paint, PaintStock, PaintEvent } from '../../model'
 
 /**
- * モック層: 塗料 master / paint_stock (count cache) / paint_events (ledger) の
- * in-memory データと CRUD アクセサ。
+ * seed 層: 塗料 master / paint_stock (count cache) / paint_events (ledger) の
+ * 初期投入用 in-memory データ。`src/shared/lib/db/seed.ts` から D1 への
+ * truncate-then-insert で利用される (dev seed、production runtime 非対象)。
  *
- * 在庫モデルを per-unit → count + event log pattern に統一 (2026-04-27)。
- * Phase C で実 server fn (createServerFn + Drizzle + D1) に差し替える前提。
+ * production の read query / mutation は Phase C で Drizzle + D1 server fn に完全移行済み。
+ * test fixture とは別系統 (test は `src/test-utils/factories/paint.ts` を使う、ADR-0016)。
  *
  * マスターは admin curated only（private item 概念廃止 2026-04-24）。
  */
 
-const MOCK_USER_ID = 'mock-user-1'
+const SEED_USER_ID = 'seed-user-1'
 
-export const mockPaints: Paint[] = [
+export const seedPaints: Paint[] = [
   {
     id: 'paint-1',
     brand: 'Mr.Color',
@@ -120,27 +121,27 @@ export const mockPaints: Paint[] = [
  * paint-6 (Mr.Surfacer) は使い切って count=0。
  * paint-7 は旧データにストックなし (未登録)。
  */
-export const mockPaintStocks: PaintStock[] = [
-  { userId: MOCK_USER_ID, paintId: 'paint-1', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-2', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-3', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-4', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-5', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-6', count: 0 }, // 使い切り (空)
-  { userId: MOCK_USER_ID, paintId: 'paint-8', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-9', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-10', count: 1 },
-  { userId: MOCK_USER_ID, paintId: 'paint-11', count: 1 },
+export const seedPaintStocks: PaintStock[] = [
+  { userId: SEED_USER_ID, paintId: 'paint-1', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-2', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-3', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-4', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-5', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-6', count: 0 }, // 使い切り (空)
+  { userId: SEED_USER_ID, paintId: 'paint-8', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-9', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-10', count: 1 },
+  { userId: SEED_USER_ID, paintId: 'paint-11', count: 1 },
 ]
 
 /**
  * paint_events: 入出庫の audit ledger。
  * SUM(delta) で paintStocks.count が再計算できることを保証する。
  */
-export const mockPaintEvents: PaintEvent[] = [
+export const seedPaintEvents: PaintEvent[] = [
   {
     id: 'pe-1',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-1',
     delta: 1,
     reason: 'purchase',
@@ -152,7 +153,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-2',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-2',
     delta: 1,
     reason: 'purchase',
@@ -164,7 +165,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-3',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-3',
     delta: 1,
     reason: 'purchase',
@@ -176,7 +177,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-4',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-4',
     delta: 1,
     reason: 'purchase',
@@ -188,7 +189,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-5',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-5',
     delta: 1,
     reason: 'purchase',
@@ -201,7 +202,7 @@ export const mockPaintEvents: PaintEvent[] = [
   // paint-6: 購入 +1
   {
     id: 'pe-6',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-6',
     delta: 1,
     reason: 'purchase',
@@ -214,7 +215,7 @@ export const mockPaintEvents: PaintEvent[] = [
   // paint-6: 使い切り廃棄 -1 → count=0
   {
     id: 'pe-7',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-6',
     delta: -1,
     reason: 'discard',
@@ -226,7 +227,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-8',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-8',
     delta: 1,
     reason: 'purchase',
@@ -238,7 +239,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-9',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-9',
     delta: 1,
     reason: 'purchase',
@@ -250,7 +251,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-10',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-10',
     delta: 1,
     reason: 'purchase',
@@ -262,7 +263,7 @@ export const mockPaintEvents: PaintEvent[] = [
   },
   {
     id: 'pe-11',
-    userId: MOCK_USER_ID,
+    userId: SEED_USER_ID,
     paintId: 'paint-11',
     delta: 1,
     reason: 'purchase',
