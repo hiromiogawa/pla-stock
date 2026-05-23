@@ -12,7 +12,10 @@ function loadPrefixes() {
   const yml = readFileSync('.project-config.yml', 'utf8')
   const match = yml.match(/prefixes:\s*\[([^\]]+)\]/)
   if (!match) return ['feat', 'fix', 'refactor', 'docs', 'chore', 'test']
-  return match[1].split(',').map((segment) => segment.trim()).filter(Boolean)
+  return match[1]
+    .split(',')
+    .map((segment) => segment.trim())
+    .filter(Boolean)
 }
 
 const branch = process.argv[2] ?? currentBranch()

@@ -17,7 +17,9 @@ import { seedDatabase } from '../src/shared/lib/db/seed.ts'
 const candidates = globSync('.wrangler/state/v3/d1/miniflare-D1DatabaseObject/*.sqlite')
 
 if (candidates.length === 0) {
-  console.error('local D1 sqlite が見つかりません。先に `pnpm db:migrate:local` を実行してください。')
+  console.error(
+    'local D1 sqlite が見つかりません。先に `pnpm db:migrate:local` を実行してください。',
+  )
   process.exit(1)
 }
 

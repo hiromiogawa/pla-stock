@@ -15,7 +15,11 @@ function coerce(raw) {
     val = val.slice(1, -1)
   }
   if (val.startsWith('[') && val.endsWith(']')) {
-    return val.slice(1, -1).split(',').map((segment) => segment.trim()).filter(Boolean)
+    return val
+      .slice(1, -1)
+      .split(',')
+      .map((segment) => segment.trim())
+      .filter(Boolean)
   }
   return val
 }
@@ -64,11 +68,15 @@ function renderIndex(skills) {
   lines.push('### トリガー表（このトリガーに該当したら即 Skill 起動）', '')
   lines.push('| トリガー | 起動する Skill | 種別 |', '|---|---|---|')
   for (const skill of skills) {
-    lines.push(`| ${skill.metadata?.trigger ?? ''} | \`${skill.name}\` | ${skill.metadata?.kind ?? '?'} |`)
+    lines.push(
+      `| ${skill.metadata?.trigger ?? ''} | \`${skill.name}\` | ${skill.metadata?.kind ?? '?'} |`,
+    )
   }
   lines.push('', '### オーケストレーション系（単一責務 skill を連鎖）', '')
   for (const orchestrator of orchestrators) {
-    const subs = Array.isArray(orchestrator.metadata?.subskills) ? orchestrator.metadata.subskills.join(', ') : ''
+    const subs = Array.isArray(orchestrator.metadata?.subskills)
+      ? orchestrator.metadata.subskills.join(', ')
+      : ''
     lines.push(`- **${orchestrator.name}** → ${subs}`)
   }
   lines.push('', '### 単一責務系（atomic）', '')

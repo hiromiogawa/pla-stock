@@ -1,0 +1,56 @@
+# pnpm check 相当のチェックを PR ごと + main への push で実行する基本 CI。
+# Node / pnpm のバージョンは .nvmrc / package.json の packageManager から取得し
+# ローカルと CI の差を SSoT に寄せる。テストは #110 unit test 基盤完了後に追加。
+# 詳細 #151。
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# 同じ ref で新しい push が来たら古い実行をキャンセル (PR の連続 push で無駄を出さない)。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: pnpm check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (oxlint)
+        run: pnpm lint
+
+      - name: Lint deprecated API (oxlint type-aware)
+        run: pnpm lint:deprecated
+
+      - name: Format check (biome)
+        run: pnpm format
+
+      - name: Typecheck (tsc)
+        run: pnpm typecheck
+
+      - name: Dependency rules (dependency-cruiser)
+        run: pnpm depcruise
+
+      - name: Unused code (knip)
+        run: pnpm knip
+
+      - name: Harness check
+        run: pnpm check:harness
