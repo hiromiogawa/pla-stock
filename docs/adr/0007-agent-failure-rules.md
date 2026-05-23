@@ -99,6 +99,24 @@
   - 修正実装: PR #119 (`entities/{kit,paint,projectPaintUse}/schema.ts`)
   - 機械検出ルールの追加要否は `rule-cycle` 経由で判断 (本エントリ追記が改善サイクルのトリガー)
 
+### FAIL-005: View 純粋性 lint ルールが paper tiger だった (2026-05-23)
+
+- **事象**: ユーザーから「Container/Hook/Presenter の機械強制は機能しているか」と問われ実機検証した結果、`lint-config/oxlint-view-purity.jsonc` の `no-restricted-imports` ルールが**まったく発火しない**ことが判明。`*DetailView.tsx` に `import { useState } from 'react'` を加えても oxlint がエラーを出さない。同じ `no-restricted-imports` を使う `oxlint-emotion-isolation.jsonc` は発火する一方、両者の違いは **`patterns + group` 形式 (動く) vs `paths + importNames` 形式 (動かない)**。加えて、ルールが守ろうとする mutation パスは `~/entities/kit` 等の entity 層を指していたが、実装は `~/features/kit-stock-add` 等の features 層に移っており、entity barrel は `addKitEvent` を re-export していない (paths も stale)。CLAUDE.md は当該節を「oxlint で機械強制」と記述しており、**ドキュメントが事実と乖離した状態が長期間放置**されていた。
+- **原因**:
+  1. **ルール導入時に「設定を書いた」で完了とし、合成違反でルールが発火することを実機検証していなかった**。oxlint 1.61 の `no-restricted-imports` は `patterns + group` は動くが `paths + importNames` は実質機能しない (または挙動が異なる) — 違反コードを 1 行書いて lint が止まることを確認すれば導入直後に気付けた
+  2. **mutation の entities → features 切り出しリファクタ時に lint 設定のパス追従が漏れた**。コード側だけ動かして lint 設定の追従を忘れ、その後の lint pass を「ルールが動いている証拠」と誤読
+  3. Container/Hook/Presenter pattern は TanStack Router の `useLoaderData` が **route 階層で呼ぶ前提の API** であることから、ライブラリ設計が convention を自然に誘導しており、人間レビュー + 自然な書き方で守られていた。lint は「重ねた安全網」のはずだったが、その安全網が paper だった事実が表面化しなかった (守ってない PR が出てこなかったため)
+  4. **「機械強制」とドキュメントに書く時のエビデンス基準が緩い**。lint 設定の存在 = 機械強制 と認識し、合成違反テストで止まることを確認するステップが運用に組み込まれていなかった
+- **対策**:
+  - **新規 lint ルール導入時は『合成違反コードを 1 つ書いて lint が止めることを実機検証する』を必須化** (`code-quality` skill への追記要否は `rule-cycle` で判断)
+  - **コードのレイヤー移動 (entities ↔ features 等) を伴うリファクタで関連 lint 設定のパス追従漏れがないか棚卸し**を self-review に追加検討 (`rule-cycle` で判断)
+  - **CLAUDE.md コード規約 #43 の「機械強制」記述を実態に合わせて訂正**: enforcement は「TanStack Router の API 設計による自然誘導 + 人間レビュー」が主で、lint は本来の補助役だったが現状動いていない旨を明示
+  - lint ルール修復は Task #155 として起票、Tier 3 (ハーネス / 品質整理) に配置
+- **反映先**:
+  - `docs/adr/0007-agent-failure-rules.md` (本エントリ)
+  - `CLAUDE.md` (コード規約 #43 セクションの「機械強制」記述を訂正)
+  - Task #155 (lint ルール再実装、別途実施)
+
 ## 運用メモ
 
 - 新エントリ追加後は `failure-record` skill が指示する通り `rule-cycle` skill を呼び出す。閾値 (前回サイクル以降 3 件) 未満ならサイクルは空回りで報告のみ。
