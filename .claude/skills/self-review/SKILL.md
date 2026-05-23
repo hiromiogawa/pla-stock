@@ -1,102 +1,38 @@
 ---
 name: self-review
-description: コミット前に lint・test・dep-check・knip の検証サイクルとコード re-read を必須で回し、全パスするまでコミットさせない。Use when 実装が完了しコミット前の検証を始めるとき、または PR 作成直前に push 差分を再検証するとき
+description: self-review subagent (.claude/agents/self-review.md) の dispatch reference。検証サイクル本体は subagent に集約。Use when dev-complete から subagent dispatch する手順を確認するとき
 metadata:
   kind: atomic
-  trigger: 実装が完了しコミット前の検証を始めるとき、または PR 作成直前に push 差分を再検証するとき
+  trigger: dev-complete オーケストレーターから subagent dispatch する直前
 ---
 
-# セルフレビュー
+# self-review (dispatch reference)
 
-実装が完了したら、以下の検証サイクルを実行する。全パスするまでコミットしない。
+検証サイクル + コード re-read + paper tiger チェックの本体は `.claude/agents/self-review.md` subagent に集約済。本 skill は **dispatch 手順の参考書** に縮小されている。
 
-**このスキルは dev-complete オーケストレーターから必ず明示的に Skill ツールで呼び出される。単発実装でも PR 直前でも、コマンドを手で叩くだけで済ませず、Skill ツールで起動してフル手順を踏むこと。**
+## dispatch 方法
 
-## 検証サイクル
+`dev-complete` skill の Step 1 が Agent tool 経由で自動 dispatch するのが正規。手動で叩く場合の手順:
 
-1. **lint**: `pnpm lint`
-   - OXLint + Biome のエラーを修正
-   - Biome の auto-fix が TypeScript の型エラーを引き起こす場合があるため、修正後に型チェックも確認
+1. `git diff origin/main...HEAD` を Bash で取得
+2. Agent tool を起動、`subagent_type: self-review`、prompt に次を含める:
+   - 取得した diff (raw)
+   - PR コンテキスト (Issue # / 主旨)
+   - 本 PR で導入した「機械強制」言及箇所リスト (無ければ「該当なし」)
+3. 返却された Markdown 要約を確認、findings あれば親が修正
+4. 修正後は再度 dispatch (= 差分が変わるたびに新鮮な目で見直す)
+5. 全 pass したら subagent 要約を `gh pr comment` で PR に記録
 
-2. **test**: `pnpm test` または対象パッケージのみ `pnpm --filter <pkg> test`
-   - 失敗したテストは修正してから次へ
+## なぜ subagent か
 
-3. **dep-check**: `pnpm dep-check`
-   - 依存方向違反があれば import を修正
+「差分を新鮮な目で再読」は書いた本人 (親 context) では構造的に成立しない。subagent dispatch で独立 context にすることで初めて成立する。検証コマンドの大量 output も subagent 内に閉じ込めて親 context のサイズを節約する副次効果あり。
 
-4. **knip**: `pnpm knip`
-   - 未使用の export, ファイル, 依存があれば削除
+## paper tiger チェックの所在
 
-5. **build**: `pnpm build`
-   - 型エラーを最終的に確認（lint と test では拾えない TS コンパイルエラーを検出）
-
-## 修正ループ
-
-```
-実装 → lint → 失敗? → 修正 → lint（再実行）
-                ↓ 成功
-            test → 失敗? → 修正 → test（再実行）
-                ↓ 成功
-            dep-check → 失敗? → 修正 → dep-check（再実行）
-                ↓ 成功
-            knip → 失敗? → 修正 → knip（再実行）
-                ↓ 成功
-            build → 失敗? → 修正 → build（再実行）
-                ↓ 成功
-            コード re-read（新鮮な目） → 指摘があれば修正し最初から
-                ↓ 問題なし
-            コミット可能
-```
-
-## コード re-read（ツールで検出できない観点）
-
-コマンドサイクルを通した後、**差分ファイルを改めて新鮮な目で読む**。ツールが検出できない懸念を人間レビュー視点で探す:
-
-- 想定外のリグレッション（元の動作と等価か？）
-- エッジケース（エラー時の挙動、race condition、unhandled rejection）
-- 未使用パラメータ・死にコード（signature の嘘）
-- 過剰設計・未来想定のための abstraction
-- ネーミングとドキュメントの整合性
-- **「既存パターン踏襲」の検証**: 周囲のコードや既存ファイルと同じ書き方をしている箇所は、それが「正しいパターン」か「古い / deprecated なパターンの惰性」かを区別する。特に schema・外部ライブラリ API・ドメイン規約を編集するときは、既存コードのコピーで済ませず当該 API / 規約の最新仕様（deprecation 含む）を確認する
-- **paper tiger チェック**: 本 PR で skill / docs / lint-config 等に「機械強制」と書いた箇所があるか? あれば次を確認:
-  1. **合成違反コードで実機検証したか** (lint / depcruise / script が止まることを確認、cleanup 済み)
-  2. **CI / pre-commit hook の配線** が同 PR に含まれているか (ローカル実行だけで終わっていない)
-  3. **機械強制スクリプト自体が本 PR に含まれているか** (含まれていないなら scope 内で追加 or 別 Issue 起票 + 本 PR 制限を本文に明示)
-  4. 過去 (`failure-record` skill 等で記録された事例) と同型の paper tiger を作っていないか
-  - 検証エビデンス (合成違反コマンドと結果) を PR 本文または PR コメントに残す
-  - 詳細は `writing-project-skills` skill の「機械強制併設原則」セクション
-
-指摘ゼロの場合は「問題なし」と明言する。無言で終わらせない。
-
-## PR 直前の再実行
-
-**commit 後、PR 作成前にもう一度フルサイクルを走らせる**。commit から push の間に追加 edit が入ったり、ファイル状態が変わる可能性があるため。「さっき走らせたから飛ばす」は無効な言い訳。
-
-## 注意事項
-
-- パッケージ単体で作業している場合も、最終確認はルートの `pnpm test` で全体テストを実行する
-- pre-commit フックで lint-staged + knip + dep-check が自動実行されるが、コミット前に手動で確認しておくとフック失敗による手戻りを防げる
+subagent 側に集約。本 skill には記述を残さない (重複回避 / SSoT 一本化)。
 
 ## Red Flags — STOP
 
-以下の考えが浮かんだら、検証を省こうとしているサイン。全項目で「いいえ、全部走らせる」が正解。
-
-- 「変更が小さいから lint だけで良い」
-- 「前回通ったから test は省略して良い」
-- 「pre-commit が走るからローカル確認不要」
-- 「時間がないから dep-check は後で」
-- 「さっき走らせたから PR 直前は不要」 — commit/push 間の編集で壊れうる
-- 「コマンド緑ならコード re-read 不要」 — ツールで検出できない懸念（unhandled rejection など）こそが re-read の対象
-- 「Skill を明示起動しなくてもコマンドは同じ」 — 明示起動しないと手順が省略されていく
-
-## よくある間違い
-
-| 言い訳 | 実態 |
-|--------|------|
-| 「pnpm test だけ通せば OK」 | dep-check/knip を飛ばすと依存違反・未使用コードが PR に漏れる |
-| 「Biome auto-fix だけで型エラーは後回し」 | auto-fix が型を壊すケースがあり、次の人が詰む |
-| 「pre-commit が自動で走る」 | フック失敗は手戻りが大きい。事前確認で摩擦を減らす |
-| 「パッケージ単体の test で十分」 | 最終確認はルートの `pnpm test` 全体 |
-| 「コマンド緑なのでコード re-read 不要」 | lint/test で検出できない懸念（unhandled rejection、エッジケース、過剰設計）が re-read の対象 |
-| 「前回のセルフレビューから少し編集しただけ」 | 「少し」の編集に本質的な誤りが潜むことが多い。再実行しない言い訳にはならない |
-| 「Skill 起動しなくてもコマンドは走る」 | Skill 起動で手順が可視化され、チェックリストが残る。手作業は省略が混入する |
+- 「subagent dispatch せず Skill 経由で検証コマンド手打ちで OK」→ 新鮮な目が崩れる、本機構の趣旨に反する
+- 「subagent 要約を PR コメントに残さなくても commit log で十分」→ レビュアーが追えなくなる、監査 trail として PR コメント必須
+- 「skill 内容が短いから簡略起動で OK」→ Skill tool で起動して dispatch 手順を毎回確認する規律は維持
