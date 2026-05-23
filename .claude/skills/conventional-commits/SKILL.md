@@ -79,10 +79,13 @@ fix/#15-kit-list-filter-state
 docs/#20-adr-design-direction
 ```
 
-## ツール
+## ツール (機械強制済)
 
 - **commitlint** と `@commitlint/config-conventional` — コミットメッセージを検証
 - **husky** — `commit-msg` フックで commitlint を実行（本プロジェクトでは pnpm self-contained 化のため lefthook ではなく husky を採用）
+- **`.husky/pre-commit`** の `node scripts/check-branch.mjs` — ブランチ名フォーマット (`[prefix]/#[issue]-[description]`) を検証、違反 commit を reject
+
+→ 本 skill は **規約 handbook (人間判断 / AI 参考)**、機械強制は上記 2 hook で完結。AI / 開発者は skill を reference として開きつつ、commit / push 時の reject に従って修正する形。
 
 ## よくある間違い
 

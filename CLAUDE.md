@@ -36,7 +36,7 @@
 | ユーザーが /design-decision で明示起動するとき (ライブラリ選定・DB 設計・アーキテクチャ変更など、設計判断確定時) | `design-decision` | orchestrator |
 | ユーザーが /dev-complete で明示起動するとき (実装一段落、コミット・PR 作成前) | `dev-complete` | orchestrator |
 | ユーザーが /dev-start で明示起動するとき (Issue 着手直前) | `dev-start` | orchestrator |
-| ドキュメントを追加・更新するとき、生成物と手動ドキュメントの役割分担に迷ったとき、または CI の docs 差分チェックが失敗したとき | `docs-freshness` | atomic |
+| ドキュメントを追加・更新するとき、生成物と手動ドキュメントの役割分担に迷ったとき、または CI / pre-push hook の docs 差分チェックが失敗したとき | `docs-freshness` | atomic |
 | エージェントが同じミスを繰り返した・ユーザーに訂正された・レビューで指摘を受けたとき | `failure-record` | atomic |
 | Issue を作成・階層付けするとき、PR を立てるとき、または GitHub Projects のステータスを更新するとき | `github-flow` | atomic |
 | ユーザーが /post-review で明示起動するとき (コードレビュー指摘受領直後) | `post-review` | orchestrator |
@@ -156,7 +156,7 @@ Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta p
 | Hook | 内容 |
 |---|---|
 | `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip + harness + deprecated + workflow-pins + test-coverage) — **test は含まない** (頻度高い軽量 gate) |
-| `pre-push` | `pnpm test` → `pnpm build` → (UI 変更時のみ) verify:ui snapshot 鮮度チェック — push 前の重め gate、test/build 失敗で reject |
+| `pre-push` | `pnpm test` → `pnpm gen:adr-index --check` (docs drift gate、#178) → `pnpm build` → (UI 変更時のみ) verify:ui snapshot 鮮度チェック — push 前の重め gate、いずれかの失敗で reject |
 | `commit-msg` | `commitlint --edit` で Conventional Commits 検証（scope は `.project-config.yml` と同期） |
 
 **test 実行 layer の役割分担** (#195):
