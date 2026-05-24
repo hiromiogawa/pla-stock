@@ -1,5 +1,10 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles'
-import { type RenderHookOptions, renderHook } from '@testing-library/react'
+import {
+  type RenderHookOptions,
+  type RenderOptions,
+  render,
+  renderHook,
+} from '@testing-library/react'
 import { SnackbarProvider } from 'notistack'
 import type { PropsWithChildren, ReactElement } from 'react'
 
@@ -32,4 +37,18 @@ export function renderHookWithProviders<TResult, TProps>(
   options?: Omit<RenderHookOptions<TProps>, 'wrapper'>,
 ) {
   return renderHook(callback, { wrapper: Providers, ...options })
+}
+
+/**
+ * render の薄い wrapper。`<MUI Theme><notistack>{children}</></>` を装着する。
+ *
+ * 使用例:
+ *   renderWithProviders(<KitListView stocks={...} kits={...} />)
+ *
+ * TanStack Router の Link / useNavigate / useRouter を含む component を render
+ * する場合は、各 test で `vi.mock('@tanstack/react-router')` を併用する
+ * (Link は最終的に <a> を出すだけだが to prop の型解決に router context を要求する)。
+ */
+export function renderWithProviders(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+  return render(ui, { wrapper: Providers, ...options })
 }
