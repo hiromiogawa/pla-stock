@@ -14,6 +14,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: false, // import { describe, it, expect } from 'vitest' を強制
+    setupFiles: ['./src/test-utils/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
       // ADR-0016 (2026-05-23 update): coverage は **閾値 gate に採用しない** 方針。
