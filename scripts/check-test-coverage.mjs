@@ -1,12 +1,15 @@
 #!/usr/bin/env node
-// testing skill ルール 2 / 3 の「対象には *.test.{ts,tsx} を必ず併設」を機械検証する。
+// testing skill ルール 2 / 3 の「対象には *.test.{ts,tsx} を必ず併設」+
+// ルール 3b の構造前提「mutation server fn には対応 *ToDb.ts が存在する」を機械検証する。
 //
 // 対象:
 //   ルール 2 (Unit):       src/features/*/schemas.ts のうち *Input Zod schema を export しているもの
 //   ルール 3a (Integration): src/views/*/use*.ts (test 除く)
 //   ルール 3b (Integration): src/features/*/*ToDb.ts (test 除く)
+//   ルール 3b 構造:         src/features/*/(add|update|delete|remove)*.ts は対応 *ToDb.ts が必須
+//                          (mutation server fn を書いて DB ロジック抽出を忘れる pattern を塞ぐ)
 //
-// 既知の paper tiger (#173 / FAIL-006) の機械強制実装。
+// 既知の paper tiger (#173 / FAIL-006 / #200) の機械強制実装。
 //
 // 動作モード:
 //   strict モード (--strict):  違反 1 件以上で exit 1 (= CI gate、default は本モード)
@@ -57,6 +60,27 @@ function hasTestSibling(file) {
   return false
 }
 
+/** mutation server fn (`add*.ts` / `update*.ts` / `delete*.ts` / `remove*.ts` で `*ToDb` 自体ではない) を判定。 */
+function isMutationServerFn(file) {
+  const base = file.substring(file.lastIndexOf('/') + 1)
+  if (base.endsWith('ToDb.ts')) return false
+  if (base.endsWith('.test.ts')) return false
+  return /^(add|update|delete|remove)[A-Z]\w*\.ts$/.test(base)
+}
+
+/** mutation server fn (e.g. `addFoo.ts`) に対応する `addFooToDb.ts` が同 dir に存在するか。 */
+function hasToDbSibling(file) {
+  const lastSlash = file.lastIndexOf('/')
+  const dir = file.substring(0, lastSlash)
+  const base = file.substring(lastSlash + 1).replace(/\.ts$/, '')
+  try {
+    statSync(join(dir, `${base}ToDb.ts`))
+    return true
+  } catch {
+    return false
+  }
+}
+
 const violations = []
 
 // ルール 2: features/*/schemas.ts の *Input Zod schema export
@@ -66,7 +90,7 @@ const featureSchemas = walk('src/features').filter(
 for (const file of featureSchemas) {
   const content = readFileSync(file, 'utf-8')
   if (/export const \w+Input\b/.test(content) && !hasTestSibling(file)) {
-    violations.push(`[rule 2 Unit]      ${file}`)
+    violations.push(`[rule 2 Unit]         ${file}`)
   }
 }
 
@@ -76,17 +100,25 @@ const viewHooks = walk('src/views').filter(
 )
 for (const file of viewHooks) {
   if (!hasTestSibling(file)) {
-    violations.push(`[rule 3a Hook]     ${file}`)
+    violations.push(`[rule 3a Hook]        ${file}`)
   }
 }
 
-// ルール 3b: features/*/*ToDb.ts
+// ルール 3b: features/*/*ToDb.ts の test 併設
 const featureToDb = walk('src/features').filter(
   (file) => /\w+ToDb\.ts$/.test(file) && !file.endsWith('.test.ts'),
 )
 for (const file of featureToDb) {
   if (!hasTestSibling(file)) {
-    violations.push(`[rule 3b *ToDb]    ${file}`)
+    violations.push(`[rule 3b *ToDb test]  ${file}`)
+  }
+}
+
+// ルール 3b 構造: features/*/(add|update|delete|remove)*.ts には対応 *ToDb.ts が必須
+const featureMutations = walk('src/features').filter(isMutationServerFn)
+for (const file of featureMutations) {
+  if (!hasToDbSibling(file)) {
+    violations.push(`[rule 3b *ToDb miss]  ${file} → *ToDb.ts に DB ロジックを抽出してください`)
   }
 }
 
@@ -108,6 +140,6 @@ out('')
 out(
   '対応: ADR-0016 / .claude/skills/testing/SKILL.md ルール 2/3 に従い、同 dir に *.test.ts を併設する。',
 )
-out('追跡 Issue: #172 (横展開) / #173 (本機械強制)')
+out('追跡 Issue: #172 (横展開) / #173 (本機械強制) / #200 (mutation→*ToDb 強制)')
 
 process.exit(STRICT ? 1 : 0)

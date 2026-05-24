@@ -1,22 +1,24 @@
-import { createServerFn } from '@tanstack/react-start'
 import { auth } from '@clerk/tanstack-react-start/server'
+import { createServerFn } from '@tanstack/react-start'
 import { env } from 'cloudflare:workers'
 import { and, eq } from 'drizzle-orm'
-import { createDb } from '~/shared/lib/db/client'
-import { projects, projectPhotos } from '~/entities/project/schema'
 import type { ProjectPhoto } from '~/entities/project'
+import { projects } from '~/entities/project/schema'
+import { createDb } from '~/shared/lib/db/client'
+import { addProjectPhotoToDb } from './addProjectPhotoToDb'
 import { extForMime, parseAddProjectPhotoInput } from './schemas'
 
 /**
- * project に写真を追加する（mutation）。
+ * project に写真を追加する（mutation server fn）。
  *
  * - 入力は FormData（file / projectId / caption / takenAt）。userId は
  *   handler 内 auth() 由来（client 入力に含めない = IDOR 防止）
- * - 対象 project の所有を確認してから R2 put + project_photos INSERT
- * - R2 key は `{userId}/{yyyy}/{mm}/{uuid}.{ext}`、Content-Type は R2 の
- *   httpMetadata に保存（配信 route が返す）
+ * - 所有確認を R2 put **前** に実施 (不正リクエストで R2 put + 補償削除が走るのを防ぐ)。
+ *   addProjectPhotoToDb 内でも所有確認するため defense-in-depth
  * - R2 と D1 は跨いだ tx を組めないため put → insert の順。insert 失敗時のみ
  *   put 済み R2 オブジェクトを補償削除して orphan を防ぐ
+ * - DB ロジック (所有確認 + INSERT) は addProjectPhotoToDb に委譲。R2 put /
+ *   補償削除と r2Key 生成は env 依存のため server fn 側に残す
  */
 export const addProjectPhoto = createServerFn({ method: 'POST' })
   .inputValidator(parseAddProjectPhotoInput)
@@ -51,11 +53,9 @@ export const addProjectPhoto = createServerFn({ method: 'POST' })
     }
 
     try {
-      await db.insert(projectPhotos).values(photo)
+      return await addProjectPhotoToDb(db, userId, { projectId: data.projectId, photo })
     } catch (err) {
       await env.BUCKET.delete(r2Key)
       throw err
     }
-
-    return photo
   })
