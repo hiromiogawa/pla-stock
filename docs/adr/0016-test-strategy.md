@@ -1,8 +1,8 @@
 # ADR-0016: テスト戦略 (Testing Trophy + in-memory DB + co-location + coverage は gate に採用しない)
 
-- ステータス: 承認 (2026-05-23 内容更新済 — coverage 関連節を Trophy 原典の主張に揃えて修正)
+- ステータス: 承認 (2026-05-23 内容更新済 — coverage 関連節を Trophy 原典の主張に揃えて修正、2026-05-24 ADR-0017 で C1 のみ部分例外)
 - 日付: 2026-05-23
-- 関連: Issue #110、FAIL-003 (ADR-0007)、ADR-0001 (Tooling)、#109 (E2E)、#148 (mock cleanup)、#198 (coverage 計測解禁)
+- 関連: Issue #110、FAIL-003 (ADR-0007)、ADR-0001 (Tooling)、#109 (E2E)、#148 (mock cleanup)、#198 (coverage 計測解禁)、**ADR-0017 (対AI coverage threshold、C1 のみ gate)**
 
 ## 文脈
 
@@ -26,6 +26,7 @@ Testing Trophy パターン (Kent C. Dodds) を採用する:
 - DB integration テストは production と同じ Drizzle migration を in-memory SQLite に適用し、CHECK / UNIQUE / FK / UPSERT 挙動を本番と等価条件で検証
 - factory pattern (`createTest<Entity>(overrides)`) で fixture を生成
 - **coverage を gate (閾値) に採用しない**。Kent C. Dodds "Testing Trophy" と Martin Fowler "TestCoverage" は両者とも **「coverage 数値を主要メトリック / 閾値 gate にするな」** が論旨であり、**計測自体を禁じてはいない**。本プロジェクトはこの原典の主張に従い、coverage を CI gate (閾値) に採用せず、`@vitest/coverage-v8` 等での計測 / PR comment 等への参考値表示は許容する
+  - **2026-05-24 部分例外 (ADR-0017)**: AI agent 運用前提では「ファイル併設で満足し case 数 / 境界条件が薄い」recurring pattern (ai-test-shallow-pattern) が顕在化したため、**C1 (branches) のみ全体 >= 70% の下限を gate** に追加。C0 / Lines / Functions は引き続き **閾値設定せず参考値のみ**。Trophy 原典の論旨は人間の自制を前提にしているが、AI 運用には機械的下限が必要という判断 (詳細は ADR-0017)
 - mutation server fn (`addKitEvent` 等) の DB ロジックは `*ToDb.ts` ファイルに pure 関数として抽出し、auth/env から分離する。production の server fn は薄い wrapper として残る
 - 設計手順は `testing` skill、設計判断は本 ADR が SSoT
 - skill 内の全ルールは「<x> なら <y>」「<a> 禁止」「<b> 必ず併設」の操作可能形式で書く (`writing-project-skills` の「操作可能ルール原則」)
@@ -55,3 +56,4 @@ Testing Trophy パターン (Kent C. Dodds) を採用する:
 
 - **2026-05-23**: 初版起票。"coverage 不採用 (測定せず gate せず)" と記述
 - **2026-05-23 (同日 update / #198)**: coverage 関連節を Trophy 原典 (Kent C. Dodds) / Martin Fowler "TestCoverage" の主張に揃えて修正。「計測自体を禁じる」記述は両原典に根拠が無く過剰だったため撤回。**閾値 gate に採用しない方針は維持**、参考値としての計測 / PR comment 表示は許容に変更。タイトル / 決定 / 結果 / 選択肢節 (E 追加) を更新
+- **2026-05-24 (ADR-0017 で部分例外 / #206)**: AI agent 運用前提で shallow test pattern (ai-test-shallow-pattern) が顕在化したため、**C1 (branches) のみ全体 >= 70% を gate** に追加 (詳細は ADR-0017)。C0 / Lines / Functions の閾値は引き続き未設定。タイトル / ステータス / 関連 / 決定節 (C1 例外の追記) を update
