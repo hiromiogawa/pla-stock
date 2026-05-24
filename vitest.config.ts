@@ -17,9 +17,10 @@ export default defineConfig({
     setupFiles: ['./src/test-utils/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
-      // ADR-0016 (2026-05-23 update): coverage は **閾値 gate に採用しない** 方針。
+      // ADR-0016 (2026-05-23 update): C0 / Lines / Functions は **閾値 gate に採用しない**。
       // 計測は許容、PR comment に参考値として出すための設定。
-      // threshold (lines / branches / functions / statements) は **意図的に未設定**。
+      // ADR-0017 (2026-05-24): **C1 (branches) のみ全体 >= 70% を gate**。AI agent 運用前提で
+      // shallow test pattern (ai-test-shallow-pattern) を機械強制で抑える対AI 措置。
       provider: 'v8',
       reporter: ['text', 'json-summary', 'json', 'html'],
       reportsDirectory: './coverage',
@@ -32,6 +33,9 @@ export default defineConfig({
         'src/**/*.gen.ts',
         'src/routeTree.gen.ts',
       ],
+      thresholds: {
+        branches: 70,
+      },
     },
   },
 })

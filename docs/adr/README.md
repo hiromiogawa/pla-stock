@@ -21,3 +21,4 @@
 | [ADR-0014](./0014-photo-upload-formats.md) | 写真アップロードの受け入れ形式 | 承認 | 2026-05-22 |
 | [ADR-0015](./0015-deprecated-api-static-detection.md) | deprecated API の静的検出 (oxlint type-aware) | 承認 | 2026-05-22 |
 | [ADR-0016](./0016-test-strategy.md) | テスト戦略 (Testing Trophy + in-memory DB + co-location + coverage は gate に採用しない) | 承認 | 2026-05-23 |
+| [ADR-0017](./0017-ai-coverage-threshold.md) | 対AI coverage threshold (C1 branches 全体 >= 70%) | 承認 | 2026-05-24 |

@@ -60,11 +60,12 @@ jobs:
         run: ${{ matrix.check.cmd }}
 
   coverage-report:
-    # ADR-0016 (2026-05-23 update / #198): coverage は **閾値 gate に採用しない**。
-    # 本 job は coverage を計測して PR に参考値コメントを投稿するのみ。
-    # threshold は未設定 (vitest.config / action 双方とも) なので job 自体は常に pass する。
-    # 「触った箇所に test が無いか」のヒントとして PR review 時に参照する想定。
-    name: coverage report (参考値、gate ではない)
+    # ADR-0017 (2026-05-24 / #206): **C1 (branches) のみ全体 >= 70% を gate**。
+    # vitest.config.ts の `coverage.thresholds.branches: 70` を `pnpm test:coverage` が
+    # 評価し、違反時 exit 1 で本 job が fail する (= PR merge ブロック)。
+    # C0 / Lines / Functions は閾値なし、引き続き PR comment への参考値表示のみ。
+    # ADR-0016 (2026-05-23 update / #198) の「閾値 gate 不採用」方針は C1 例外で部分 update。
+    name: coverage report (C1 gate + 他 metric 参考値)
     runs-on: ubuntu-latest
     # PR でのみ走る (main への push では comment 先がないため skip)
     if: github.event_name == 'pull_request'
