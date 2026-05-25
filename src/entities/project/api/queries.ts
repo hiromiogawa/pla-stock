@@ -4,7 +4,7 @@ import { env } from 'cloudflare:workers'
 import { and, eq } from 'drizzle-orm'
 import { createDb } from '~/shared/lib/db/client'
 import { projects, projectPhotos } from '../schema'
-import { projectPaintUse } from '~/entities/projectPaintUse/schema'
+import { projectPaintUse } from '~/entities/project-paint-use/schema'
 import { projectIdInput } from './schemas'
 
 /**

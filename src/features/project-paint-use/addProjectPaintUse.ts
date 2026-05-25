@@ -1,7 +1,7 @@
 import { auth } from '@clerk/tanstack-react-start/server'
 import { createServerFn } from '@tanstack/react-start'
 import { env } from 'cloudflare:workers'
-import type { ProjectPaintUse } from '~/entities/projectPaintUse'
+import type { ProjectPaintUse } from '~/entities/project-paint-use'
 import { createDb } from '~/shared/lib/db/client'
 import { addProjectPaintUseToDb } from './addProjectPaintUseToDb'
 import { projectPaintUseServerInput } from './schemas'
