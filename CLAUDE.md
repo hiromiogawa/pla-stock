@@ -182,7 +182,17 @@ mutation や 3 個以上の useState、async handler を持つ view は **Contai
 - Hook (`useXxx.ts`) が state + handler を担う、`router.invalidate()` で loader 再取得
 - Route file が Container 役: `Route.useLoaderData()` → `useXxx(input)` → `<XxxView {...data} {...hookProps} />`
 
-**現状の enforcement**: TanStack Router の `useLoaderData` が route 階層で呼ぶ前提の API であることから、Container/Hook/Presenter は実質「ライブラリ設計の自然な誘導 + 人間レビュー」で担保されている。`lint-config/oxlint-view-purity.jsonc` に oxlint の `no-restricted-imports` ルール（`*DetailView.tsx` / `*AddView.tsx` / `*CreateView.tsx` の `useState` 等 / 全 `*View.tsx` の entity mutation）も置いているが、`paths + importNames` 形式が oxlint 1.61 で機能しておらず**現状は機械強制が paper tiger**（FAIL-005 / ADR-0007 / 修復は #155）。**List view (filter state のみ) は inline 維持 OK**。
+**現状の enforcement** (#155 で paper tiger 部分解消):
+
+| レイヤー | 強制方法 | 状態 |
+|---|---|---|
+| **View 本体 (`*View.tsx`) → `~/features/*` 直 import 禁止** | **depcruise rule `fsd-view-component-no-features-direct`** | ✅ 機械強制 (CI / pre-commit) |
+| ライブラリ設計の自然誘導 (TanStack Router の `useLoaderData` は route 階層 = Container でしか呼べない) | フレームワーク仕様 | ✅ 構造的に守られる |
+| `*DetailView.tsx` 等で react の `useState` / `useEffect` / `useReducer` named import 禁止 | **review 担保** (機械強制なし) | ⚠️ 意識的選択 (#217 で OSS 検討中) |
+
+機械強制できない範囲 (named import の `useState` 等) は **意識的に review 担保** として運用。`scripts/check-view-purity.mjs` の custom script 案は腐敗リスク (regex 場当たり / IDE squiggle なし / oxlint 外で進化享受できない) から見送り、OSS 検討は Issue #217 で別途。
+
+**List view (filter state のみ) は inline 維持 OK**。`useXxxList` hook 化までは不要 (filter state はその View でしか使わない)。
 
 ### JSDoc 必須対象
 

@@ -116,6 +116,11 @@
   - `docs/adr/0007-agent-failure-rules.md` (本エントリ)
   - `CLAUDE.md` (コード規約 #43 セクションの「機械強制」記述を訂正)
   - Task #155 (lint ルール再実装、別途実施)
+- **2026-05-25 update (#155 部分解消 + #217 で残課題積上げ)**:
+  - **`*View.tsx` → `~/features/*` 直 import** は depcruise rule `fsd-view-component-no-features-direct` で機械強制 (CI / pre-commit)、合成違反で exit 1 実機検証済
+  - **react の `useState` / `useEffect` / `useReducer` 等 named import 禁止**は **review 担保** に明示転換 (custom script 案は腐敗リスクから見送り)。OSS / 別ツール検討は Issue #217 に積み上げ
+  - 古い paper tiger 設定 `lint-config/oxlint-view-purity.jsonc` を削除、`.oxlintrc.json` extends からも除外
+  - CLAUDE.md `Container/Hook/Presenter` 節を更新 (depcruise 強制範囲 + review 担保範囲 + Issue #217 リンクを表で明示)
 
 ### FAIL-006: testing skill ルール 2/3 を機械強制せず paper tiger を再発 (2026-05-23)
 
