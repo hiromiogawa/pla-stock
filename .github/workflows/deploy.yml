@@ -1,0 +1,72 @@
+# Phase F (#8 / #210): main マージ時に Cloudflare Workers へ自動 deploy。
+#
+# 動作概要:
+# 1. main への push を trigger に起動 (PR merge / 直接 push 両方)
+# 2. workflow_dispatch でも起動可 (手動再 deploy 用、GH UI から "Run workflow")
+# 3. install → 本番 D1 migration apply (--remote) → build → wrangler deploy
+# 4. 失敗時は GH Actions の re-run で再試行、deploy 後の rollback は手動
+#    (`pnpm wrangler rollback`、README 参照)
+#
+# 必要な GitHub Secret:
+# - `CLOUDFLARE_API_TOKEN`: CF dashboard > My Profile > API Tokens で発行
+#   (template: "Edit Cloudflare Workers"、または Workers Scripts:Edit + D1:Edit
+#    + R2:Edit の Custom Token)
+#
+# 必要な Workers Secret (deploy 前に wrangler secret put で配置済の前提):
+# - `CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` (README「本番 deploy」参照)
+#
+# 3rd-party action は commit SHA pin 必須 (check:workflow-pins で機械強制)。
+# バージョン上げ時は新 SHA を再取得して差し替える。
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # 同 branch の deploy は並列実行させず、進行中の deploy 完了後に後続を順次実行。
+  # cancel-in-progress: false = 進行中の deploy は途中で止めない (中途半端な状態を避ける)。
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        # 3rd-party action は commit SHA pin 必須。バージョン上げ時は再取得して差し替え。
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply D1 migration to production
+        # build 前に schema を本番に反映 (schema が古い状態で deploy されると DB error)。
+        # 失敗時は workflow 全体が止まり deploy は走らない。
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: d1 migrations apply pla-stock --remote
+
+      - name: Build
+        run: pnpm build
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: deploy

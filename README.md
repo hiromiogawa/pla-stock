@@ -92,11 +92,14 @@ SEED_USER_ID=user_xxx pnpm db:seed:local
 
 ## 本番 deploy (Cloudflare Workers)
 
-Phase F の本番デプロイ手順。**初回 deploy** から **継続運用** まで本セクションだけで完遂可能な粒度で記載する。詳細仕様は Issue #8 (Phase F Epic) と関連 ADR を参照。
+Phase F の本番デプロイ手順。**初回セットアップ** (user 一回作業) と **以降の deploy** (main マージで CI 自動) を分けて記載。
 
 > **前提**: Cloudflare account / Clerk アカウントは既に持っていること。無料プランで開始可能。
+> **以降の deploy**: 初回セットアップ完了後は **main にマージするだけ** で GitHub Actions の `deploy` workflow が自動実行 → 本番 D1 migration → build → wrangler deploy の順で走る。
 
-### 1. Cloudflare 側の払い出し (初回のみ)
+### 初回セットアップ (user 一回作業)
+
+#### 1. Cloudflare 側の払い出し
 
 ```bash
 # Cloudflare ログイン (ブラウザ OAuth 開く)
@@ -113,19 +116,7 @@ pnpm wrangler r2 bucket create pla-stock-images
 
 > **既存リソースがある場合**: `wrangler d1 create` / `r2 bucket create` は同名で再実行するとエラーになる。`pnpm wrangler d1 list` / `r2 bucket list` で既存確認後、`wrangler.jsonc` の binding 値が一致していればこのステップは skip。
 
-### 2. 本番 D1 に migration 適用
-
-```bash
-# 全 migration を本番 D1 に適用 (初回 / 追加時の両方)
-pnpm db:migrate:remote
-
-# 確認 (本番に存在するテーブルを表示)
-pnpm wrangler d1 execute pla-stock --remote --command "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-```
-
-`drizzle/migrations/` 配下の SQL が順次適用される。`pnpm db:migrate:local` の `--local` フラグが `--remote` に変わるだけ。
-
-### 3. Clerk production instance を作成
+#### 2. Clerk production instance を作成
 
 [Clerk dashboard](https://dashboard.clerk.com/) で:
 
@@ -134,9 +125,9 @@ pnpm wrangler d1 execute pla-stock --remote --command "SELECT name FROM sqlite_m
 3. **Sign-in URL** / **Sign-up URL** / **After sign-in URL** / **After sign-up URL** を本番 URL に揃える
 4. API keys タブから `Publishable key` と `Secret key` をコピー (次節で配置)
 
-### 4. Workers Secret を配置
+#### 3. Workers Secret を配置 (run-time 用)
 
-本番 deploy に必要な Secret 一覧:
+Cloudflare Workers の production runtime が読む secret。CI 経由ではなく `wrangler secret put` で配置 (Cloudflare 側で暗号化保存):
 
 | Secret 名 | 用途 | 取得元 |
 |---|---|---|
@@ -149,20 +140,48 @@ pnpm wrangler secret put CLERK_PUBLISHABLE_KEY
 pnpm wrangler secret put CLERK_SECRET_KEY
 ```
 
-配置済 Secret の一覧は `pnpm wrangler secret list` で確認できる (値そのものは表示されない、Cloudflare 側で暗号化)。
+配置済 Secret の一覧は `pnpm wrangler secret list` で確認できる (値そのものは表示されない)。
 
 > **将来追加候補**: Sentry (#44 で導入予定の `SENTRY_DSN`)、外部 API 連携時の API key 等。新規 Secret 追加時は本表に追記する。
 
-### 5. deploy 実行
+#### 4. CI 自動 deploy 用 API Token を発行 + GitHub Secret に配置
+
+`.github/workflows/deploy.yml` が `wrangler deploy` を実行するために必要。
+
+**4-1. Cloudflare で API Token を発行**:
+
+1. [https://dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens) にアクセス
+2. **"Create Token"** をクリック
+3. **"Edit Cloudflare Workers"** テンプレートを **"Use template"** で選択 (built-in、必要 permission が prefilled)
+   - Workers Scripts: Edit / D1: Edit / Workers R2 Storage: Edit / その他 read 系
+   - 不要なら Zone permissions (Workers Routes 等) は削除可
+4. **Account Resources**: 自分の account を選択
+5. **TTL**: 無期限でも可 (心配なら 1 年)
+6. **"Continue to summary"** → **"Create Token"**
+7. **トークン文字列を必ずコピー** (画面遷移すると再表示不可)
+
+**4-2. GitHub repo に Secret 配置**:
+
+1. GitHub repo > **Settings** > **Secrets and variables** > **Actions**
+2. **"New repository secret"** クリック
+3. Name: `CLOUDFLARE_API_TOKEN` / Value: 上記コピーしたトークン
+4. **"Add secret"** で保存
+
+#### 5. 初回 deploy を手動実行 + 動作確認
+
+CI workflow の動作確認前に **手動で 1 回 deploy** して切り分けやすくする:
 
 ```bash
-# build + wrangler deploy をまとめて実行
+# 本番 D1 に schema を反映
+pnpm db:migrate:remote
+
+# build + wrangler deploy
 pnpm deploy
 ```
 
-完了後、出力されるデフォルト URL (`https://pla-stock.<your-subdomain>.workers.dev`) または設定済カスタムドメインで動作確認。
+完了後、出力される URL (`https://pla-stock.<your-subdomain>.workers.dev`) で動作確認 (下記 checklist)。
 
-### 6. 動作確認動線 (本番化 checklist)
+#### 6. 動作確認動線 (本番化 checklist)
 
 初回 deploy 後、以下を順に確認:
 
@@ -176,16 +195,41 @@ pnpm deploy
 - [ ] log out → 再 SignIn できる
 - [ ] (任意) Cloudflare dashboard で Workers の Requests / Errors を確認
 
-### rollback / 再 deploy
+### 以降の deploy (CI 自動)
 
-deploy が壊れた場合:
+初回セットアップ完了後、main ブランチへの push (PR merge 含む) で **`.github/workflows/deploy.yml`** が自動起動し、以下を順に実行:
+
+1. `pnpm install --frozen-lockfile`
+2. `wrangler d1 migrations apply pla-stock --remote` (schema 同期)
+3. `pnpm build`
+4. `wrangler deploy`
+
+進捗は GitHub Actions の **"Actions"** タブで確認。失敗時は **"Re-run failed jobs"** で再試行。
+
+手動で再 deploy したいときは GH Actions UI で **`deploy` workflow > "Run workflow"** を選択 (`workflow_dispatch` trigger 配線済)。
+
+### 緊急時の手動 deploy (CI が動かない / hotfix)
+
+CI workflow が壊れている / 緊急で手元から push したいとき:
 
 ```bash
-# 一つ前の deployment に rollback
+pnpm db:migrate:remote
+pnpm deploy
+```
+
+### rollback
+
+deploy が壊れた / バグ deploy をすぐ戻したい場合:
+
+```bash
+# 一つ前の deployment に rollback (interactive で確認 prompt)
 pnpm wrangler rollback
 
 # 過去 deployment 一覧 (deployment ID を選んで rollback の引数に渡せる)
 pnpm wrangler deployments list
+
+# 特定 deployment に rollback
+pnpm wrangler rollback <DEPLOYMENT_ID>
 ```
 
 migration を巻き戻したい場合は **drizzle が down migration を出力しない** ため、手動で revert SQL を書いて `pnpm wrangler d1 execute pla-stock --remote --file=revert.sql` で適用する。
