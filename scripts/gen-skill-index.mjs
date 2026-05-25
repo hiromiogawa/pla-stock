@@ -61,6 +61,11 @@ function collectSkills() {
   })
 }
 
+// rule-cycle が連鎖呼出する内部 atomic skill。トリガー表では rule-cycle (orchestrator)
+// 1 行 + 集約 1 行に圧縮 (#150)。skill ファイル自体は残し単独起動の余地は維持。
+const RULE_CYCLE_INTERNAL = ['rule-measure', 'rule-explore', 'rule-improve', 'rule-audit']
+const isRuleCycleInternal = (name) => RULE_CYCLE_INTERNAL.includes(name)
+
 function renderIndex(skills) {
   const orchestrators = skills.filter((skill) => skill.metadata?.kind === 'orchestrator')
   const atomics = skills.filter((skill) => skill.metadata?.kind === 'atomic')
@@ -68,10 +73,16 @@ function renderIndex(skills) {
   lines.push('### トリガー表（このトリガーに該当したら即 Skill 起動）', '')
   lines.push('| トリガー | 起動する Skill | 種別 |', '|---|---|---|')
   for (const skill of skills) {
+    if (isRuleCycleInternal(skill.name)) continue
     lines.push(
       `| ${skill.metadata?.trigger ?? ''} | \`${skill.name}\` | ${skill.metadata?.kind ?? '?'} |`,
     )
   }
+  // 4 つの rule-* 内部 skill を 1 行に集約 (#150)。
+  const ruleInternalSkills = RULE_CYCLE_INTERNAL.map((name) => `\`${name}\``).join(' / ')
+  lines.push(
+    `| rule-cycle が連鎖呼出する内部 skill (詳細は \`.claude/skills/rule-cycle/SKILL.md\` 参照、単独起動も可能) | ${ruleInternalSkills} | atomic (内部) |`,
+  )
   lines.push('', '### オーケストレーション系（単一責務 skill を連鎖）', '')
   for (const orchestrator of orchestrators) {
     const subs = Array.isArray(orchestrator.metadata?.subskills)
