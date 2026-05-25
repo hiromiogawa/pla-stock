@@ -128,7 +128,7 @@ Phase 2 で以下を整備予定：
 | `pnpm dev` | 開発サーバ起動（Vite, http://localhost:3000 ） |
 | `pnpm build` | プロダクションビルド (`vite build && tsc --noEmit`) |
 | `pnpm preview` | ビルド済みアセットのローカルプレビュー |
-| `pnpm deploy` | Cloudflare Workers にデプロイ (`wrangler deploy`) |
+| `pnpm run deploy` | Cloudflare Workers にデプロイ (`wrangler deploy`)。`pnpm deploy` は pnpm builtin と衝突するため `run` 必須 (#214) |
 | `pnpm cf-typegen` | Cloudflare バインディングの型生成 (`wrangler types`) |
 | `pnpm install` | 依存インストール（postinstall で cf-typegen 自動実行） |
 | `pnpm lint` | oxlint で静的解析 |

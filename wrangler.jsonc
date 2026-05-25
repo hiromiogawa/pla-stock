@@ -15,6 +15,10 @@
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
+  // Preview URLs (`*-pla-stock.<subdomain>.workers.dev`) は MVP では不要と判断 (#214 / #208)。
+  // 明示禁止にしないと再 deploy のたびに自動 enable され warning が出るため false で固定。
+  // 将来 staging / PR preview 用に有効化判断したら true に変更 + Clerk preview origin 設定が必要。
+  "preview_urls": false,
   "d1_databases": [
     {
       "binding": "DB",
