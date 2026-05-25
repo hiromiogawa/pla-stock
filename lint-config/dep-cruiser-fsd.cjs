@@ -132,6 +132,28 @@ module.exports = {
     },
 
     // ------------------------------------------------------------------------
+    // Container/Hook/Presenter (#43 / #155 / #217)
+    // ------------------------------------------------------------------------
+    // View 本体 (*View.tsx) から features への **直接参照を全般禁止** (mutation /
+    // schema 問わず)。同じ view dir 内の useXxx hook (use*.ts) や dialog/form 部品
+    // (*Dialog.tsx / *Form.tsx 等) は対象外 = hook 経由 / form schema 用途は許容。
+    //
+    // regex 制約: `views/<dir>/<name>View.tsx` の 1 階層ネスト前提。将来 views を
+    // domain group で 2 階層化 (例: `views/Kit/Detail/KitDetailView.tsx`) する場合は
+    // `[^/]+/[^/]*` を `(?:[^/]+/){1,2}[^/]*` 等に拡張要。
+    //
+    // 名前付き import (useState 等) の禁止は oxlint 1.61 で困難 (FAIL-005)、
+    // OSS 検討は Issue #217 で別途、現状は review 担保。
+    {
+      name: 'fsd-view-component-no-features-direct',
+      severity: 'error',
+      comment:
+        'View 本体 (*View.tsx) は ~/features/* を直接 import しない (mutation / schema 問わず features への参照全般を禁止)。mutation は useXxx hook 経由、schema は dialog/form 部品から (Container/Hook/Presenter、#43 / #155)',
+      from: { path: '^src/views/[^/]+/[^/]*View\\.tsx$' },
+      to: { path: '^src/features/' },
+    },
+
+    // ------------------------------------------------------------------------
     // test-utils → production 依存禁止 (ADR-0016)
     // ------------------------------------------------------------------------
     {

@@ -1,9 +1,5 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "extends": [
-    "./lint-config/oxlint-base.jsonc",
-    "./lint-config/oxlint-view-purity.jsonc",
-    "./lint-config/oxlint-emotion-isolation.jsonc"
-  ],
+  "extends": ["./lint-config/oxlint-base.jsonc", "./lint-config/oxlint-emotion-isolation.jsonc"],
   "plugins": ["react", "typescript", "import"]
 }
