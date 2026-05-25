@@ -1,3 +1,14 @@
+// pla-stock の Cloudflare Workers 設定。
+//
+// env 戦略 (Phase F #8 / #208 で判断記録):
+// - **single env 構成**: `[env.production]` block を持たない。dev は `wrangler dev` /
+//   `--local` フラグで local SQLite を、prod は `--remote` で実 D1 を使う運用。
+// - dev / prod で異なる D1 instance を使う必要が出たら `[env.production]` block を
+//   追加して binding を分離する。現状 MVP のため single instance で運用、dev データは
+//   seed (`src/shared/lib/db/seed.ts`) で投入する。
+//
+// Secret 一覧: README の「本番 deploy > 4. Workers Secret を配置」セクション参照。
+// 本ファイルに値を書かない (`wrangler secret put` で配置、Cloudflare 側で暗号化)。
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "pla-stock",
