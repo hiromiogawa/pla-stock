@@ -41,16 +41,13 @@
 | Issue を作成・階層付けするとき、PR を立てるとき、または GitHub Projects のステータスを更新するとき | `github-flow` | atomic |
 | ユーザーが /post-review で明示起動するとき (コードレビュー指摘受領直後) | `post-review` | orchestrator |
 | 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき | `project-bootstrap` | orchestrator |
-| rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき | `rule-audit` | atomic |
 | ユーザーが /rule-cycle で明示起動するとき (failure-record 追記直後 or 「ルールを改善して」依頼時) | `rule-cycle` | orchestrator |
-| rule-cycle オーケストレーターから rule-measure 直後に subagent dispatch する直前 | `rule-explore` | atomic |
-| rule-explore の直後、measure と explore の結果をもとに改善提案を Issue 化するとき | `rule-improve` | atomic |
-| rule-cycle オーケストレーターから subagent dispatch する直前 | `rule-measure` | atomic |
 | 新機能の設計を始めるとき、仕様書から実装へ移行するとき、または JSDoc / typedoc による仕様記述に迷ったとき | `sdd` | atomic |
 | dev-complete オーケストレーターから subagent dispatch する直前 | `self-review` | atomic |
 | 新規 test file (*.test.ts / *.test.tsx) を作成するとき、または既存 test を更新するとき | `testing` | atomic |
 | 新規 Issue を立てる時、既存 Issue を整える時、Epic に sub-issue をぶら下げる時 | `writing-issues` | atomic |
 | 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき | `writing-project-skills` | atomic |
+| rule-cycle が連鎖呼出する内部 skill (詳細は `.claude/skills/rule-cycle/SKILL.md` 参照、単独起動も可能) | `rule-measure` / `rule-explore` / `rule-improve` / `rule-audit` | atomic (内部) |
 
 ### オーケストレーション系（単一責務 skill を連鎖）
 
