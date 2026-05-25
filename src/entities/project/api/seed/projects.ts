@@ -1,5 +1,5 @@
 import type { Project } from '../../model'
-import type { ProjectPaintUse } from '~/entities/projectPaintUse'
+import type { ProjectPaintUse } from '~/entities/project-paint-use'
 
 /**
  * seed 層: project / project_paint_use の初期投入用 in-memory データ。

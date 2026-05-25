@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm'
 import { projects } from '~/entities/project/schema'
-import { projectPaintUse } from '~/entities/projectPaintUse/schema'
+import { projectPaintUse } from '~/entities/project-paint-use/schema'
 import { type CompatibleDb, isD1Db } from '~/shared/lib/db/compat'
 
 type ProjectPaintUseData = {
