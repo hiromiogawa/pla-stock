@@ -140,8 +140,9 @@ Phase 2 で以下を整備予定：
 | `pnpm depcruise` | dependency-cruiser で FSD レイヤー違反/循環依存を検出 |
 | `pnpm knip` | knip strict で未使用 export/file を検出 |
 | `pnpm check:test-coverage` | testing skill ルール 2/3 対象に `*.test.{ts,tsx}` 併設があるか機械検証 (warning モード、`--strict` で error 化) |
-| `pnpm check:parallel` | typecheck + depcruise + knip + harness + deprecated + test-coverage を並列実行 (pre-commit 用) |
-| `pnpm check` | lint → lint:deprecated → format → typecheck → depcruise → knip → harness → test-coverage を直列実行 (CI 用) |
+| `pnpm check:view-purity` | View 純粋性 (#43 Container/Hook/Presenter) を機械検証。`*DetailView/*AddView/*CreateView.tsx` の useState 等 + 全 `*View.tsx` の `~/features/*` import を禁止 (#155) |
+| `pnpm check:parallel` | typecheck + depcruise + knip + harness + deprecated + test-coverage + view-purity を並列実行 (pre-commit 用) |
+| `pnpm check` | lint → lint:deprecated → format → typecheck → depcruise → knip → harness → test-coverage → view-purity を直列実行 (CI 用) |
 | `pnpm db:generate` | drizzle-kit で schema から migration SQL を生成 (`drizzle/migrations/`) |
 | `pnpm db:migrate:local` | local D1 (`.wrangler/state/...`) に migration を適用 |
 | `pnpm db:migrate:remote` | prod D1 に migration を適用 (`--remote`) |
@@ -155,7 +156,7 @@ Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta p
 
 | Hook | 内容 |
 |---|---|
-| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip + harness + deprecated + workflow-pins + test-coverage) — **test は含まない** (頻度高い軽量 gate) |
+| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip + harness + deprecated + workflow-pins + test-coverage + view-purity) — **test は含まない** (頻度高い軽量 gate) |
 | `pre-push` | `pnpm test` → `pnpm gen:adr-index --check` (docs drift gate、#178) → `pnpm build` → (UI 変更時のみ) verify:ui snapshot 鮮度チェック — push 前の重め gate、いずれかの失敗で reject |
 | `commit-msg` | `commitlint --edit` で Conventional Commits 検証（scope は `.project-config.yml` と同期） |
 
@@ -182,7 +183,12 @@ mutation や 3 個以上の useState、async handler を持つ view は **Contai
 - Hook (`useXxx.ts`) が state + handler を担う、`router.invalidate()` で loader 再取得
 - Route file が Container 役: `Route.useLoaderData()` → `useXxx(input)` → `<XxxView {...data} {...hookProps} />`
 
-**現状の enforcement**: TanStack Router の `useLoaderData` が route 階層で呼ぶ前提の API であることから、Container/Hook/Presenter は実質「ライブラリ設計の自然な誘導 + 人間レビュー」で担保されている。`lint-config/oxlint-view-purity.jsonc` に oxlint の `no-restricted-imports` ルール（`*DetailView.tsx` / `*AddView.tsx` / `*CreateView.tsx` の `useState` 等 / 全 `*View.tsx` の entity mutation）も置いているが、`paths + importNames` 形式が oxlint 1.61 で機能しておらず**現状は機械強制が paper tiger**（FAIL-005 / ADR-0007 / 修復は #155）。**List view (filter state のみ) は inline 維持 OK**。
+**現状の enforcement**: TanStack Router の `useLoaderData` が route 階層で呼ぶ前提の API であることから、Container/Hook/Presenter は「ライブラリ設計の自然な誘導 + 人間レビュー」で担保 + **`scripts/check-view-purity.mjs` で機械強制** (#155 で FAIL-005 paper tiger を custom script に置き換え):
+
+- `*DetailView.tsx` / `*AddView.tsx` / `*CreateView.tsx` から react の `useState` / `useEffect` / `useReducer` の import を禁止 → useXxx hook に抽出
+- 全 `*View.tsx` (List 含む) から `~/features/*` の import を禁止 → mutation は hook 経由
+- **List view (filter 用 useState のみ) は inline 維持 OK** (useState 自体は禁止対象外)
+- `pnpm check:view-purity` で実行、`check:parallel` (pre-commit) + CI matrix に組込済
 
 ### JSDoc 必須対象
 

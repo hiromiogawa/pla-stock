@@ -116,6 +116,7 @@
   - `docs/adr/0007-agent-failure-rules.md` (本エントリ)
   - `CLAUDE.md` (コード規約 #43 セクションの「機械強制」記述を訂正)
   - Task #155 (lint ルール再実装、別途実施)
+- **2026-05-25 update (#155 完了)**: `scripts/check-view-purity.mjs` を新規追加し、`*DetailView / *AddView / *CreateView.tsx` の react state hook + `~/features/*` mutation import 禁止 / `*View.tsx` 全体の `~/features/*` 禁止を **custom script で機械強制** に置換。`lint-config/oxlint-view-purity.jsonc` は削除、`.oxlintrc.json` extends からも除外。`pnpm check:view-purity` で実行、`check:parallel` (pre-commit) + CI matrix に組み込み。合成違反 (`import { useState } from 'react'` を `*DetailView.tsx` に追加) で `exit 1` + 違反箇所表示を実機確認済。paper tiger 解消。
 
 ### FAIL-006: testing skill ルール 2/3 を機械強制せず paper tiger を再発 (2026-05-23)
 
