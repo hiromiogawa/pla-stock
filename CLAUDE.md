@@ -4,7 +4,7 @@
 
 **MVP スコープ**: プラモデル（キット）管理 + 塗料管理の 2 ドメイン。消耗品（ヤスリ・マスキング・軟化剤など）は v2 以降。
 
-**ステータス**: Phase A-2 完了、**Phase C 着手中**。フレームワーク (TanStack Start / MUI v7 / Clerk / Drizzle + D1) は導入済み。`entities/<x>/schema.ts` を SSoT として kit / paint / project の read query + mutation は Drizzle + D1 server fn に完全移行済み。`entities/<x>/api/seed/` の data は dev seed 専用 (production runtime 非対象、`src/shared/lib/db/seed.ts` からのみ参照)。
+**ステータス**: Phase A-2 / C / D 完了、**Phase F (本番 deploy) 準備中**。フレームワーク (TanStack Start / MUI v7 / Clerk / Drizzle + D1 / R2) は稼働、kit / paint / project mutation は Drizzle + D1 server fn に完全移行済み (#200 で mutation 抽出展開 + check-test-coverage gate)、写真 upload (Phase D) も稼働中。test 戦略は ADR-0016 / ADR-0017 (C1 70% gate) で確定。本番 deploy 手順は README「本番 deploy」セクション参照。`entities/<x>/api/seed/` の data は dev seed 専用 (production runtime 非対象、`src/shared/lib/db/seed.ts` からのみ参照)。
 
 ---
 

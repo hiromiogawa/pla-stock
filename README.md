@@ -4,9 +4,10 @@
 
 ## ステータス
 
-**Phase A-2 完了、Phase C 着手中** — Drizzle + D1 schema 基盤導入済み。
-FSD スケルトン + MUI v7 + Clerk + Kit/Paint/Project 各画面 (Dashboard / List / Detail / Add/Create) は mock データで動作。
-Phase C で mock → 実 DB (D1) へ段階移行中 (server fn 化は domain ごとの後続 PR)。
+**Phase A-2 / C / D 完了、Phase F (本番 deploy) 準備中** — kit / paint / project mutation は Drizzle + D1 server fn に完全移行済、R2 写真 upload (Phase D) も稼働中。
+FSD スケルトン + MUI v7 + Clerk + Kit/Paint/Project 各画面 (Dashboard / List / Detail / Add/Create) は実 D1 で動作。
+test 戦略 (Trophy + co-location + C1 70% gate) は ADR-0016 / ADR-0017 に確定。
+本番 deploy の手順は下記「本番 deploy」セクション参照。
 
 ## スコープ
 
@@ -88,6 +89,119 @@ SEED_USER_ID=user_xxx pnpm db:seed:local
 - `better-sqlite3` の native binding を使う。`pnpm install` 時に自動 build される
   (`pnpm.onlyBuiltDependencies` で許可済)。build に失敗する環境では Xcode CLT /
   ビルドツールチェーンを確認
+
+## 本番 deploy (Cloudflare Workers)
+
+Phase F の本番デプロイ手順。**初回 deploy** から **継続運用** まで本セクションだけで完遂可能な粒度で記載する。詳細仕様は Issue #8 (Phase F Epic) と関連 ADR を参照。
+
+> **前提**: Cloudflare account / Clerk アカウントは既に持っていること。無料プランで開始可能。
+
+### 1. Cloudflare 側の払い出し (初回のみ)
+
+```bash
+# Cloudflare ログイン (ブラウザ OAuth 開く)
+pnpm wrangler login
+
+# 本番 D1 DB を作成 (出力された database_id を控える)
+pnpm wrangler d1 create pla-stock
+
+# R2 bucket を作成 (画像保存用、Phase D)
+pnpm wrangler r2 bucket create pla-stock-images
+```
+
+`wrangler.jsonc` の `d1_databases[0].database_id` と `r2_buckets[0].bucket_name` を上記で取得した値に書き換えてコミット (機微情報ではないので公開リポジトリに含めて OK)。
+
+> **既存リソースがある場合**: `wrangler d1 create` / `r2 bucket create` は同名で再実行するとエラーになる。`pnpm wrangler d1 list` / `r2 bucket list` で既存確認後、`wrangler.jsonc` の binding 値が一致していればこのステップは skip。
+
+### 2. 本番 D1 に migration 適用
+
+```bash
+# 全 migration を本番 D1 に適用 (初回 / 追加時の両方)
+pnpm db:migrate:remote
+
+# 確認 (本番に存在するテーブルを表示)
+pnpm wrangler d1 execute pla-stock --remote --command "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+```
+
+`drizzle/migrations/` 配下の SQL が順次適用される。`pnpm db:migrate:local` の `--local` フラグが `--remote` に変わるだけ。
+
+### 3. Clerk production instance を作成
+
+[Clerk dashboard](https://dashboard.clerk.com/) で:
+
+1. 新規 application を "Production" mode で作成 (既存 dev instance とは分離)
+2. **Allowed origins** に本番 URL (`https://pla-stock.<your-subdomain>.workers.dev` or custom domain) を追加
+3. **Sign-in URL** / **Sign-up URL** / **After sign-in URL** / **After sign-up URL** を本番 URL に揃える
+4. API keys タブから `Publishable key` と `Secret key` をコピー (次節で配置)
+
+### 4. Workers Secret を配置
+
+本番 deploy に必要な Secret 一覧:
+
+| Secret 名 | 用途 | 取得元 |
+|---|---|---|
+| `CLERK_PUBLISHABLE_KEY` | Clerk client SDK (`pk_live_...`) | Clerk dashboard > API keys |
+| `CLERK_SECRET_KEY` | Clerk server SDK (`sk_live_...`、auth wrapper 用) | 同上 |
+
+```bash
+# 各 Secret を本番 Workers に配置 (prompt で値を入力)
+pnpm wrangler secret put CLERK_PUBLISHABLE_KEY
+pnpm wrangler secret put CLERK_SECRET_KEY
+```
+
+配置済 Secret の一覧は `pnpm wrangler secret list` で確認できる (値そのものは表示されない、Cloudflare 側で暗号化)。
+
+> **将来追加候補**: Sentry (#44 で導入予定の `SENTRY_DSN`)、外部 API 連携時の API key 等。新規 Secret 追加時は本表に追記する。
+
+### 5. deploy 実行
+
+```bash
+# build + wrangler deploy をまとめて実行
+pnpm deploy
+```
+
+完了後、出力されるデフォルト URL (`https://pla-stock.<your-subdomain>.workers.dev`) または設定済カスタムドメインで動作確認。
+
+### 6. 動作確認動線 (本番化 checklist)
+
+初回 deploy 後、以下を順に確認:
+
+- [ ] `https://<本番 URL>/` で Landing が表示される
+- [ ] "Sign In" から Clerk SignIn flow が走り、production Clerk のユーザーで login できる
+- [ ] login 後 `/dashboard` で 5 cards が表示される (在庫 0 でも空 cards で OK)
+- [ ] `/kits` でキット一覧が表示 (空でも OK)、`+ 追加` から新規キット登録 → 在庫 +1 が反映される
+- [ ] `/paints` で塗料一覧が表示、`+ 追加` から新規塗料登録 → 在庫 +1
+- [ ] `/projects` でプロジェクト一覧、作成すると kit 在庫が -1 される (D1 batch 動作確認)
+- [ ] 写真添付 (Phase D) — project detail で画像 upload → R2 に格納 → 表示確認
+- [ ] log out → 再 SignIn できる
+- [ ] (任意) Cloudflare dashboard で Workers の Requests / Errors を確認
+
+### rollback / 再 deploy
+
+deploy が壊れた場合:
+
+```bash
+# 一つ前の deployment に rollback
+pnpm wrangler rollback
+
+# 過去 deployment 一覧 (deployment ID を選んで rollback の引数に渡せる)
+pnpm wrangler deployments list
+```
+
+migration を巻き戻したい場合は **drizzle が down migration を出力しない** ため、手動で revert SQL を書いて `pnpm wrangler d1 execute pla-stock --remote --file=revert.sql` で適用する。
+
+### wrangler.jsonc の env 戦略
+
+現状 `wrangler.jsonc` は **single env** で構成 (`[env.production]` block なし)。dev は `--local` フラグで local SQLite、prod は `--remote` で実 D1 を使う運用。
+
+dev / prod で **異なる D1 instance を使う必要が出たら** `[env.production]` block を追加して binding を分離する判断 (現状は MVP のため single instance で運用、dev データは seed で投入)。
+
+## 関連 docs
+
+- `docs/adr/` — 設計判断記録 (ADR-0001 〜 ADR-0017)
+- `docs/specs/` — 仕様書
+- `CLAUDE.md` — 開発規約 + skill 起動トリガー表
+- Issue #8 (Phase F Epic)、Issue #170 (品質改善 Epic)、Issue #44 (Sentry)
 
 ## 参考（頓挫済み・参考程度）
 
