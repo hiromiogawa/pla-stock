@@ -5,7 +5,7 @@
  * 役割:
  *   主要 URL × viewport × color scheme で screenshot を撮影し
  *   `.playwright-snapshots/` に保存。pre-push hook が UI ファイル
- *   (src/views/, src/widgets/, src/theme/, src/styles/, src/components/) の
+ *   (src/views/, src/widgets/, src/theme/, src/styles/) の
  *   変更を検出した時、本スクリプトの実行が必須となる。
  *
  * 使い方:
