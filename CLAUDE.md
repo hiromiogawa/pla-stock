@@ -32,9 +32,8 @@ Claude Code は session 開始時に **system-reminder** で全 skill / command 
 | 機構 | 配置 | 種別 | 起動 |
 |---|---|---|---|
 | **orchestrator** (本物 slash command) | `.claude/commands/<name>.md` | `/dev-start` `/dev-complete` `/post-review` `/design-decision` `/rule-cycle` | user 入力のみ (構造的に AI auto-trigger 不可) |
-| **atomic** (handbook skill) | `.claude/skills/<name>/SKILL.md` | adr / code-quality / conventional-commits / docs-freshness / failure-record / github-flow / sdd / testing / writing-issues / writing-project-skills / self-review / rule-measure / rule-explore / rule-improve / rule-audit | AI auto-trigger or user `/name` |
-| **subagent** | `.claude/agents/<name>.md` | self-review / rule-measure / rule-explore | Agent tool で dispatch (独立 context) |
-| **transitional orchestrator skill** | `.claude/skills/project-bootstrap/SKILL.md` | project-bootstrap | #188 で subagent 化判断するまで現状維持 |
+| **atomic** (handbook skill) | `.claude/skills/<name>/SKILL.md` | adr / code-quality / conventional-commits / docs-freshness / failure-record / github-flow / project-bootstrap / sdd / testing / writing-issues / writing-project-skills / self-review / rule-measure / rule-explore / rule-improve / rule-audit | AI auto-trigger or user `/name` (self-review / rule-* / project-bootstrap は dispatch reference、本体は subagent) |
+| **subagent** | `.claude/agents/<name>.md` | self-review / rule-measure / rule-explore / project-bootstrap | Agent tool で dispatch (独立 context、Write tool は project-bootstrap のみ許可) |
 
 orchestrator の連鎖関係 (frontmatter `metadata.subskills` が SSoT):
 
