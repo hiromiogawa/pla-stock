@@ -14,31 +14,23 @@ Refs/Closes #NNN (footer)
 Co-authored-by: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 ```
 
-## type (Conventional Commits 標準)
+## type
 
-`@commitlint/config-conventional` の標準セット:
+`@commitlint/config-conventional` の標準セット (`feat` / `fix` / `docs` / `chore` / `refactor` / `style` / `test` / `perf` / `build` / `ci` / `revert`) を採用。各 type の定義は **Conventional Commits 公式** 参照:
 
-- `feat` — 新機能
-- `fix` — バグ修正
-- `docs` — ドキュメント変更
-- `chore` — その他 (依存更新 / config 等)
-- `refactor` — 機能変更なしのリファクタ
-- `style` — フォーマット変更のみ
-- `test` — テスト追加・修正
-- `perf` — パフォーマンス改善
-- `build` — ビルドシステム変更
-- `ci` — CI 設定変更
-- `revert` — revert commit
+- 仕様: <https://www.conventionalcommits.org/>
+- type 一覧: <https://github.com/conventional-changelog/commitlint/tree/master/@commitlint/config-conventional>
+
+pla-stock 固有の運用ルール:
+
+- `docs` は本 repo では「docs/ 直下 + CLAUDE.md + docs/rules/ + docs/adr/」変更で使う (scope は `docs`)
+- `chore` は依存更新 (`scope: deps`) や CI 以外の tooling 変更 (`scope: tooling`) で使う
 
 ## scope (`.project-config.yml` enum、commitlint 機械強制)
 
-| カテゴリ | scope |
-|---|---|
-| Domain (MVP 範囲) | `kit` / `paint` / `project` / `stock` |
-| FSD layer | `shared` / `entities` / `features` / `widgets` / `views` / `routes` |
-| Cross-cutting | `auth` / `nav` / `ui` / `infra` / `deps` / `ci` / `docs` / `tooling` |
+scope は **`.project-config.yml` の `scopes` フィールドが SSoT** (カテゴリ分類: Domain / FSD layer / Cross-cutting のコメント付き)。`lint-config/commitlint-config.cjs` の `scope-enum` で同 enum を機械強制。
 
-scope 追加時は `.project-config.yml` と `lint-config/commitlint-config.cjs` の両方を更新。
+scope 追加 / 変更時は `.project-config.yml` と `lint-config/commitlint-config.cjs` の両方を更新する (二重保守だが commitlint の制約)。
 
 ## subject
 
