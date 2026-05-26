@@ -44,38 +44,49 @@ const COLOR_SCHEMES = ['light', 'dark']
  */
 const URLS = ['/']
 
+/* oxlint-disable no-await-in-loop -- Playwright: 単一 context/page で goto → wait → screenshot は順序必須、Promise.all 化すると race condition (同一 page への並列 navigate / screenshot 不可) */
+
+/**
+ * 単一 (colorScheme, viewport) の context を生成し URLS を順に screenshot する。
+ * context は viewport / colorScheme に bind されるため combo ごとに作り直す。
+ */
+async function captureForContext(browser, { colorScheme, viewport }, results) {
+  const context = await browser.newContext({
+    viewport: { width: viewport.width, height: viewport.height },
+    colorScheme,
+  })
+  const page = await context.newPage()
+  for (const path of URLS) {
+    const slug = path === '/' ? 'home' : path.replace(/^\//, '').replace(/\//g, '_')
+    const filename = `${SNAPSHOT_DIR}/${slug}-${viewport.name}-${colorScheme}.png`
+    try {
+      await page.goto(`${DEV_URL}${path}`, { waitUntil: 'networkidle', timeout: 10_000 })
+      await page.waitForTimeout(500)
+      await page.screenshot({ path: filename, fullPage: true })
+      console.log(`✓ ${filename}`)
+      results.push({ filename, status: 'ok' })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`✗ ${filename}: ${message}`)
+      results.push({ filename, status: 'error', message })
+    }
+  }
+  await context.close()
+}
+
 const browser = await chromium.launch()
 const results = []
 
-/* oxlint-disable no-await-in-loop -- Playwright: 単一 context/page で goto → wait → screenshot は順序必須、Promise.all 化すると race condition (同一 page への並列 navigate / screenshot 不可) */
-for (const colorScheme of COLOR_SCHEMES) {
-  for (const viewport of VIEWPORTS) {
-    const context = await browser.newContext({
-      viewport: { width: viewport.width, height: viewport.height },
-      colorScheme,
-    })
-    const page = await context.newPage()
-    for (const path of URLS) {
-      const slug = path === '/' ? 'home' : path.replace(/^\//, '').replace(/\//g, '_')
-      const filename = `${SNAPSHOT_DIR}/${slug}-${viewport.name}-${colorScheme}.png`
-      try {
-        await page.goto(`${DEV_URL}${path}`, { waitUntil: 'networkidle', timeout: 10_000 })
-        await page.waitForTimeout(500)
-        await page.screenshot({ path: filename, fullPage: true })
-        console.log(`✓ ${filename}`)
-        results.push({ filename, status: 'ok' })
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error)
-        console.error(`✗ ${filename}: ${message}`)
-        results.push({ filename, status: 'error', message })
-      }
-    }
-    await context.close()
-  }
+const contextSpecs = COLOR_SCHEMES.flatMap((colorScheme) =>
+  VIEWPORTS.map((viewport) => ({ colorScheme, viewport })),
+)
+
+for (const spec of contextSpecs) {
+  await captureForContext(browser, spec, results)
 }
-/* oxlint-enable no-await-in-loop */
 
 await browser.close()
+/* oxlint-enable no-await-in-loop */
 
 const failed = results.filter((result) => result.status === 'error')
 if (failed.length > 0) {
