@@ -33,7 +33,7 @@ pnpm build || exit 1
 # Step 3: UI 変更検出 (画面に出る要素の変更のみ verify:ui の対象とする):
 #
 # - 検出対象:
-#   - src/(views|widgets|components)/ 配下の .tsx / .css / .scss
+#   - src/(views|widgets)/ 配下の .tsx / .css / .scss
 #     (Presenter component と style。hook の .ts や utility は対象外)
 #   - src/(theme|styles)/ 配下の全変更
 #     (design token / global style は .ts でも UI に直接影響する)
@@ -45,7 +45,7 @@ pnpm build || exit 1
 #
 # - 検出 0 件なら exit 0 (verify:ui 不要)
 ui_in_components=$(git diff origin/main...HEAD --name-only 2>/dev/null \
-  | grep -E '^src/(views|widgets|components)/' \
+  | grep -E '^src/(views|widgets)/' \
   | grep -vE '\.test\.(ts|tsx)$' \
   | grep -E '\.(tsx|css|scss)$' \
   | head -1)

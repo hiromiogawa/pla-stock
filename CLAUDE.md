@@ -319,7 +319,7 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
 物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は **機械強制できない判断系 + 半機械強制 (hook で run を強制) の規律**:
 
 - **UI 変更の push は機械強制で `pnpm verify:ui` 必須** (`.husky/pre-push` が以下を検出時、`.playwright-snapshots/` の鮮度をチェックして reject)
-  - `src/(views|widgets|components)/**/*.{tsx,css,scss}` (Presenter / style。hook の `.ts` や test は対象外)
+  - `src/(views|widgets)/**/*.{tsx,css,scss}` (Presenter / style。hook の `.ts` や test は対象外)
   - `src/(theme|styles)/**` (design token / global style は `.ts` でも対象)
   - 撮った screenshot を **controller 自身が必ず目視確認** (run しただけで OK は禁止、それは harness の趣旨に反する)
 - **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
