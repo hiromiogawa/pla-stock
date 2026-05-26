@@ -1,132 +1,32 @@
 import { useCallback, useState } from 'react'
-import { useNavigate, useRouter } from '@tanstack/react-router'
-import { useSnackbar } from 'notistack'
+import { useNavigate } from '@tanstack/react-router'
 import type { Project } from '~/entities/project'
-import { addProjectPhoto } from '~/features/project-photo-add'
-import { deleteProjectPhoto } from '~/features/project-photo-delete'
-import { updateProject } from '~/features/project-edit'
-import { deleteProject } from '~/features/project-delete'
-import { addProjectPaintUse, removeProjectPaintUse } from '~/features/project-paint-use'
-import type { AddPhotoInput } from './AddPhotoDialog'
-import type { ProjectEditValues } from './ProjectEditForm'
-
-interface UseProjectDetailInput {
-  project: Project | null
-}
-
-export interface UseProjectDetailReturn {
-  editing: boolean
-  showDeleteDialog: boolean
-  setEditing: (editing: boolean) => void
-  setShowDeleteDialog: (open: boolean) => void
-  handleSave: (values: ProjectEditValues) => Promise<void>
-  handleDelete: () => Promise<void>
-  handleAddPaint: (paintId: string) => Promise<void>
-  handleRemovePaint: (paintId: string) => Promise<void>
-  handleAddPhoto: (input: AddPhotoInput) => Promise<void>
-  handleRemovePhoto: (photoId: string) => Promise<void>
-  handleBackToList: () => void
-}
+import { useAddProjectPaint } from './hooks/useAddProjectPaint'
+import { useAddProjectPhoto } from './hooks/useAddProjectPhoto'
+import { useDeleteProject } from './hooks/useDeleteProject'
+import { useDeleteProjectPhoto } from './hooks/useDeleteProjectPhoto'
+import { useRemoveProjectPaint } from './hooks/useRemoveProjectPaint'
+import { useUpdateProject } from './hooks/useUpdateProject'
 
 /**
- * ProjectDetailView 用の Hook (Container/Hook/Presenter パターン)。
- *
- * 担当する state / 副作用:
- * - 編集モード / 削除確認ダイアログの表示状態 (useState ×2)
- * - プロジェクト編集 (updateProject server fn) / 削除 (deleteProject server fn、planning なら kit 在庫戻し)
- *   (userId は server fn 内 auth() 由来、client 入力なし = IDOR 防止)
- * - 紐付け塗料の追加・削除 (addProjectPaintUse / removeProjectPaintUse server fn、count 非影響)
- * - 写真の追加・削除 (project-photo-add / project-photo-delete server fn、R2 put/delete + D1)
- * - mutation 後は router.invalidate() で loader 再実行 → 最新 paints/photos を再取得
- * - 削除成功時は一覧へ navigation
- * - mutation 失敗 / null 戻り時は Snackbar (notistack) で error 通知
- * - mutation 成功時は Snackbar (notistack) で success 通知
- *
- * View (Presenter) は本 Hook の戻り値をそのまま props として受け取り、
- * useState / 副作用は持たない (#43 ルール)。
+ * ProjectDetailView 用 Container hook (#43 / #165)。
+ * state (editing / showDeleteDialog) 保持 + 6 個の mutation micro hook を composition、
+ * onSuccess に Container 固有の副作用 (navigate / setEditing) を差し込む。
  */
-export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetailReturn {
+export function useProjectDetail(input: { project: Project | null }) {
   const navigate = useNavigate()
-  const router = useRouter()
-  const { enqueueSnackbar } = useSnackbar()
   const [editing, setEditing] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-
-  const { project } = input
-
-  const handleSave = useCallback(
-    async (values: ProjectEditValues) => {
-      if (!project) return
-      const updated = await updateProject({
-        data: { projectId: project.id, patch: values },
-      })
-      if (updated) {
-        setEditing(false)
-        await router.invalidate()
-        enqueueSnackbar('プロジェクトを更新しました', { variant: 'success' })
-      } else {
-        enqueueSnackbar('プロジェクトの更新に失敗しました', { variant: 'error' })
-      }
-    },
-    [project, router, enqueueSnackbar],
-  )
-
-  const handleDelete = useCallback(async () => {
-    if (!project) return
-    const ok = await deleteProject({ data: { projectId: project.id } })
-    if (ok) {
-      enqueueSnackbar('プロジェクトを削除しました', { variant: 'success' })
-      void navigate({ to: '/projects' })
-    } else {
-      enqueueSnackbar('プロジェクトの削除に失敗しました', { variant: 'error' })
-    }
-  }, [project, navigate, enqueueSnackbar])
-
-  const handleAddPaint = useCallback(
-    async (paintId: string) => {
-      if (!project) return
-      await addProjectPaintUse({ data: { projectId: project.id, paintId } })
-      await router.invalidate()
-      enqueueSnackbar('塗料を紐付けました', { variant: 'success' })
-    },
-    [project, router, enqueueSnackbar],
-  )
-
-  const handleRemovePaint = useCallback(
-    async (paintId: string) => {
-      if (!project) return
-      await removeProjectPaintUse({ data: { projectId: project.id, paintId } })
-      await router.invalidate()
-      enqueueSnackbar('塗料を解除しました', { variant: 'success' })
-    },
-    [project, router, enqueueSnackbar],
-  )
-
-  const handleAddPhoto = useCallback(
-    async (photoInput: AddPhotoInput) => {
-      if (!project) return
-      const formData = new FormData()
-      formData.append('file', photoInput.file)
-      formData.append('projectId', project.id)
-      formData.append('caption', photoInput.caption ?? '')
-      formData.append('takenAt', photoInput.takenAt ?? '')
-      await addProjectPhoto({ data: formData })
-      await router.invalidate()
-      enqueueSnackbar('写真を追加しました', { variant: 'success' })
-    },
-    [project, router, enqueueSnackbar],
-  )
-
-  const handleRemovePhoto = useCallback(
-    async (photoId: string) => {
-      const ok = await deleteProjectPhoto({ data: { photoId } })
-      if (ok) {
-        await router.invalidate()
-        enqueueSnackbar('写真を削除しました', { variant: 'success' })
-      }
-    },
-    [router, enqueueSnackbar],
-  )
+  const projectId = input.project?.id ?? null
+  const { handleSave } = useUpdateProject({ projectId, onSuccess: () => setEditing(false) })
+  const { handleDelete } = useDeleteProject({
+    projectId,
+    onSuccess: () => void navigate({ to: '/projects' }),
+  })
+  const { handleAddPaint } = useAddProjectPaint({ projectId })
+  const { handleRemovePaint } = useRemoveProjectPaint({ projectId })
+  const { handleAddPhoto } = useAddProjectPhoto({ projectId })
+  const { handleRemovePhoto } = useDeleteProjectPhoto()
 
   const handleBackToList = useCallback(() => {
     void navigate({ to: '/projects' })
@@ -146,3 +46,5 @@ export function useProjectDetail(input: UseProjectDetailInput): UseProjectDetail
     handleBackToList,
   }
 }
+
+export type UseProjectDetailReturn = ReturnType<typeof useProjectDetail>
