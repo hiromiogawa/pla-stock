@@ -31,36 +31,17 @@ pla-stock の lint / format / 静的解析 / pre-commit / pre-push / CI gate 構
 - **pre-push**: 重め gate (`pnpm test` 2 秒 + `pnpm build` 30-60 秒)、push 前検出で CI fail による手戻り防止
 - **CI matrix**: pre-commit + pre-push の全部 + lint / format / lint:deprecated を独立 job、最後の砦
 
-## コマンド一覧
+## 実行可能スクリプト
 
-| コマンド | 用途 |
-|---|---|
-| `pnpm dev` | 開発サーバ起動 (Vite, http://localhost:3000) |
-| `pnpm build` | プロダクションビルド (`vite build && tsc --noEmit`) |
-| `pnpm preview` | ビルド済みアセットのローカルプレビュー |
-| `pnpm run deploy` | Cloudflare Workers にデプロイ (`wrangler deploy`)。`pnpm deploy` は pnpm builtin と衝突するため `run` 必須 (#214) |
-| `pnpm cf-typegen` | Cloudflare バインディングの型生成 |
-| `pnpm install` | 依存インストール (postinstall で cf-typegen 自動実行) |
-| `pnpm lint` | oxlint で静的解析 |
-| `pnpm lint:fix` | oxlint の自動修正 |
-| `pnpm lint:deprecated` | oxlint type-aware で deprecated API 使用を検出 (ADR-0015) |
-| `pnpm format` | biome で format チェック (no-write) |
-| `pnpm format:write` | biome で全ファイル整形 |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm depcruise` | dependency-cruiser で FSD レイヤー違反/循環依存を検出 |
-| `pnpm knip` | knip strict で未使用 export/file を検出 |
-| `pnpm check:test-coverage` | testing skill ルール 2/3 対象に `*.test.{ts,tsx}` 併設があるか機械検証 |
-| `pnpm check:parallel` | typecheck + depcruise + knip + deprecated + workflow-pins + test-coverage を並列実行 (pre-commit 用) |
-| `pnpm check` | lint → lint:deprecated → format → typecheck → depcruise → knip → workflow-pins → test-coverage を直列実行 (CI 用) |
-| `pnpm db:generate` | drizzle-kit で schema から migration SQL 生成 |
-| `pnpm db:migrate:local` | local D1 に migration 適用 |
-| `pnpm db:migrate:remote` | prod D1 に migration 適用 (`--remote`) |
-| `pnpm db:studio` | drizzle-kit studio で DB を GUI 閲覧 |
-| `pnpm gen:adr-index` | ADR 索引 (`docs/adr/README.md`) を再生成 |
-| `pnpm gen:adr-index --check` | 索引 drift 検出 (pre-push) |
-| `pnpm verify:ui` | Playwright で LandingView の screenshot 撮影 (詳細 CLAUDE.md AI 固有規律) |
+利用可能な pnpm スクリプト一覧は `package.json` の `scripts` セクションが SSoT。ここに重複列挙すると drift する。
 
-Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta pin` で `.nvmrc` に追従。
+確認方法: `pnpm run` (引数なしで全 script を一覧表示)。
+
+特殊な運用ルール (規約として残すもの):
+
+- **`pnpm deploy` は使えない** (pnpm builtin と衝突)。Cloudflare Workers への deploy は `pnpm run deploy` (`run` 必須、#214)
+- **`pnpm install` の postinstall で `cf-typegen` が自動実行** される (Cloudflare バインディング型生成)
+- Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta pin` で `.nvmrc` に追従
 
 ## 関連
 
