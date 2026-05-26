@@ -63,6 +63,7 @@ orchestrator の連鎖関係 (各 `.claude/commands/<name>.md` body 中の言及
 | Skill 規約 (orchestration only) | [docs/rules/skill-authoring.md](./docs/rules/skill-authoring.md) | ADR-0018 |
 
 その他:
+- 規約索引: [docs/rules/README.md](./docs/rules/README.md) (rules 全体 + workflow)
 - 設計判断の歴史: [docs/adr/README.md](./docs/adr/README.md) (索引、自動生成)
 - 失敗事例 live log: [docs/adr/0007-agent-failure-rules.md](./docs/adr/0007-agent-failure-rules.md)
 - ハーネス俯瞰: [docs/harness-map.md](./docs/harness-map.md)
