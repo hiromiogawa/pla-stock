@@ -1,317 +1,115 @@
 # pla-stock
 
-プラモデル・塗料の在庫管理ツール。
+プラモデル・塗料の在庫管理ツール。MVP スコープはプラモデル (キット) + 塗料の 2 ドメイン (消耗品は v2 以降)。
 
-**MVP スコープ**: プラモデル（キット）管理 + 塗料管理の 2 ドメイン。消耗品（ヤスリ・マスキング・軟化剤など）は v2 以降。
+**ステータス**: Phase A-2 / C / D 完了、Phase F (本番 deploy) 稼働中 (https://pla-stock.hiromi-ogawa-1223.workers.dev)。
 
-**ステータス**: Phase A-2 / C / D 完了、**Phase F (本番 deploy) 準備中**。フレームワーク (TanStack Start / MUI v7 / Clerk / Drizzle + D1 / R2) は稼働、kit / paint / project mutation は Drizzle + D1 server fn に完全移行済み (#200 で mutation 抽出展開 + check-test-coverage gate)、写真 upload (Phase D) も稼働中。test 戦略は ADR-0016 / ADR-0017 (C1 70% gate) で確定。本番 deploy 手順は README「本番 deploy」セクション参照。`entities/<x>/api/seed/` の data は dev seed 専用 (production runtime 非対象、`src/shared/lib/db/seed.ts` からのみ参照)。
+このファイルは **AI セッション開始時に必読の規律** と **規約への目次** に絞る。具体的な規約は `docs/rules/` 配下、設計判断の歴史は `docs/adr/` 配下が SSoT (ADR-0018)。
 
 ---
 
 ## 🛑 必ず最初に読むこと: Skill 起動ルール
 
-このプロジェクトは `.claude/skills/` 配下のスキルを **状況トリガー** で必ず起動する運用。
-「呼べる」ではなく「呼ばねばならない」。**Skill / slash command を明示起動**することで手順省略を防ぐ (orchestrator は本物 slash `.claude/commands/`、atomic skill は `.claude/skills/`、#227)。
+このプロジェクトは `.claude/skills/` 配下の skill / `.claude/commands/` 配下の slash command を **状況トリガー** で必ず起動する運用。「呼べる」ではなく「呼ばねばならない」。
 
-> **記憶 (file memory) ルール**: 本プロジェクトの記憶は skill ではなく本ルールに従う。
-> global `~/.claude/CLAUDE.md` の memory skill 起動指示は **本プロジェクトでは本節が優先**
-> （指示優先順位: project CLAUDE.md > global）。memory 操作のための skill 起動は不要。
+> **記憶 (file memory) ルール**: 本プロジェクトの記憶は memory skill ではなく本ルールに従う。global `~/.claude/CLAUDE.md` の memory skill 起動指示は **本プロジェクトでは本節が優先** (指示優先順位: project CLAUDE.md > global)。memory 操作のための skill 起動は不要。
 >
-> - 判断の前に file memory（memory ディレクトリの `MEMORY.md` 索引 + 型別エントリ
->   `user`/`feedback`/`project`/`reference`）を確認する
+> - 判断の前に file memory (memory ディレクトリの `MEMORY.md` 索引 + 型別エントリ) を確認する
 > - 保存基準: 「次セッションで同じ状況に遭遇したとき判断が速くなるか」が YES なら保存
-> - 設計判断は ADR 一本化（`docs/adr/`）。memory への二重保存はしない
-> - 詳細は `docs/harness-map.md`（ADR-0009）
+> - 設計判断は ADR 一本化 (`docs/adr/`)。memory への二重保存はしない
+> - 詳細は `docs/harness-map.md` (ADR-0009)
 
-**セッション開始時**: file memory（memory ディレクトリの `MEMORY.md` + 型別エントリ）を確認し、過去の決定・好み・失敗事例を把握する（skill 起動不要・本ルール参照）。
+**セッション開始時**: file memory (memory ディレクトリの `MEMORY.md` + 型別エントリ) を確認し、過去の決定・好み・失敗事例を把握する (skill 起動不要・本ルール参照)。
 
 ### Skill / Command 一覧
 
-Claude Code は session 開始時に **system-reminder** で全 skill / command の description を context 注入する。AI は description を見て起動判断する (トリガー表は #227 で廃止)。俯瞰図が必要な場面は #229 (drawio でハーネス全体図) で別途整備予定。
+Claude Code は session 開始時に **system-reminder** で全 skill / command の description を context 注入する。AI は description を見て起動判断する。
 
-| 機構 | 配置 | 種別 | 起動 |
-|---|---|---|---|
-| **orchestrator** (本物 slash command) | `.claude/commands/<name>.md` | `/dev-start` `/dev-complete` `/post-review` `/design-decision` `/rule-cycle` | user 入力のみ (構造的に AI auto-trigger 不可) |
-| **atomic** (handbook skill) | `.claude/skills/<name>/SKILL.md` | adr / code-quality / conventional-commits / docs-freshness / failure-record / github-flow / project-bootstrap / sdd / testing / writing-issues / writing-project-skills / self-review / rule-measure / rule-explore / rule-improve / rule-audit | AI auto-trigger or user `/name` (self-review / rule-* / project-bootstrap は dispatch reference、本体は subagent) |
-| **subagent** | `.claude/agents/<name>.md` | self-review / rule-measure / rule-explore / project-bootstrap | Agent tool で dispatch (独立 context、Write tool は project-bootstrap のみ許可) |
+| 機構 | 配置 | 起動 |
+|---|---|---|
+| **orchestrator command** | `.claude/commands/<name>.md` (`/dev-start` `/dev-complete` `/post-review` `/design-decision` `/rule-cycle`) | user 入力のみ (本物 slash、構造的に AI auto-trigger 不可) |
+| **atomic skill** | `.claude/skills/<name>/SKILL.md` (adr / code-quality / conventional-commits / docs-freshness / failure-record / github-flow / project-bootstrap / testing / writing-issues / writing-project-skills / self-review / rule-measure / rule-explore / rule-improve / rule-audit) | AI auto-trigger or user `/name` |
+| **subagent** | `.claude/agents/<name>.md` (self-review / rule-measure / rule-explore / project-bootstrap) | Agent tool で dispatch (独立 context、Write tool は project-bootstrap のみ許可) |
 
-orchestrator の連鎖関係 (各 `.claude/commands/<name>.md` body 中の sub-skill / subagent 言及が SSoT):
+orchestrator の連鎖関係 (各 `.claude/commands/<name>.md` body 中の言及が SSoT):
 
-- **`/dev-start`** → github-flow, sdd
+- **`/dev-start`** → github-flow (+ docs/rules/branch.md)
 - **`/dev-complete`** → docs-freshness, conventional-commits, github-flow (+ self-review subagent)
 - **`/post-review`** → dev-complete, failure-record
 - **`/design-decision`** → adr
 - **`/rule-cycle`** → rule-improve, rule-audit (+ rule-measure / rule-explore subagent)
 
-> 実作業の主役の一部は superpowers **plugin** skill（`brainstorming` /
-> `writing-plans` / `subagent-driven-development` / `systematic-debugging` /
-> `requesting-code-review`）で、project frontmatter 管理外。plugin 参照は
-> orchestrator command の subskills に `plugin:` 接頭辞で記す。
-
-> **注**: 移植元の st-cost は Next.js / pnpm 前提で書かれている skill が多い。pla-stock は TanStack Start + Cloudflare + Neon + Drizzle を採用予定のため、Phase 2（スキャフォールド時）に `code-quality`, `self-review`, `conventional-commits` などを本プロジェクトのスタックに合わせて更新すること。
+実作業の主役の一部は superpowers **plugin** skill (`brainstorming` / `writing-plans` / `subagent-driven-development` / `systematic-debugging` / `requesting-code-review`) で project frontmatter 管理外。
 
 ---
 
-## アーキテクチャ
+## 📖 規約 / 仕様の目次 (逆引き index)
 
-**未確定**（Phase 2 でスキャフォールド時に確定）。FSD 類似のレイヤー構造を採用予定。確定後に **ユーザーに `/design-decision` を依頼** して ADR 記録し、本セクションと `.project-config.yml` の `architecture.layers` を更新する。
+**規約は `docs/rules/` が SSoT** (人間 + AI 共通の現状形)。**経緯 / 決定は `docs/adr/`** (不変、歴史)。
 
-## 技術スタック
+| Topic | 規約 (現状形) | 関連 ADR / 機械強制 |
+|---|---|---|
+| アーキテクチャ (FSD + Container/Hook/Presenter) | [docs/rules/architecture.md](./docs/rules/architecture.md) | ADR-0019、`.dependency-cruiser.cjs` |
+| UI パターン (Form / Toast / Loading / Emotion 隔離) | [docs/rules/ui-patterns.md](./docs/rules/ui-patterns.md) | ADR-0002 / 0003 / 0020、`lint-config/oxlint-emotion-isolation.jsonc` |
+| Domain modeling (Drizzle schema SSoT / timestamp) | [docs/rules/domain-modeling.md](./docs/rules/domain-modeling.md) | ADR-0006 / 0008、`.dependency-cruiser.cjs` |
+| Linting (型 4 ルール) | [docs/rules/linting.md](./docs/rules/linting.md) | ADR-0021 / 0015、`lint-config/oxlint-base.jsonc` |
+| Code quality (lint / format / hooks / コマンド一覧) | [docs/rules/code-quality.md](./docs/rules/code-quality.md) | ADR-0001、`.husky/`、`lint-config/` |
+| Commit 規約 (Conventional Commits / scope) | [docs/rules/commit.md](./docs/rules/commit.md) | `lint-config/commitlint-config.cjs`、`.project-config.yml` |
+| Branch / PR / Issue 階層 | [docs/rules/branch.md](./docs/rules/branch.md) | `scripts/check-branch.mjs` |
+| Issue 書き方 (Type 別) | [docs/rules/issue.md](./docs/rules/issue.md) | `.github/ISSUE_TEMPLATE/` |
+| Testing (Trophy / factory / coverage gate) | [docs/rules/testing.md](./docs/rules/testing.md) | ADR-0016 / 0017、`vitest.config.ts` |
+| ADR policy + 「ADR → 実装 → rules 更新」workflow | [docs/rules/adr-policy.md](./docs/rules/adr-policy.md) | ADR-0007 / 0009 / 0018 |
+| Docs 構造 + SSoT 境界 | [docs/rules/docs-policy.md](./docs/rules/docs-policy.md) | ADR-0018 |
+| Skill 規約 (orchestration only) | [docs/rules/skill-authoring.md](./docs/rules/skill-authoring.md) | ADR-0018 |
 
-**Phase 1: 未確定**。
+その他:
+- 設計判断の歴史: [docs/adr/README.md](./docs/adr/README.md) (索引、自動生成)
+- 失敗事例 live log: [docs/adr/0007-agent-failure-rules.md](./docs/adr/0007-agent-failure-rules.md)
+- ハーネス俯瞰: [docs/harness-map.md](./docs/harness-map.md)
+- デザイン方向性: [docs/specs/2026-04-29-design-direction.md](./docs/specs/2026-04-29-design-direction.md)
+- 開発環境セットアップ / 本番 deploy: [README.md](./README.md)
 
-予定:
-
-| レイヤー | 技術 |
-|---|---|
-| フレームワーク | TanStack Start |
-| 言語 | TypeScript |
-| ホスティング | Cloudflare Workers |
-| DB | Neon (Postgres) |
-| ORM | Drizzle（仮） |
-
-Phase 2 で正式採用。採用時に **ユーザーに `/design-decision` を依頼** して ADR-001 を記録する。
-
-## プロジェクト固有の指示
-
-- **main への直接コミット禁止**。編集前に `git branch --show-current` を確認、`main` なら **ユーザーに `/dev-start` を依頼** して feature ブランチへ (AI auto-trigger は無効、ユーザー明示起動のみ)
-- **コミット前は必ずユーザーに `/dev-complete` を依頼**（内部で self-review subagent dispatch → docs-freshness → commit が連鎖実行される）。AI 単独で `git commit` するのは NG
-- コミットメッセージは Conventional Commits（scope は `.project-config.yml` の enum を参照）
-- **narrative は日本語で記述する**：コミット本文 / PR タイトル&本文 / Issue タイトル&本文 / ドキュメント。`type(scope):` プレフィックスとコード内識別子（変数名・関数名）は英語のまま、技術用語の英語混在も OK。
-- PR は必ず関連 Issue を `Closes #XX` で紐付ける
-- 型定義変更時は JSDoc も同時に更新する（SDD ルール: 実装後は型 + JSDoc が SSoT）
-- テストの設計と書き方は **ADR-0016** と `testing` skill が SSoT (Testing Trophy 採用、coverage 不採用、co-location)
-- **seed と test fixture の役割境界**: `src/entities/<x>/api/seed/` は dev seed 専用データ (`src/shared/lib/db/seed.ts` から D1 投入)、production からの import は depcruise `no-seed-from-production` で機械強制禁止。test 用の data は `src/test-utils/factories/<entity>.ts` の `createTest<Entity>(overrides)` を使う (ADR-0016)
-- 設計判断があったら **ユーザーに `/design-decision` を依頼**（ADR 追加、ADR が SSoT）
-- セルフレビュー・コードレビューの結果は PR 上にコメントとして残す（`gh pr comment`）。指摘 → 修正 → 修正内容を返信コメントで記録
+---
 
 ## ローカル専用ファイル
 
-- `docs/superpowers/` — AI 向けの一過性の設計メモ・実装計画（`.gitignore` で除外、公開リポジトリに含めない）
+- `docs/superpowers/` — AI 向けの一過性の設計メモ / 実装計画 (`.gitignore` で除外、公開 repo に含めない)
 
-## ドキュメント
+---
 
-Phase 2 で以下を整備予定：
+## AI 運用ルール (skill 化するまでもない都度判断)
 
-- `docs/adr/` — 設計判断記録
-- `docs/specs/` — 追加仕様
-- `docs/api/` — typedoc 自動生成（gitignore）
-- `docs/generated/` — 依存関係図 等（gitignore）
+物理ガード (force push / 本番 deploy / secret 編集禁止) は `.claude/settings.json` で deny / ask 機械強制 (ADR-0011)。以下は **AI が毎セッション読む** 規律:
 
-## コマンド
-
-| コマンド | 用途 |
-|---|---|
-| `pnpm dev` | 開発サーバ起動（Vite, http://localhost:3000 ） |
-| `pnpm build` | プロダクションビルド (`vite build && tsc --noEmit`) |
-| `pnpm preview` | ビルド済みアセットのローカルプレビュー |
-| `pnpm run deploy` | Cloudflare Workers にデプロイ (`wrangler deploy`)。`pnpm deploy` は pnpm builtin と衝突するため `run` 必須 (#214) |
-| `pnpm cf-typegen` | Cloudflare バインディングの型生成 (`wrangler types`) |
-| `pnpm install` | 依存インストール（postinstall で cf-typegen 自動実行） |
-| `pnpm lint` | oxlint で静的解析 |
-| `pnpm lint:fix` | oxlint の自動修正 |
-| `pnpm lint:deprecated` | oxlint type-aware で deprecated API 使用を検出 (ADR-0015) |
-| `pnpm format` | biome で format チェック (no-write) |
-| `pnpm format:write` | biome で全ファイル整形 |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm depcruise` | dependency-cruiser で FSD レイヤー違反/循環依存を検出 |
-| `pnpm knip` | knip strict で未使用 export/file を検出 |
-| `pnpm check:test-coverage` | testing skill ルール 2/3 対象に `*.test.{ts,tsx}` 併設があるか機械検証 (warning モード、`--strict` で error 化) |
-| `pnpm check:parallel` | typecheck + depcruise + knip + harness + deprecated + test-coverage を並列実行 (pre-commit 用) |
-| `pnpm check` | lint → lint:deprecated → format → typecheck → depcruise → knip → harness → test-coverage を直列実行 (CI 用) |
-| `pnpm db:generate` | drizzle-kit で schema から migration SQL を生成 (`drizzle/migrations/`) |
-| `pnpm db:migrate:local` | local D1 (`.wrangler/state/...`) に migration を適用 |
-| `pnpm db:migrate:remote` | prod D1 に migration を適用 (`--remote`) |
-| `pnpm db:studio` | drizzle-kit studio で DB を GUI 閲覧 |
-
-Node バージョンマネージャ使用時は `nvm use` / `fnm use` / `volta pin` で `.nvmrc` に追従。
-
-## Git Hooks
-
-**husky v9 + lint-staged + commitlint で導入済**（ADR-0001 参照）。
-
-| Hook | 内容 |
-|---|---|
-| `pre-commit` | `lint-staged` (oxlint --fix + biome format) → `check:parallel` (typecheck + depcruise + knip + harness + deprecated + workflow-pins + test-coverage) — **test は含まない** (頻度高い軽量 gate) |
-| `pre-push` | `pnpm test` → `pnpm gen:adr-index --check` (docs drift gate、#178) → `pnpm build` → (UI 変更時のみ) verify:ui snapshot 鮮度チェック — push 前の重め gate、いずれかの失敗で reject |
-| `commit-msg` | `commitlint --edit` で Conventional Commits 検証（scope は `.project-config.yml` と同期） |
-
-**test 実行 layer の役割分担** (#195):
-- `pre-commit`: 軽量 gate (typecheck / lint / dep-check / 未使用 / test 併設チェック)、test 本体は走らない (頻度に対する摩擦最小)
-- `pre-push`: 重め gate (`pnpm test` 2 秒 + `pnpm build` 30-60 秒)、push 前検出で CI fail による手戻り防止
-- CI matrix: pre-commit + pre-push の全部 + lint / format / lint:deprecated を独立 job、最後の砦
-
-設定ファイル:
-- `.oxlintrc.json` — oxlint
-- `biome.json` — Biome (formatter only)
-- `.dependency-cruiser.cjs` — FSD レイヤールール
-- `knip.json` — dead code 検出
-- `.lintstagedrc.json` — staged ファイル処理
-- `commitlint.config.cjs` — commit message 規約
-
-## コード規約
-
-### Container/Hook/Presenter (#43)
-
-mutation や 3 個以上の useState、async handler を持つ view は **Container (route file) / Hook (`useXxx.ts`) / Presenter (`XxxView.tsx`)** に分離する。
-
-- View は **pure Presenter**: props in / JSX out のみ。useState / useEffect / mutation 直呼び禁止
-- Hook (`useXxx.ts`) が state + handler を担う、`router.invalidate()` で loader 再取得
-- Route file が Container 役: `Route.useLoaderData()` → `useXxx(input)` → `<XxxView {...data} {...hookProps} />`
-
-**現状の enforcement** (#155 で paper tiger 部分解消):
-
-| レイヤー | 強制方法 | 状態 |
-|---|---|---|
-| **View 本体 (`*View.tsx`) → `~/features/*` 直 import 禁止** | **depcruise rule `fsd-view-component-no-features-direct`** | ✅ 機械強制 (CI / pre-commit) |
-| ライブラリ設計の自然誘導 (TanStack Router の `useLoaderData` は route 階層 = Container でしか呼べない) | フレームワーク仕様 | ✅ 構造的に守られる |
-| `*DetailView.tsx` 等で react の `useState` / `useEffect` / `useReducer` named import 禁止 | **review 担保** (機械強制なし) | ⚠️ 意識的選択 (#217 で OSS 検討中) |
-
-機械強制できない範囲 (named import の `useState` 等) は **意識的に review 担保** として運用。`scripts/check-view-purity.mjs` の custom script 案は腐敗リスク (regex 場当たり / IDE squiggle なし / oxlint 外で進化享受できない) から見送り、OSS 検討は Issue #217 で別途。
-
-**List view (filter state のみ) は inline 維持 OK**。`useXxxList` hook 化までは不要 (filter state はその View でしか使わない)。
-
-### JSDoc 必須対象
-
-以下の export には JSDoc コメント必須（lint で機械強制はしないが、レビューで確認する）。
-
-- **Custom hook** (`use*` プレフィックス): 担当する state / 副作用 / mutation / navigation を簡潔に記載
-- **Entity API** (`src/entities/*/api/**`): 何を返すか、引数の意味、副作用 (mutation の場合)、Phase C で server fn 化時の note があれば
-
-```ts
-/**
- * KitDetailView 用の Hook。
- * 担当する state / 副作用:
- * - 購入ダイアログの表示状態 (useState)
- * - addKitEvent({ delta: +1, reason: 'purchase' }) の呼び出し
- * - mutation 後は router.invalidate() で loader 再実行
- */
-export function useKitDetail(input: ...): ... { ... }
-```
-
-### デザインシステム (ADR-0002 / `docs/specs/2026-04-29-design-direction.md`)
-
-UI は **MUI v7 + Emotion** を採用。判断ルールは **Material Design 3** ガイドラインを参照する。
-
-- 公式 docs: https://m3.material.io/ (色 / typography / spacing / elevation / state layer の規約)
-- MUI docs: https://mui.com/material-ui/ (component の API / sx prop の書き方)
-- pla-stock の方向性 (Tone / Differentiation 等) は **`docs/specs/2026-04-29-design-direction.md`** に確定 (Refined Minimalism + 塗料 color swatch 差別化、primary は M3 green)
-- UI 変更時は **`frontend-design` skill を invoke** して spec 方針との整合性確認
-
-判断時の優先順:
-1. M3 ガイドライン (色の意味論、コンポーネント階層)
-2. MUI docs (具体 API)
-3. `src/theme/tokens.ts` (M3 準拠の token 実体)
-
-### Toast 通知
-
-mutation 成功 / 失敗、検証エラー等は **notistack の Snackbar** で通知する。
-
-- React コンポーネント内: `const { enqueueSnackbar } = useSnackbar()`
-- 非 React 文脈 (loader / route handler): `import { enqueueSnackbar } from 'notistack'`
-- variant: `'success' | 'error' | 'warning' | 'info' | 'default'`
-- `window.alert` / `console.warn` を user-facing 通知に使わない (debug 用は OK)
-
-### Loading 表示
-
-route 遷移中の loader 待機は **TanStack Router の `pendingComponent`** で画面上部に MUI `<LinearProgress>` を表示。
-mutation 中の button は `disabled + <CircularProgress size={16} />` パターン (既存実装のまま継続)。
-
-### Emotion 隔離方針 (#43-style 機械強制)
-
-MUI v7 は内部 engine に Emotion を使うが、**user code は MUI 抽象しか触らない**。将来 Pigment CSS 等への engine 切替時に user code 書換を最小化するため。
-
-| ルール | 内容 |
-|---|---|
-| 1 | styling は MUI の `sx` prop で |
-| 2 | `styled()` は `@mui/material/styles` から (NEVER `@emotion/styled`) |
-| 3 | `@emotion/*` の直接 import 禁止 (oxlint 機械強制) |
-| 4 | theme tokens は `src/theme/` に集約 (engine 非依存の plain TS object) |
-| 5 | `createTheme()` 引数は M3 schema 準拠 |
-| 6 | `<ThemeProvider>` は `@mui/material/styles` から (NEVER `@emotion/react`) |
-
-ルール 3 は `lint-config/oxlint-emotion-isolation.jsonc` で `no-restricted-imports` 強制。違反すると pre-commit / CI で reject。
-
-### Form パターン (ADR-0003)
-
-Form は **TanStack Form + MUI TextField/Select**、`<FormTextField field={...} />` / `<FormSelect field={...} options={...} />` 経由で統一。詳細 ADR-0003。
-
-### Domain schema (ADR-0008、ADR-0005 を Supersede)
-
-ドメインのテーブル定義・列・enum values・派生型は **`entities/{domain}/schema.ts`** に Drizzle table として集約する (SSoT)。UI 表示用 label のみ `entities/{domain}/model.ts` に置く。
-
-```ts
-// entities/kit/schema.ts (SSoT)
-export const KIT_EVENT_REASONS = ['purchase', 'project', 'gift', 'sell', 'discard', 'other'] as const
-export const kitEvents = sqliteTable('kit_events', {
-  // ...
-  reason: text('reason', { enum: KIT_EVENT_REASONS }).notNull(),
-})
-export type KitEvent = typeof kitEvents.$inferSelect
-export type KitEventReason = (typeof KIT_EVENT_REASONS)[number]
-
-// entities/kit/model.ts (UI labels のみ)
-export type { KitEvent, KitEventReason } from './schema'
-export const KIT_EVENT_REASON_LABELS = {
-  purchase: '購入', project: 'プロジェクト', /* ... */
-} as const satisfies Record<KitEventReason, string>
-```
-
-中間テーブル (M:N) は **専用 entity ディレクトリ** を切る (例: `entities/projectPaintUse/schema.ts`)。この entity だけが両端 entity の schema を import してよい。
-
-利用側は entity barrel (`~/entities/{domain}`) 経由で値・型・labels を取り出し、UI 専用 subset (例: release だけで使う reasons) は dialog 内に `as const satisfies readonly KitEventReason[]` で型整合だけ守って宣言。同 subset を 2 箇所以上で使うなら entity 側に昇格させる。
-
-timestamp の 2 種類区別:
-- **時点 (instant)** `createdAt` 等 → `integer({ mode: 'timestamp_ms' })`、boundary は **`Date`**
-- **カレンダー日付** `purchasedAt` / `startedAt` 等 → `text('purchased_at')`、boundary は **`string`** ('YYYY-MM-DD')
-
-機械強制はせず convention 運用。AI エージェントが本規約に違反した場合は ADR-0007 に FAIL エントリとして追記 (`failure-record` skill) → **ユーザーに `/rule-cycle` を依頼** して再発防止サイクルを回す。詳細 ADR-0006 / ADR-0008 / ADR-0007。
-
-### 型アサーション・三項ネスト禁止 (PR #56 レビュー由来)
-
-oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
-
-- **`value as Foo` 形の型アサーション禁止** (`consistent-type-assertions: never`)
-  - 代替: 型 narrowing (`typeof`, `'in'`, type guard 関数), `as const`, `satisfies`
-  - `as const` は本ルールの例外として許可される (TS の特殊形)
-  - 真にやむを得ない箇所は `// oxlint-disable-next-line consistent-type-assertions -- 理由` で 1 行ずつ disable し、必ず理由コメントを付ける
-- **三項演算子のネスト禁止** (`no-nested-ternary`)
-  - 代替: if/return 早期 return、ヘルパ関数化、map lookup
-
-### 1 文字変数禁止 (PR #56 レビュー由来)
-
-`id-length: { min: 2, exceptions: ['_'] }` で機械強制。
-
-- `e` (event), `p` (paint/project/part), `o` (option) 等の単文字省略は禁止
-- 文脈に応じて意味のある名前を付ける (`event` / `paint` / `option` 等)
-- 例外は `_` (意図的未使用の destructured 変数) のみ
-
-### 明示的 any 禁止 (ユーザーレビュー指摘 (b) 由来)
-
-`typescript/no-explicit-any: error` で機械強制 (`lint-config/oxlint-base.jsonc`)。
-
-- 関数引数 / 戻り値 / 変数注釈で `any` を使うのは禁止
-- 代替: 正確な型注釈、`unknown` + type narrowing、generics、型 import (React の `children` は `ReactNode` 等)
-- 真にやむを得ない箇所は `// oxlint-disable-next-line typescript/no-explicit-any -- 理由` で 1 行 disable + 理由コメント
-
-## AI 運用ルール
-
-物理的なガード (force push 禁止 / 本番 deploy 禁止 / secret 編集禁止 等) は `.claude/settings.json` で deny / ask 機械強制。以下は **機械強制できない判断系 + 半機械強制 (hook で run を強制) の規律**:
-
-- **UI 変更の push は機械強制で `pnpm verify:ui` 必須** (`.husky/pre-push` が以下を検出時、`.playwright-snapshots/` の鮮度をチェックして reject)
-  - `src/(views|widgets)/**/*.{tsx,css,scss}` (Presenter / style。hook の `.ts` や test は対象外)
-  - `src/(theme|styles)/**` (design token / global style は `.ts` でも対象)
-  - 撮った screenshot を **controller 自身が必ず目視確認** (run しただけで OK は禁止、それは harness の趣旨に反する)
-- **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
-- **DB 書込 mutation の spec/plan は UPSERT/batch × CHECK/UNIQUE/FK の相互作用を実機 SQL で再現確認必須** (FAIL-003 由来 / ADR-0007)
-  - 机上の SQL 設計を merge 前提にしない。特に `INSERT ... ON CONFLICT DO UPDATE`: **SQLite は DO UPDATE 切替前に INSERT 候補行の CHECK を評価する**ため、INSERT 候補値は生 delta でなく最終結果値 (`(既存値 or 0) + delta`) にそろえる
-  - **mutation PR は controller 自身がマージ前に制約違反系の手動 smoke を実施**してからユーザー確認に回す (ユーザー任せにしない)。必須境界ケース: 在庫 1→0 が成功 / 0→-1 が拒否され**台帳も増えない** (CHECK + batch rollback)
+- **main / master への直接コミット禁止**: 編集前に `git branch --show-current` を確認、main なら **user に `/dev-start <issue>` を依頼** して feature branch (AI auto-trigger 無効)
+- **commit 前は必ず user に `/dev-complete` を依頼**: 内部で self-review subagent dispatch → docs-freshness → conventional-commits → github-flow が連鎖実行される。AI 単独で `git commit` は NG
+- **narrative は日本語**: コミット本文 / PR / Issue / docs。`type(scope):` プレフィックスとコード内識別子は英語のまま
+- **PR は必ず `Closes #<issue>` で Issue を紐付ける**
 - **新規ライブラリ採用は ADR 起票必須** (`docs/adr/`)
-- **UI コード変更前 (`.tsx` の styling / sx prop / 新規 component) は必ず `frontend-design` skill を invoke する**
-  - 特に「**見た目に対する feedback**」(例: 「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず**、まず skill で Design Thinking (Tone / Differentiation / Constraints) を再適用する
-  - spec (`docs/specs/2026-04-29-design-direction.md`) は方針、skill は **その実装局面での craft 適用ガイド**。両方必須
+- **設計判断があったら user に `/design-decision` を依頼** (ADR が SSoT、memory への二重保存禁止)
+- **セルフレビュー / コードレビューの結果は PR コメントで残す** (`gh pr comment`、指摘 → 修正 → 修正内容を返信で記録)
 
-### Skill / Command 起動の規律 (FAIL-002 由来 / ADR-0007)
+### UI 変更時の規律
+
+- **UI コード変更前 (`.tsx` の styling / sx prop / 新規 component) は必ず `frontend-design` skill を invoke する**
+  - 特に「見た目に対する feedback」(「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず** skill で Design Thinking (Tone / Differentiation / Constraints) を再適用
+  - design 方針 (`docs/specs/2026-04-29-design-direction.md`) と skill (craft 適用ガイド) の両方必須
+- **UI 変更の push は機械強制で `pnpm verify:ui` 必須** (`.husky/pre-push` が以下を検出時、`.playwright-snapshots/` の鮮度をチェックして reject):
+  - `src/(views|widgets)/**/*.{tsx,css,scss}` (Presenter / style、hook の `.ts` や test は対象外)
+  - `src/(theme|styles)/**` (design token / global style)
+  - 撮った screenshot を **controller 自身が必ず目視確認** (run しただけで OK は禁止)
+
+### DB mutation の規律
+
+- **DB 書込 mutation の spec/plan は UPSERT/batch × CHECK/UNIQUE/FK の相互作用を実機 SQL で再現確認必須** (FAIL-003、ADR-0007)
+  - 机上の SQL 設計を merge 前提にしない。特に `INSERT ... ON CONFLICT DO UPDATE`: **SQLite は DO UPDATE 切替前に INSERT 候補行の CHECK を評価する**ため、INSERT 候補値は生 delta でなく最終結果値 (`(既存値 or 0) + delta`) にそろえる
+  - **mutation PR は controller 自身がマージ前に制約違反系の手動 smoke を実施** (ユーザー任せにしない)。必須境界ケース: 在庫 1→0 が成功 / 0→-1 が拒否され台帳も増えない (CHECK + batch rollback)
+
+### subagent の規律
+
+- **subagent の DONE 報告は独立検証**を経るまで信用しない (コード読み + 視覚確認 or test 実行)
+
+### Skill / Command 起動の規律 (FAIL-002 / ADR-0007)
 
 orchestrator command (`.claude/commands/<name>.md`) や atomic skill (`.claude/skills/<name>/SKILL.md`) は、適用場面で **必ず明示起動する**。内容を読み流して検証コマンドを `pnpm xxx` で手打ちしても **起動の代替にはならない**。
 
@@ -319,21 +117,21 @@ orchestrator command (`.claude/commands/<name>.md`) や atomic skill (`.claude/s
 
 | 起動が必須な skill / command | コマンド手打ちで代替できない理由 |
 |---|---|
-| `/dev-complete` (本物 slash command) | Step 1 で `self-review` **subagent を Agent dispatch**、Step 2-4 で docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。本物 slash は user 入力でしか起動できず、AI が context に command 内容を読み込み実行 (#227) |
-| `self-review` subagent | 検証コマンド + 「**差分ファイルを新鮮な目で再読**」「ツールで検出できない懸念探索」を subagent が独立 context で実施。親 context のバイアスを排除するのが核心 |
-| `/dev-start` (本物 slash command) | memory 検索 / Issue 確認 / ブランチ作成のオーケストレーション。user 明示 `/dev-start <issue-number>` で起動、AI auto-trigger は構造的に不可 |
-| `frontend-design` skill | Design Thinking (Tone / Differentiation / Constraints) の適用ガイド。skill を読み流して反応的に sx を弄ると craft が崩れる |
+| `/dev-complete` (本物 slash) | Step 1 で `self-review` **subagent を Agent dispatch**、Step 2-4 で docs-freshness / conventional-commits / github-flow を REQUIRED SUB-SKILL として連鎖呼出する設計 |
+| `self-review` subagent | 検証コマンド + 「差分ファイルを新鮮な目で再読」「ツールで検出できない懸念探索」を独立 context で実施。親 context のバイアス排除が核心 |
+| `/dev-start` (本物 slash) | memory 検索 / Issue 確認 / branch 作成の orchestration。user 明示 `/dev-start <issue>` で起動、AI auto-trigger は構造的に不可 |
+| `frontend-design` skill | Design Thinking (Tone / Differentiation / Constraints) の適用ガイド |
 
-**Red Flag** (これが浮かんだら STOP — skill / command 起動を省略しようとしているサイン):
+**Red Flag** (浮かんだら STOP):
 
-- 「skill / command の内容は把握してるからコマンドだけで OK」 → 把握してても手順が抜ける。明示起動して checklist を毎回踏む
-- 「docs / 軽微な変更だから self-review 軽くて OK」 → docs こそ grep カウント汚染等の落とし穴あり (FAIL-002 で実証)。重さは内容ではなく **省略を許さない態度** で決める
-- 「`pnpm check:parallel` が pre-commit hook で走るから OK」 → hook は最後の砦であって self-review subagent dispatch の代替ではない。差分 re-read / paper tiger チェックは hook で代替できない
-- 「task で `self-review` をマークしたから OK」 → タスク完了マークは記録、Agent tool での subagent dispatch が実行。両方必要
+- 「skill / command の内容は把握してるからコマンドだけで OK」 → 把握してても手順が抜ける、明示起動して checklist を毎回踏む
+- 「docs / 軽微な変更だから self-review 軽くて OK」 → docs こそ grep カウント汚染等の落とし穴あり (FAIL-002)、重さは内容ではなく **省略を許さない態度** で決める
+- 「`pnpm check:parallel` が pre-commit hook で走るから OK」 → hook は最後の砦であって self-review subagent dispatch の代替ではない、差分 re-read / paper tiger チェックは hook で代替できない
+- 「task で `self-review` をマークしたから OK」 → タスク完了マークは記録、Agent tool での subagent dispatch が実行、両方必要
 
-実装系タスクで TaskCreate を使う際は、**「ユーザーに `/dev-complete` を依頼」を独立タスクとして必ず切る** と、起動行為が可視化されて省略しにくくなる。
+実装系タスクで TaskCreate を使う際は、**「user に `/dev-complete` を依頼」を独立タスクとして必ず切る** と起動行為が可視化されて省略しにくくなる。
 
-### `verify:ui` 運用
+### `verify:ui` 運用と限界
 
 ```sh
 pnpm dev               # 別 terminal で dev server 起動
@@ -342,5 +140,6 @@ pnpm verify:ui         # screenshot 撮影 → .playwright-snapshots/ に保存
 
 初回のみ chromium インストール: `pnpm exec playwright install chromium`
 
-**重要な制約**: 現状 verify:ui は **LandingView (`/`) のみ対象**。Clerk 認証 gate 配下 (`/dashboard` 等) は screenshot 不可。  
-**= verify:ui の OK = 「全画面 OK」ではない。** 認証 gate 内の dark mode / レイアウト / Action 配置は **controller がブラウザで目視確認** するか **ユーザーの screenshot を待つ** こと。LandingView だけで OK 判定するのは 2026-04-29 の失敗 (ai-failures.md 参照) と同じ過ち。
+**重要な制約**: 現状 verify:ui は **LandingView (`/`) のみ対象**。Clerk 認証 gate 配下 (`/dashboard` 等) は screenshot 不可。
+
+**= verify:ui の OK = 「全画面 OK」ではない**。認証 gate 内の dark mode / レイアウト / Action 配置は **controller がブラウザで目視確認** するか **user の screenshot を待つ**。LandingView だけで OK 判定するのは 2026-04-29 の失敗 (ADR-0007 FAIL-000b) と同じ過ち。
