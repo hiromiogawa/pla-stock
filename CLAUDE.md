@@ -11,7 +11,7 @@
 ## 🛑 必ず最初に読むこと: Skill 起動ルール
 
 このプロジェクトは `.claude/skills/` 配下のスキルを **状況トリガー** で必ず起動する運用。
-「呼べる」ではなく「呼ばねばならない」。**Skill ツールで明示起動**することで手順省略を防ぐ。
+「呼べる」ではなく「呼ばねばならない」。**Skill / slash command を明示起動**することで手順省略を防ぐ (orchestrator は本物 slash `.claude/commands/`、atomic skill は `.claude/skills/`、#227)。
 
 > **記憶 (file memory) ルール**: 本プロジェクトの記憶は skill ではなく本ルールに従う。
 > global `~/.claude/CLAUDE.md` の memory skill 起動指示は **本プロジェクトでは本節が優先**
@@ -25,48 +25,29 @@
 
 **セッション開始時**: file memory（memory ディレクトリの `MEMORY.md` + 型別エントリ）を確認し、過去の決定・好み・失敗事例を把握する（skill 起動不要・本ルール参照）。
 
-<!-- gen:skill-index start -->
-### トリガー表（このトリガーに該当したら即 Skill 起動）
+### Skill / Command 一覧
 
-| トリガー | 起動する Skill | 種別 |
-|---|---|---|
-| 技術選定・アーキテクチャ変更・代替案比較の末に設計判断を下したとき、design-decision 外で単独記録する場合や既存 ADR を Supersede するとき | `adr` | atomic |
-| 品質ツールの設定・実行タイミングを決めるとき、または lint・未使用コード・依存違反エラーに遭遇したとき | `code-quality` | atomic |
-| コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき | `conventional-commits` | atomic |
-| ユーザーが /design-decision で明示起動するとき (ライブラリ選定・DB 設計・アーキテクチャ変更など、設計判断確定時) | `design-decision` | orchestrator |
-| ユーザーが /dev-complete で明示起動するとき (実装一段落、コミット・PR 作成前) | `dev-complete` | orchestrator |
-| ユーザーが /dev-start で明示起動するとき (Issue 着手直前) | `dev-start` | orchestrator |
-| ドキュメントを追加・更新するとき、生成物と手動ドキュメントの役割分担に迷ったとき、または CI / pre-push hook の docs 差分チェックが失敗したとき | `docs-freshness` | atomic |
-| エージェントが同じミスを繰り返した・ユーザーに訂正された・レビューで指摘を受けたとき | `failure-record` | atomic |
-| Issue を作成・階層付けするとき、PR を立てるとき、または GitHub Projects のステータスを更新するとき | `github-flow` | atomic |
-| ユーザーが /post-review で明示起動するとき (コードレビュー指摘受領直後) | `post-review` | orchestrator |
-| 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき | `project-bootstrap` | orchestrator |
-| ユーザーが /rule-cycle で明示起動するとき (failure-record 追記直後 or 「ルールを改善して」依頼時) | `rule-cycle` | orchestrator |
-| 新機能の設計を始めるとき、仕様書から実装へ移行するとき、または JSDoc / typedoc による仕様記述に迷ったとき | `sdd` | atomic |
-| dev-complete オーケストレーターから subagent dispatch する直前 | `self-review` | atomic |
-| 新規 test file (*.test.ts / *.test.tsx) を作成するとき、または既存 test を更新するとき | `testing` | atomic |
-| 新規 Issue を立てる時、既存 Issue を整える時、Epic に sub-issue をぶら下げる時 | `writing-issues` | atomic |
-| 新しい skill を追加・編集するとき、既存 skill を点検するとき、または description や構造に迷ったとき | `writing-project-skills` | atomic |
-| rule-cycle が連鎖呼出する内部 skill (詳細は `.claude/skills/rule-cycle/SKILL.md` 参照、単独起動も可能) | `rule-measure` / `rule-explore` / `rule-improve` / `rule-audit` | atomic (内部) |
+Claude Code は session 開始時に **system-reminder** で全 skill / command の description を context 注入する。AI は description を見て起動判断する (トリガー表は #227 で廃止)。俯瞰図が必要な場面は #229 (drawio でハーネス全体図) で別途整備予定。
 
-### オーケストレーション系（単一責務 skill を連鎖）
+| 機構 | 配置 | 種別 | 起動 |
+|---|---|---|---|
+| **orchestrator** (本物 slash command) | `.claude/commands/<name>.md` | `/dev-start` `/dev-complete` `/post-review` `/design-decision` `/rule-cycle` | user 入力のみ (構造的に AI auto-trigger 不可) |
+| **atomic** (handbook skill) | `.claude/skills/<name>/SKILL.md` | adr / code-quality / conventional-commits / docs-freshness / failure-record / github-flow / sdd / testing / writing-issues / writing-project-skills / self-review / rule-measure / rule-explore / rule-improve / rule-audit | AI auto-trigger or user `/name` |
+| **subagent** | `.claude/agents/<name>.md` | self-review / rule-measure / rule-explore | Agent tool で dispatch (独立 context) |
+| **transitional orchestrator skill** | `.claude/skills/project-bootstrap/SKILL.md` | project-bootstrap | #188 で subagent 化判断するまで現状維持 |
 
-- **design-decision** → adr
-- **dev-complete** → docs-freshness, conventional-commits, github-flow
-- **dev-start** → github-flow, sdd
-- **post-review** → dev-complete, failure-record
-- **project-bootstrap** → code-quality, conventional-commits, github-flow, sdd, adr
-- **rule-cycle** → rule-improve, rule-audit
+orchestrator の連鎖関係 (frontmatter `metadata.subskills` が SSoT):
 
-### 単一責務系（atomic）
-
-`adr` `code-quality` `conventional-commits` `docs-freshness` `failure-record` `github-flow` `rule-audit` `rule-explore` `rule-improve` `rule-measure` `sdd` `self-review` `testing` `writing-issues` `writing-project-skills`
+- **`/dev-start`** → github-flow, sdd
+- **`/dev-complete`** → docs-freshness, conventional-commits, github-flow (+ self-review subagent)
+- **`/post-review`** → dev-complete, failure-record
+- **`/design-decision`** → adr
+- **`/rule-cycle`** → rule-improve, rule-audit (+ rule-measure / rule-explore subagent)
 
 > 実作業の主役の一部は superpowers **plugin** skill（`brainstorming` /
 > `writing-plans` / `subagent-driven-development` / `systematic-debugging` /
 > `requesting-code-review`）で、project frontmatter 管理外。plugin 参照は
-> orchestrator の subskills に `plugin:` 接頭辞で記す。
-<!-- gen:skill-index end -->
+> orchestrator command の subskills に `plugin:` 接頭辞で記す。
 
 > **注**: 移植元の st-cost は Next.js / pnpm 前提で書かれている skill が多い。pla-stock は TanStack Start + Cloudflare + Neon + Drizzle を採用予定のため、Phase 2（スキャフォールド時）に `code-quality`, `self-review`, `conventional-commits` などを本プロジェクトのスタックに合わせて更新すること。
 
@@ -331,22 +312,22 @@ oxlint で機械強制（`lint-config/oxlint-base.jsonc`）。
   - 特に「**見た目に対する feedback**」(例: 「貧相」「派手」「狭すぎ」「変」) を受けた時、**反応的にパラメータ調整せず**、まず skill で Design Thinking (Tone / Differentiation / Constraints) を再適用する
   - spec (`docs/specs/2026-04-29-design-direction.md`) は方針、skill は **その実装局面での craft 適用ガイド**。両方必須
 
-### Skill tool 起動の規律 (FAIL-002 由来 / ADR-0007)
+### Skill / Command 起動の規律 (FAIL-002 由来 / ADR-0007)
 
-トリガー表 (本ドキュメント冒頭) で「起動する Skill」と書かれているものは、**Skill tool で明示起動する**。skill 内に書かれた検証コマンドを `pnpm xxx` で手打ちしても skill 起動の代替にはならない。
+orchestrator command (`.claude/commands/<name>.md`) や atomic skill (`.claude/skills/<name>/SKILL.md`) は、適用場面で **必ず明示起動する**。内容を読み流して検証コマンドを `pnpm xxx` で手打ちしても **起動の代替にはならない**。
 
 特に以下は **コマンド手打ちでの代替を厳禁**:
 
-| 起動が必須な skill | コマンド手打ちで代替できない理由 |
+| 起動が必須な skill / command | コマンド手打ちで代替できない理由 |
 |---|---|
-| `/dev-complete` (slash) | Step 1 で `self-review` **subagent を Agent dispatch**、Step 2-4 で docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。AI auto-trigger は無効化済、ユーザー明示 `/dev-complete` 入力で AI が context に skill 内容を読み込み実行 |
-| `self-review` (skill = dispatch reference) / **subagent** | 検証コマンド + 「**差分ファイルを新鮮な目で再読**」「ツールで検出できない懸念探索」を subagent が独立 context で実施。親 context のバイアスを排除するのが核心。skill は dispatch 手順の参考書 |
-| `/dev-start` (slash) | memory 検索 / Issue 確認 / ブランチ作成のオーケストレーション。AI auto-trigger 無効、ユーザー明示 `/dev-start` 入力で起動 |
-| `frontend-design` | Design Thinking (Tone / Differentiation / Constraints) の適用ガイド。skill を読み流して反応的に sx を弄ると craft が崩れる |
+| `/dev-complete` (本物 slash command) | Step 1 で `self-review` **subagent を Agent dispatch**、Step 2-4 で docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。本物 slash は user 入力でしか起動できず、AI が context に command 内容を読み込み実行 (#227) |
+| `self-review` subagent | 検証コマンド + 「**差分ファイルを新鮮な目で再読**」「ツールで検出できない懸念探索」を subagent が独立 context で実施。親 context のバイアスを排除するのが核心 |
+| `/dev-start` (本物 slash command) | memory 検索 / Issue 確認 / ブランチ作成のオーケストレーション。user 明示 `/dev-start <issue-number>` で起動、AI auto-trigger は構造的に不可 |
+| `frontend-design` skill | Design Thinking (Tone / Differentiation / Constraints) の適用ガイド。skill を読み流して反応的に sx を弄ると craft が崩れる |
 
-**Red Flag** (これが浮かんだら STOP — Skill tool 起動を省略しようとしているサイン):
+**Red Flag** (これが浮かんだら STOP — skill / command 起動を省略しようとしているサイン):
 
-- 「skill の内容は把握してるからコマンドだけで OK」 → 把握してても手順が抜ける。Skill tool 起動して checklist を毎回踏む
+- 「skill / command の内容は把握してるからコマンドだけで OK」 → 把握してても手順が抜ける。明示起動して checklist を毎回踏む
 - 「docs / 軽微な変更だから self-review 軽くて OK」 → docs こそ grep カウント汚染等の落とし穴あり (FAIL-002 で実証)。重さは内容ではなく **省略を許さない態度** で決める
 - 「`pnpm check:parallel` が pre-commit hook で走るから OK」 → hook は最後の砦であって self-review subagent dispatch の代替ではない。差分 re-read / paper tiger チェックは hook で代替できない
 - 「task で `self-review` をマークしたから OK」 → タスク完了マークは記録、Agent tool での subagent dispatch が実行。両方必要

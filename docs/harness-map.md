@@ -1,7 +1,8 @@
 # ハーネス地図
 
-pla-stock の AI 運用ハーネスの全体像。skill 索引は `CLAUDE.md`
-（`scripts/gen-skill-index.mjs` 生成・各 `SKILL.md` frontmatter が SSoT）を参照。
+pla-stock の AI 運用ハーネスの全体像。skill / command 一覧は Claude Code の
+session 開始時 system-reminder と CLAUDE.md `Skill / Command 一覧` を参照
+（各 SKILL.md / commands/*.md の frontmatter が SSoT、#227 でトリガー表生成は廃止）。
 
 ## 5 層構造
 
@@ -9,26 +10,26 @@ pla-stock の AI 運用ハーネスの全体像。skill 索引は `CLAUDE.md`
 |---|---|---|---|
 | 静的 | 決定的・安価な機械検証 | husky 3 hook / oxlint 3 config / dep-cruiser / knip / biome / **settings.json 権限ポリシー (ADR-0011)** / **check-branch** / **check-harness** | — |
 | 動的 | 振る舞いの正しさ | playwright verify:ui（**LandingView のみ**）+ controller 手動 smoke | verify:ui が Clerk 認証 gate を越えられない → spin-off (b)。unit test 基盤なし → spin-off (c) |
-| 振り返り | ルール改善 | rule-cycle（FAIL+3 / 手動） | 発火が反応的・signal 未集約 → spin-off (a) |
-| 統制 | skill 起動規律 | CLAUDE.md トリガー表（**frontmatter SSoT → 生成**）+ FAIL-002 規律 | proportionality / skill 内ループ遵守は未明文 |
-| skill | 作業の型 | project 20 skill（kind 分類）+ check-harness | — |
+| 振り返り | ルール改善 | `/rule-cycle`（FAIL+3 / 手動） | 発火が反応的・signal 未集約 → spin-off (a) |
+| 統制 | skill / command 起動規律 | CLAUDE.md `Skill / Command 一覧` (手動 + system-reminder) + FAIL-002 規律 | proportionality / skill 内ループ遵守は未明文 |
+| skill / command | 作業の型 | project orchestrator 5 (commands) + atomic 15 (skills) + transitional orchestrator 1 (project-bootstrap)、`check-harness` が分類不変条件を機械検証 | 俯瞰図は #229 drawio で別途 |
 
-## skill: project と plugin の境界
+## skill / command: project と plugin の境界
 
-- **project skill**（`.claude/skills/`, 20, frontmatter 管理）: 本リポジトリ固有。
-  `CLAUDE.md` の生成索引が一覧。内訳は **orchestrator 6 / atomic 14**
-  （frontmatter `kind` が SSoT。`check-harness` が分類不変条件を機械検証）
-  - orchestrator 6: `dev-start` `dev-complete` `post-review` `rule-cycle`
-    `project-bootstrap` `design-decision`
-  - atomic 14: `adr` `code-quality` `conventional-commits` `docs-freshness`
+- **orchestrator command**（`.claude/commands/`, 5、frontmatter 管理）: 本物
+  slash command (#227)。user 入力でしか起動できない構造的不可逆性。
+  - `dev-start` `dev-complete` `post-review` `design-decision` `rule-cycle`
+- **atomic skill**（`.claude/skills/`, 15, frontmatter 管理）: 本リポジトリ固有。
+  description で AI auto-trigger + user `/name` どちらも可
+  - `adr` `code-quality` `conventional-commits` `docs-freshness`
     `failure-record` `github-flow` `rule-audit` `rule-explore` `rule-improve`
-    `rule-measure` `sdd` `self-review` `writing-issues` `writing-project-skills`
+    `rule-measure` `sdd` `self-review` `testing` `writing-issues` `writing-project-skills`
+- **transitional orchestrator skill** (`.claude/skills/project-bootstrap/`):
+  #188 で subagent 化判断するまで現状維持 (check-harness が例外として許容)
 - **plugin skill**（superpowers, frontmatter 管理外・参照のみ）: 実作業の主役。
   `brainstorming` `writing-plans` `subagent-driven-development`
   `systematic-debugging` `requesting-code-review` 等。project orchestrator が
   連鎖する場合 `subskills` に `plugin:` 接頭辞で明示
-- 生成索引は project 20 のみを写すため、本ドキュメントが plugin 主役の存在を
-  補完する（「project 20 が全て」という誤読を防ぐ）
 
 ## 権限ポリシー (ADR-0011)
 
