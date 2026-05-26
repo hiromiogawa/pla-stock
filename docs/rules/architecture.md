@@ -2,6 +2,9 @@
 
 pla-stock のアーキテクチャ規約。FSD (Feature-Sliced Design) 類似の 6 レイヤー構造を採用し、`.dependency-cruiser.cjs` で機械強制。
 
+> **FSD 自体の概念・原典は公式ドキュメント参照**: <https://feature-sliced.design/>
+> 本ファイルは pla-stock 固有の **delta** (層構成 / 採用ルール / 機械強制実装) のみを記す。FSD の概念定義 (Layers / Slices / Segments、Public API 規約、Cross-import ルール等) は公式 docs が SSoT。
+
 ## FSD レイヤー
 
 依存方向は下から上 (上位レイヤーは下位を import 可、逆は不可):
