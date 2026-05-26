@@ -33,7 +33,6 @@ jobs:
           - { name: typecheck, cmd: pnpm typecheck }
           - { name: depcruise, cmd: pnpm depcruise }
           - { name: knip, cmd: pnpm knip }
-          - { name: harness, cmd: pnpm check:harness }
           - { name: workflow-pins, cmd: pnpm check:workflow-pins }
           - { name: test-coverage, cmd: pnpm check:test-coverage }
           - { name: test, cmd: pnpm test }

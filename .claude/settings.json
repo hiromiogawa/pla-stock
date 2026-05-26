@@ -55,8 +55,7 @@
       "Bash(pnpm format)",
       "Bash(pnpm check)",
       "Bash(pnpm check:parallel)",
-      "Bash(pnpm check:branch)",
-      "Bash(pnpm check:harness)"
+      "Bash(pnpm check:branch)"
     ]
   }
 }

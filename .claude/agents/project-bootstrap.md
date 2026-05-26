@@ -51,7 +51,6 @@ tools: [Bash, Read, Grep, Glob, Write]
 - `.lintstagedrc.json` (oxlint --fix + biome format)
 - `commitlint.config.cjs` (`.project-config.yml` の `scopes` enum を参照)
 - `scripts/check-branch.mjs` (branch prefix 規約)
-- `scripts/check-harness.mjs` (skill / command 分類検証)
 
 ### フェーズ 3: GitHub セットアップ
 
@@ -117,7 +116,6 @@ dry-run mode (親 prompt で `dryRun: true` 指定時):
 - [ ] `pnpm knip` pass
 - [ ] `pnpm depcruise` pass
 - [ ] `node scripts/check-branch.mjs` 配線確認
-- [ ] `node scripts/check-harness.mjs` 配線確認 (skill / command 存在しない repo では空 pass)
 - [ ] husky フックが配置済 (`ls .husky/`)
 - [ ] `.github/ISSUE_TEMPLATE/` 配置済
 - [ ] CLAUDE.md が plausible (技術スタック / コマンド一覧 / 規約参照)

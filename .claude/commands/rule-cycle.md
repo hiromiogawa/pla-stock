@@ -1,10 +1,5 @@
 ---
 description: ルール改善サイクル（rule-measure → rule-explore → rule-improve → rule-audit）を順次実行する
-metadata:
-  kind: orchestrator
-  subskills: [rule-improve, rule-audit]
-  subagents: [rule-measure, rule-explore]
-  trigger: ユーザーが /rule-cycle で明示起動するとき (failure-record 追記直後 or 「ルールを改善して」依頼時)
 ---
 
 # ルール改善サイクル

@@ -1,9 +1,5 @@
 ---
 description: 設計判断を docs/adr/ の ADR に記録する (adr 一本)
-metadata:
-  kind: orchestrator
-  subskills: [adr]
-  trigger: ユーザーが /design-decision で明示起動するとき (ライブラリ選定・DB 設計・アーキテクチャ変更など、設計判断確定時)
 ---
 
 # 設計判断

@@ -14,7 +14,6 @@ pnpm test || exit 1
 # Step 1.5: docs drift (ADR index、約 0.1 秒)
 # ============================================================================
 # docs/adr/ を追加・編集した場合に docs/adr/README.md (ADR 索引) の drift を検出。
-# skill-index は check:harness 経由で pre-commit で既に検証済 (check:parallel)。
 # adr-index は手動で `pnpm gen:adr-index` を打たないと drift する性質 → hook で gate。
 echo "▶ pnpm gen:adr-index --check (docs-freshness drift gate、#178)"
 pnpm gen:adr-index --check || exit 1

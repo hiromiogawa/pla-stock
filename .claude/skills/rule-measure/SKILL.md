@@ -1,9 +1,6 @@
 ---
 name: rule-measure
 description: rule-measure subagent (.claude/agents/rule-measure.md) の dispatch reference。計測本体は subagent に集約。Use when rule-cycle オーケストレーターから subagent dispatch する手順を確認するとき
-metadata:
-  kind: atomic
-  trigger: rule-cycle オーケストレーターから subagent dispatch する直前
 ---
 
 # rule-measure (dispatch reference)

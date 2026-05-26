@@ -1,10 +1,5 @@
 ---
 description: 実装完了時の仕上げ（self-review subagent dispatch → docs-freshness → conventional-commits → PR 作成）を統括する
-metadata:
-  kind: orchestrator
-  subskills: [docs-freshness, conventional-commits, github-flow]
-  subagents: [self-review]
-  trigger: ユーザーが /dev-complete で明示起動するとき (実装一段落、コミット・PR 作成前)
 ---
 
 # 開発完了

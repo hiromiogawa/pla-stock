@@ -1,10 +1,6 @@
 ---
 description: Issue 着手前のコンテキスト準備（memory 検索 → github-flow でブランチ作成 → sdd で仕様確認）を統括する
 argument-hint: <issue-number>
-metadata:
-  kind: orchestrator
-  subskills: [github-flow, sdd]
-  trigger: ユーザーが /dev-start で明示起動するとき (Issue 着手直前)
 ---
 
 # 開発開始

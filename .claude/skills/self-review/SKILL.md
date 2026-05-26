@@ -1,9 +1,6 @@
 ---
 name: self-review
 description: self-review subagent (.claude/agents/self-review.md) の dispatch reference。検証サイクル本体は subagent に集約。Use when dev-complete から subagent dispatch する手順を確認するとき
-metadata:
-  kind: atomic
-  trigger: dev-complete オーケストレーターから subagent dispatch する直前
 ---
 
 # self-review (dispatch reference)

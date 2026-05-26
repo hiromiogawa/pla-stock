@@ -1,9 +1,6 @@
 ---
 name: rule-explore
 description: rule-explore subagent (.claude/agents/rule-explore.md) の dispatch reference。探索本体は subagent に集約。Use when rule-cycle オーケストレーターから rule-measure 直後に subagent dispatch する手順を確認するとき
-metadata:
-  kind: atomic
-  trigger: rule-cycle オーケストレーターから rule-measure 直後に subagent dispatch する直前
 ---
 
 # rule-explore (dispatch reference)
