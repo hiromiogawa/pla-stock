@@ -1,94 +1,43 @@
 ---
 name: project-bootstrap
-description: .project-config.yml をもとに新リポジトリを dev-skills 標準（code-quality / conventional-commits / github-flow / sdd / docs-freshness）で初期化する。Use when 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき
+description: project-bootstrap subagent (.claude/agents/project-bootstrap.md) の dispatch reference。生成サイクル本体は subagent に集約。Use when 新規プロジェクトを dev-skills 標準でブートストラップするとき
 metadata:
-  kind: orchestrator
-  subskills: [code-quality, conventional-commits, github-flow, sdd, adr]
+  kind: atomic
   trigger: 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき
 ---
 
-# プロジェクトブートストラップ
+# project-bootstrap (dispatch reference)
 
-新プロジェクト開始時に以下のスキルを順序付きで実行する統括スキル。
+新規 repo の bootstrap (Biome / OXLint / knip / dep-cruiser / husky / Issue template / docs/ / CLAUDE.md 生成) は `.claude/agents/project-bootstrap.md` subagent に集約済。本 skill は **dispatch 手順の参考書**。
 
-## 前提条件
+## いつ使うか
 
-- `.project-config.yml` がプロジェクトルートに存在すること
-- git が初期化されていること
+新規 repo を dev-skills 標準で初期化するとき (pla-stock の現状 bootstrap 済 state を fixture とした dry-run も subagent 対応)。
 
-## 実行順序
+## dispatch 方法
 
-### フェーズ 1: コード品質セットアップ
-**REQUIRED SUB-SKILL:** code-quality:
-1. Biome 設定ファイル生成
-2. OXLint 設定ファイル生成
-3. knip 設定ファイル生成
-4. dependency-cruiser 設定ファイル生成
-5. Vitest 設定
+1. ターゲット repo に `.project-config.yml` を配置 (project / coverage / architecture / scopes 等を記述)
+2. Bash で先に `git init` / `pnpm init` を実施 (不可逆操作は subagent 範囲外)
+3. Agent tool を起動、`subagent_type: project-bootstrap`、prompt に次を含める:
+   - `.project-config.yml` の内容 (raw YAML)
+   - ターゲット repo path
+   - 既存ファイル取扱い (`skip-existing` or `overwrite`)
+   - 期待出力フォーマット (subagent 側「出力フォーマット」に従う)
+4. 返却された Markdown 要約を確認、確認事項チェックリストを順次実施
+5. 必要なら subagent を再 dispatch (生成 fail / 一部だけ生成失敗等)
 
-### フェーズ 2: Git ワークフローセットアップ
-**REQUIRED SUB-SKILL:** conventional-commits:
-1. husky + lint-staged 設定（本プロジェクトでは lefthook ではなく husky を採用）
-2. commitlint 設定
-3. Git hooks インストール（`pnpm exec husky init` + `.husky/{pre-commit,pre-push,commit-msg}` 作成）
+## なぜ subagent か
 
-### フェーズ 3: GitHub セットアップ
-**REQUIRED SUB-SKILL:** github-flow:
-1. Issue テンプレート作成 (`.github/ISSUE_TEMPLATE/`)
-2. GitHub Projects 設定（手動 or gh CLI）
-3. ラベル作成
+- Write tool が必要 (大量 config / skill / docs ファイル生成)
+- 大量の生成 output を独立 context に閉じ込めて親 context のサイズを節約
+- 新規 repo 立ち上げという 1 回限りの作業のため、独立 context での隔離が安全 (誤って既存 repo を上書きするリスクの低減)
 
-### フェーズ 4: ドキュメントセットアップ
-**REQUIRED SUB-SKILL:** sdd:
-1. `docs/specs/` ディレクトリ作成
-2. typedoc 設定
+## 実機検証
 
-**REQUIRED SUB-SKILL:** adr:
-1. `docs/adr/` ディレクトリを作成（flat 構成、`NNNN-short-name.md` を直下に置く）
-2. ファイル構成・命名規則の詳細は adr skill を参照
+subagent の実機検証は **次回新規プロジェクト立ち上げ時** に実施 (Issue #188 のスコープ記述通り)。pla-stock 上での dry-run mode は subagent 側でサポート。
 
-### フェーズ 5: CLAUDE.md
-1. CLAUDE.md を生成（プロジェクト設定 + スキルへのポインタ + ドキュメント一覧）
+## Red Flags — STOP
 
-## `.project-config.yml` テンプレート
-
-下は **monorepo 例**（domain / infrastructure / interface に分ける構成）。値は **プロジェクトごとに書き換える前提** のテンプレ値。例えば single-package の domain ベース構成なら scopes は `[kit, paint, project, stock, ...]` のような具体ドメイン名になり、architecture.layers も別の表現になる。
-
-```yaml
-# Project-specific configuration values
-# Referenced by skills for project-specific settings
-
-project:
-  name: my-project
-  type: monorepo  # or single-package
-
-coverage:
-  minimum: 75
-  target: 80
-
-architecture:
-  type: clean-architecture
-  layers:
-    domain: packages/core
-    infrastructure:
-      - packages/storage-postgres
-    interface:
-      - packages/mcp-server
-
-scopes:
-  - core
-  - storage-postgres
-  - mcp-server
-```
-
-## 確認事項
-
-ブートストラップ後に確認:
-- [ ] `pnpm lint` が通ること
-- [ ] `pnpm test` が通ること（テストがまだない場合はOK）
-- [ ] `pnpm knip` が通ること
-- [ ] `pnpm dep-check` が通ること
-- [ ] husky フックがインストールされていること（`.husky/` 配下にスクリプトが存在）
-- [ ] Issue テンプレートが `.github/ISSUE_TEMPLATE/` に存在すること
-- [ ] `docs/` の構造が作成されていること
-- [ ] CLAUDE.md が正しいポインタで存在すること
+- 「subagent dispatch せず Skill 経由で手作業生成」→ 独立 context の利点 (大量 output 隔離 / Write 範囲限定) が崩れる
+- 「`.project-config.yml` を渡さず subagent dispatch」→ scopes / architecture / coverage 値が決まらず scaffold が hardcode 化、再利用性が損なわれる
+- 「不可逆操作 (`git init` / `pnpm install`) を subagent にやらせる」→ rollback 不能な操作は親 context が責任を持って実施する

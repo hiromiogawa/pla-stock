@@ -73,33 +73,17 @@ const commands = commandFiles.map((file) => {
 
 const referableSet = new Set([...skills, ...commands].map((entry) => entry.name))
 
-// 過渡的に skill 側に orchestrator が残ることを許す例外。
-// project-bootstrap は #188 で subagent 化判断するまで現状維持 (#227 で明示スコープ外)。
-const TRANSITIONAL_ORCHESTRATOR_SKILLS = new Set(['project-bootstrap'])
-
-// skill 側バリデーション: kind は atomic 必須 (orchestrator は commands に移行)
-// 例外として TRANSITIONAL_ORCHESTRATOR_SKILLS は orchestrator のまま許可
+// skill 側バリデーション: kind は atomic 必須 (orchestrator は commands に移行、#227 / #188)
 for (const skill of skills) {
   const kind = skill.metadata?.kind
-  const isTransitional = TRANSITIONAL_ORCHESTRATOR_SKILLS.has(skill.name)
-  if (kind !== 'atomic' && !(isTransitional && kind === 'orchestrator')) {
+  if (kind !== 'atomic') {
     errors.push(
       `[1] skill ${skill.name}: kind は atomic 必須 (orchestrator は commands に移行、got ${kind})`,
     )
   }
   if (!skill.metadata?.trigger) errors.push(`[4] skill ${skill.name}: trigger 必須`)
-  if (!isTransitional && skill.metadata?.subskills) {
+  if (skill.metadata?.subskills) {
     errors.push(`[3] skill ${skill.name}: atomic は subskills を持てない`)
-  }
-  if (isTransitional && kind === 'orchestrator') {
-    // transitional orchestrator の subskills 実在性は念のため検証
-    const subs = Array.isArray(skill.metadata?.subskills) ? skill.metadata.subskills : []
-    for (const sub of subs) {
-      if (sub.startsWith('plugin:')) continue
-      if (!referableSet.has(sub)) {
-        errors.push(`[2] skill ${skill.name} (transitional): subskill '${sub}' が実在しない`)
-      }
-    }
   }
 }
 
