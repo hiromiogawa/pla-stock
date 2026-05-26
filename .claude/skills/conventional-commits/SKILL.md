@@ -1,104 +1,42 @@
 ---
 name: conventional-commits
-description: Conventional Commits のコミットメッセージとブランチ名規約を定める（scope は `.project-config.yml` の scopes フィールドを参照）。Use when コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき
+description: Conventional Commits のコミットメッセージとブランチ名規約を docs/rules/ から参照して適用する。Use when コミットメッセージを書くとき、ブランチを作成するとき、または type/scope/命名規則に迷ったとき
 ---
 
 # Conventional Commits とブランチルール
 
-コミットメッセージとブランチ名を機械可読なフォーマットに揃え、changelog 生成・scope フィルタ・Issue 紐付けを自動化可能にする。
+orchestration only。規約本文は `docs/rules/commit.md` (コミット規約) + `docs/rules/branch.md` (ブランチ命名) を参照。
 
-## コミットフォーマット
+## 起動規律
 
-```
-<type>(<scope>): <description>
+コミット直前 / ブランチ作成直前に Skill ツールで本 skill を invoke する。本 skill の内容が context に表示された = 起動された証跡。
 
-[optional body]
+## 実行フロー
 
-[optional footer(s)]
-```
+### コミットメッセージ作成時
 
-### タイプ
+1. `docs/rules/commit.md` を読む
+2. 該当 type (`feat` / `fix` / `docs` / `refactor` / `chore` / `test` 等) と scope (`.project-config.yml` の `scopes` enum) を選ぶ
+3. header は **100 文字以内**、subject は日本語 narrative OK
+4. body は「why」中心の日本語、関連 Issue は `Refs #NNN` or `Closes #NNN` (footer)
+5. AI 共著は footer に `Co-authored-by: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`
 
-| タイプ | 使用場面 |
-|--------|----------|
-| `feat` | 新機能 |
-| `fix` | バグ修正 |
-| `docs` | ドキュメントのみ |
-| `style` | フォーマット変更、ロジック変更なし |
-| `refactor` | 修正でも追加でもないコード変更 |
-| `test` | テストの追加・修正 |
-| `chore` | ビルド、ツール、依存関係 |
-| `perf` | パフォーマンス改善 |
-| `ci` | CI 設定 |
+### ブランチ作成時
 
-### スコープ
+1. `docs/rules/branch.md` を読む
+2. 形式 `[prefix]/#[issue]-[description]` (prefix は `.project-config.yml` の `branch.prefixes` enum)
+3. main / master 直編集禁止、先に Issue を作る
 
-パッケージ名またはモジュール名を使用。利用可能なスコープは `.project-config.yml` を参照。
+## 機械強制
 
-### 破壊的変更
+- `lint-config/commitlint-config.cjs` (scope-enum、header-max-length: 100)
+- `.husky/commit-msg` で commitlint 実行
+- `.husky/pre-commit` の `scripts/check-branch.mjs` でブランチ名検証
 
-タイプ/スコープの後に `!` を付ける: `feat(kit)!: KitEvent の型を再設計`
-またはフッターに `BREAKING CHANGE:` を記述。
+違反すると commit / push が reject される。
 
-### 例
+## 参照
 
-```
-feat(kit): キット追加 dialog を実装
-fix(views): KitListView の filter state を初期化
-docs(docs): ADR-NNNN を追加 (タイトル要旨)
-chore(deps): MUI を v7.4 に更新
-feat(kit)!: KitEvent の型を再設計
-```
-
-> 上は **pla-stock の `.project-config.yml` の scopes** に基づく具体例。実際の scope enum は `.project-config.yml` を参照（kit / paint / project / stock / shared / entities / features / widgets / views / routes / auth / nav / ui / infra / deps / ci / docs / tooling）。commitlint が `lint-config/commitlint-config.cjs` で同 enum を強制している。
-
-## ブランチ命名
-
-```
-[prefix]/#[issue-number]-[short-description]
-```
-
-### プレフィックス
-
-| プレフィックス | 使用場面 |
-|---------------|----------|
-| `feat` | 新機能 |
-| `fix` | バグ修正 |
-| `chore` | メンテナンス、ツール |
-| `docs` | ドキュメント |
-| `refactor` | リファクタリング |
-
-### 例
-
-```
-feat/#12-add-kit-dialog
-fix/#15-kit-list-filter-state
-docs/#20-adr-design-direction
-```
-
-## ツール (機械強制済)
-
-- **commitlint** と `@commitlint/config-conventional` — コミットメッセージを検証
-- **husky** — `commit-msg` フックで commitlint を実行（本プロジェクトでは pnpm self-contained 化のため lefthook ではなく husky を採用）
-- **`.husky/pre-commit`** の `node scripts/check-branch.mjs` — ブランチ名フォーマット (`[prefix]/#[issue]-[description]`) を検証、違反 commit を reject
-
-→ 本 skill は **規約 handbook (人間判断 / AI 参考)**、機械強制は上記 2 hook で完結。AI / 開発者は skill を reference として開きつつ、commit / push 時の reject に従って修正する形。
-
-## よくある間違い
-
-| 間違い | 正しい |
-|--------|--------|
-| `feat: Add feature.` | 小文字始まり・ピリオドなし: `feat(scope): add feature` |
-| `fix: fix bug` | scope を省略しない: `fix(kit): handle null input` |
-| 破壊的変更を本文のみに書く | `!` または `BREAKING CHANGE:` フッターで明示 |
-| `feat/add-memory` | Issue 番号必須: `feat/#12-add-memory` |
-| 複数パッケージ変更を 1 コミット | scope を分けてコミット分割 |
-
-## チェックリスト
-
-コミット前の確認:
-- [ ] メッセージが `type(scope): description` フォーマットに従っている
-- [ ] スコープが有効なパッケージ/モジュールに一致している
-- [ ] 説明は命令形、小文字、ピリオドなし
-- [ ] 破壊的変更は `!` または `BREAKING CHANGE:` フッターで明示されている
-- [ ] ブランチ名が `[prefix]/#[issue]-[description]` フォーマットに従っている
+- 規約本文: [docs/rules/commit.md](../../../docs/rules/commit.md), [docs/rules/branch.md](../../../docs/rules/branch.md)
+- 機械強制実装: `lint-config/commitlint-config.cjs`, `scripts/check-branch.mjs`
+- scope SSoT: `.project-config.yml`
