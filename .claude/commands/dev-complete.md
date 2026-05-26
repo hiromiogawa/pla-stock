@@ -1,7 +1,5 @@
 ---
-name: dev-complete
-description: 実装完了時の仕上げ（self-review subagent dispatch → docs-freshness → conventional-commits → PR 作成）を統括する slash command (/dev-complete)。ユーザーが実装一段落時に明示的に叩いて起動する。AI auto-trigger は無効化済 (#177)
-disable-model-invocation: true
+description: 実装完了時の仕上げ（self-review subagent dispatch → docs-freshness → conventional-commits → PR 作成）を統括する
 metadata:
   kind: orchestrator
   subskills: [docs-freshness, conventional-commits, github-flow]
@@ -15,9 +13,9 @@ metadata:
 
 ## ⚠ 起動規律 (FAIL-002 由来 / ADR-0007)
 
-**この skill の内容が context に表示された = ユーザー明示 `/dev-complete` で起動された証跡**。手順を最初から省略せず踏むこと。
+**このコマンドの内容が context に表示された = ユーザー明示 `/dev-complete` で起動された証跡**。手順を最初から省略せず踏むこと。
 
-skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせるだけでは **本 skill 起動の代替にならない**。本 skill は Step 1 で `self-review` **subagent を Agent tool で dispatch** し、Step 2-4 で docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。`/dev-complete` 起動経由でないと連鎖が起きず工程が抜ける。
+コマンド内の検証コマンド (`pnpm check:parallel` 等) を直接走らせるだけでは **本コマンド起動の代替にならない**。本コマンドは Step 1 で `self-review` **subagent を Agent tool で dispatch** し、Step 2-4 で docs-freshness / conventional-commits / github-flow を **REQUIRED SUB-SKILL として連鎖呼出** する設計。`/dev-complete` 起動経由でないと連鎖が起きず工程が抜ける。
 
 「コマンドは走らせたから手順は把握してる」「軽微な変更だから略式で OK」は省略合理化のサイン。Red Flag が浮かんだら STOP し、ユーザーに `/dev-complete` 再入力を依頼 (内部で `self-review` subagent を Agent dispatch) する。
 
@@ -92,6 +90,6 @@ skill 内の検証コマンド (`pnpm check:parallel` 等) を直接走らせる
 | 「CI が走るから手元は飛ばす」 | CI は最後の砦であって一次チェックではない。手元で気づくほうがループが短い |
 | 「さっき走らせたから PR 直前は不要」 | commit → push の間に追加 edit が入りうる。push 時点の差分で再検証する |
 | 「ユーザーに確認されるから後で直せる」 | ユーザーが検出する前に自分で検出するのがセルフレビューの定義 |
-| 「self-review skill を呼ばなくても手でコマンド打てば同じ」 | skill を明示起動することで「やった証拠」と次のチェックリストが残る。手作業だと省略が混入する |
+| 「self-review コマンドを呼ばなくても手でコマンド打てば同じ」 | コマンドを明示起動することで「やった証拠」と次のチェックリストが残る。手作業だと省略が混入する |
 | 「親 context で diff を Read してから dispatch すれば速い」 | 新鮮な目が崩れる。親は diff を Bash で取って prompt に注入するだけ、Read しない |
 | 「subagent dispatch なしで Skill 起動した self-review でも十分」 | 親 context のバイアスが残る、新鮮な目が成立しない (本機構導入の趣旨に反する) |

@@ -1,7 +1,5 @@
 ---
-name: rule-cycle
-description: ルール改善サイクル（rule-measure → rule-explore → rule-improve → rule-audit）を順次実行する slash command (/rule-cycle)。ユーザーが failure-record 追記直後 or 「ルールを改善して」と明示依頼するときに叩いて起動する。AI auto-trigger は無効化済 (#190)
-disable-model-invocation: true
+description: ルール改善サイクル（rule-measure → rule-explore → rule-improve → rule-audit）を順次実行する
 metadata:
   kind: orchestrator
   subskills: [rule-improve, rule-audit]

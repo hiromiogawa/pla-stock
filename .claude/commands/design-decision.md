@@ -1,7 +1,5 @@
 ---
-name: design-decision
-description: 設計判断を docs/adr/ の ADR に記録する slash command (/design-decision、adr 一本)。ユーザーが設計判断確定時に明示的に叩いて起動する。AI auto-trigger は無効化済 (#190)
-disable-model-invocation: true
+description: 設計判断を docs/adr/ の ADR に記録する (adr 一本)
 metadata:
   kind: orchestrator
   subskills: [adr]
