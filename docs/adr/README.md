@@ -22,3 +22,7 @@
 | [ADR-0015](./0015-deprecated-api-static-detection.md) | deprecated API の静的検出 (oxlint type-aware) | 承認 | 2026-05-22 |
 | [ADR-0016](./0016-test-strategy.md) | テスト戦略 (Testing Trophy + in-memory DB + co-location + coverage は gate に採用しない) | 承認 | 2026-05-23 |
 | [ADR-0017](./0017-ai-coverage-threshold.md) | 対AI coverage threshold (C1 branches 全体 >= 70%) | 承認 | 2026-05-24 |
+| [ADR-0018](./0018-ssot-boundary.md) | SSoT 境界規約 (docs/rules/ を ground truth とし skill / CLAUDE.md は参照する) | 承認 | 2026-05-26 |
+| [ADR-0019](./0019-view-container-hook-presenter.md) | View Container/Hook/Presenter 分離 (retroactive) | 承認 | 2026-04-29 |
+| [ADR-0020](./0020-emotion-isolation.md) | Emotion 隔離方針 (6 ルール、retroactive) | 承認 | 2026-04-28 |
+| [ADR-0021](./0021-linting-policy.md) | TypeScript / JS linting policy (retroactive) | 承認 | 2026-04-29 |

@@ -1,76 +1,37 @@
 ---
 name: code-quality
-description: OXLint/Biome/knip/dependency-cruiser を pre-commit / pre-push / CI の 3 層で運用する設定と判断基準を示す。Use when 品質ツールの設定・実行タイミングを決めるとき、または lint・未使用コード・依存違反エラーに遭遇したとき
+description: OXLint/Biome/knip/dependency-cruiser を pre-commit / pre-push / CI の 3 層で運用する規約を docs/rules/code-quality.md から参照して適用する。Use when 品質ツールの設定・実行タイミングを決めるとき、または lint・未使用コード・依存違反エラーに遭遇したとき
 ---
 
-# コード品質ツール
+# コード品質
 
-品質を pre-commit / pre-push / CI の 3 層で担保し、フォーマットとリントは別ツールに役割分担する。
+orchestration only。規約本文 (ツール構成 + 3 層 hook + コマンド一覧) は `docs/rules/code-quality.md` を参照。
 
-## ツールスタック
+## 起動規律
 
-| ツール | 用途 |
-|--------|------|
-| **Biome** | フォーマッター（Prettier の代替） |
-| **OXLint** | リンター（全ルール有効ベース） |
-| **knip** | 未使用コード・exports・依存の検出 |
-| **dependency-cruiser** | 依存方向の強制 + 循環依存検出 |
-| **Vitest** | テストフレームワーク |
-| **husky + lint-staged** | Git hooks 管理（pnpm self-contained で完結させるため lefthook ではなくこちらを採用） |
-| **commitlint** | コミットメッセージ検証 |
+品質ツール設定変更時 / lint・型・dep-check エラー対処時に Skill ツールで本 skill を invoke する。
 
-## 実行タイミング
+## 実行フロー
 
-| ツール | pre-commit | pre-push | CI |
-|--------|-----------|----------|-----|
-| Biome (format) | o | | o |
-| OXLint (lint) | o | | o |
-| OXLint (deprecated, type-aware) | o | | o |
-| knip (変更分) | o | | |
-| knip (全体) | | o | o |
-| dependency-cruiser | o | | o (+ SVG) |
-| TypeScript | | | o |
-| commitlint | commit-msg | | |
-| Vitest (unit) | | | o |
-| Vitest (integration + E2E) | | | o |
+1. `docs/rules/code-quality.md` を読む
+2. 該当 layer (pre-commit / pre-push / CI) でどのツールが走るか把握
+3. エラー対処は **根本対応** が原則:
+   - lint warning → 該当ルールに従って修正、disable 必要なら理由コメント必須 ([docs/rules/linting.md](../../../docs/rules/linting.md) の例外運用)
+   - knip 未使用警告 → 削除 or `knip.json` の entry 追加で正しく解消
+   - depcruise 違反 → import 方向を直す (層を超えないように設計修正)
+   - typecheck error → 型を直す、`any` で逃げない (linting ルール 4 違反)
+4. 機械強制 hook を skip する `--no-verify` 等は **禁止** (CLAUDE.md AI 固有規律)
 
-## カバレッジ閾値
+## 機械強制 (3 層)
 
-本プロジェクトでは coverage を採用しない（Testing Trophy 採用の論理的帰結。詳細 ADR-0016 / `testing` skill）。
+- **pre-commit**: lint-staged + `check:parallel` (typecheck + depcruise + knip + deprecated + workflow-pins + test-coverage)
+- **pre-push**: `pnpm test` + `gen:adr-index --check` + `pnpm build` + (UI 変更時) verify:ui
+- **commit-msg**: commitlint
+- **CI matrix**: 全 hook + lint / format / lint:deprecated を独立 job
 
-## deprecated API 検出（type-aware）
+## 参照
 
-ライブラリ（drizzle / MUI 等）の `@deprecated` タグ付き API の使用を静的層で検出する（#121 / ADR-0015）。
-
-- `tsc --noEmit` は deprecated を TS6387 = suggestion 扱いにするため `pnpm typecheck` をすり抜ける。この死角を埋めるための専用パス。
-- 実行: `pnpm lint:deprecated`（= `oxlint --type-aware -A all -D typescript/no-deprecated`）
-- type-aware ルールは型情報を要するため `oxlint-tsgolint` パッケージと `--type-aware` フラグが必須。
-- `--type-aware` は type-aware ルール全体を一括有効化するため、`-A all -D typescript/no-deprecated` でスコープを deprecated 検出のみに限定する。他の type-aware ルールの採用は別途検討する（ADR-0015 参照）。
-
-## dependency-cruiser ルール
-
-以下を強制する:
-1. **ドメイン層** はインフラ層・インターフェース層をインポートしてはならない
-2. **インフラ層** はインターフェース層をインポートしてはならない
-3. **循環依存の禁止**
-
-CI で依存グラフの SVG を自動生成する。
-
-## 設定ファイル
-
-- `biome.json` — フォーマッター設定（リンターは無効、OXLint が担当）
-- `.oxlintrc.json` — `"all": "warn"` ベース、必要に応じて個別ルールを無効化
-- `knip.json` — ワークスペース対応、entry/project パターン
-- `.dependency-cruiser.cjs` — 禁止依存ルール
-- `.husky/{pre-commit,pre-push,commit-msg}` — フック本体
-- `package.json` の `lint-staged` セクション — staged files に対する format/lint 定義
-- `commitlint.config.cjs` — Conventional Commits 設定（scope enum 付き）
-
-## よくある間違い
-
-| 間違い | 正しい対応 |
-|--------|-----------|
-| Biome と OXLint の両方で lint を有効化 | Biome はフォーマットのみ、lint は OXLint に一元化 |
-| knip の未使用警告を無視 | 必ず解消（削除 or entry に追加） |
-| dep-check 違反を許可コメントで回避 | import 方向を直す |
-| 新規パッケージ追加時に dep-check 設定を忘れる | `.dependency-cruiser.cjs` に層情報を追加 |
+- 規約本文 (コマンド一覧含む): [docs/rules/code-quality.md](../../../docs/rules/code-quality.md)
+- 詳細 linting ルール: [docs/rules/linting.md](../../../docs/rules/linting.md)
+- 設計経緯: ADR-0001 (tooling 採用)、ADR-0015 (deprecated API)
+- 設定実体: `lint-config/`、`.husky/`、`.lintstagedrc.json`、`biome.json`、`.oxlintrc.json`、`knip.json`、`.dependency-cruiser.cjs`

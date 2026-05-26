@@ -13,6 +13,8 @@
 
 通常の ADR は「不変・supersede のみ」だが、本 ADR は **失敗事例ログ** という性質上 `### FAIL-NNN` を追記する live document として運用する。**過去エントリの内容は不変** (誤記訂正除く)、新エントリは末尾に追加。
 
+> NOTE: 番号は連番だが、retro 挿入 (本 ADR 確立より前の失敗事例を後から追加する場合) は `FAIL-NNNx` (x = a/b/c) で fragment 番号化する。既存参照 (CLAUDE.md / docs / file memory) を壊さないため連番再割振りは禁止。例: `FAIL-000a/000b/000c` は ai-failures.md (2026-04-29) から本 ADR に統合した 3 件 (ADR-0018 / Issue #111)。
+
 ## エントリフォーマット
 
 新規エントリは末尾に追記する。各エントリは H3 見出しで始める:
@@ -29,6 +31,52 @@
 > カウントしてしまうため、テンプレートは上記の説明文形式で記述する。
 
 ## エントリ
+
+### FAIL-000a: subagent DONE 盲信による視覚崩れ (2026-04-29)
+
+- **事象**: PR #58 (Phase β-3a, AppShell + LandingView の MUI sx 化) で `maxWidth: 168` (= 168px、本来は 672px のつもり) と書かれ、Desktop で title がタテ書き化、Tablet/Desktop でボタン縦割状態
+- **原因**:
+  1. subagent の DONE_WITH_CONCERNS 報告を視覚検証なしに pass
+  2. HTTP 200 確認だけで PR 作成
+  3. MUI sx の `maxWidth` / `width` は **px 解釈** (theme.spacing 適用なし) を controller が把握してなかった
+- **対策**:
+  - `.claude/settings.json` で force push 等を機械強制 (将来の事故防止)
+  - CLAUDE.md `## AI 運用ルール` に「UI 変更 PR は controller 自身が Playwright screenshot 検証」明記
+  - 同 spec で「subagent DONE は独立検証」明記
+- **反映先**:
+  - `CLAUDE.md` (AI 運用ルール節)
+  - `.claude/settings.json`
+- **注記**: 元は `docs/ai-failures.md` (2026-04-29) に記録、ADR-0018 (SSoT 境界規約) 確立に伴い本 ADR に統合 (2026-05-26、fragment 番号 000a)。
+
+### FAIL-000b: ダークモード verify:ui の false positive (LandingView だけ確認) (2026-04-29)
+
+- **事象**: PR #65 で「dark mode 動作」と claim したが実際は **LandingView 以外 (List / Detail / 認証配下全部) が light のまま**。Tailwind class (`bg-card` `border-border` 等) が dark に追従していなかった。
+- **原因**:
+  1. verify:ui スクリプトが LandingView (`/`) のみ対象 (= 認証 gate 配下が screenshot 不可)。LandingView は MUI sx 完全移行済で dark mode 動作 → false positive
+  2. shadcn の `.dark { ... }` CSS 変数は定義済だが、 `<html class="dark">` を toggle していなかったため 1 度も活性化していなかった
+  3. controller が「LandingView OK = 全画面 OK」と推定 (抽出範囲を誤った)
+- **対策**:
+  - 即時修正: `ThemeModeProvider` で `<html>` の class を mode 変更時に toggle
+  - 構造改善: verify:ui は **LandingView の見栄えを確認する手段** であって「全画面 OK」を保証しない、と CLAUDE.md に明記
+  - 認証 gate 内の visual QA は **Clerk session 込みでブラウザ目視** を controller の責務とする
+- **反映先**:
+  - `CLAUDE.md` (`verify:ui` 運用節)
+- **注記**: 元は `docs/ai-failures.md` (2026-04-29) に記録、ADR-0018 (SSoT 境界規約) 確立に伴い本 ADR に統合 (2026-05-26、fragment 番号 000b)。
+
+### FAIL-000c: frontend-design skill 未経由の貧相 Sidebar (2026-04-29)
+
+- **事象**: Sidebar nav の見た目が貧相 (sparse / cheap)。padding 3px / spacing 0 / 装飾ゼロ。
+- **原因**:
+  1. design direction spec (`docs/specs/2026-04-29-design-direction.md`) 確定直後、「実装は skill 不要」と判断
+  2. 「ミニマル」と「貧相」の区別が曖昧、 skill の "intentional restraint + craft" を経由してなかった
+  3. user feedback (「nav 大きすぎ」) に **反応的に**「padding 縮める」「spacing 0」と直接調整、 設計を再考しなかった
+  4. CLAUDE.md の `## AI 運用ルール` で skill invoke 規約が「UI 変更時に invoke」と曖昧で、forcing function 不在
+- **対策**:
+  - CLAUDE.md `## AI 運用ルール` に追記: 「UI コード変更前は必ず frontend-design skill を invoke」明文化
+  - 「**見た目に対する feedback** を受けた時は反応的にパラメータ調整せず、 まず skill で Design Thinking を再適用」を強化
+- **反映先**:
+  - `CLAUDE.md` (AI 運用ルール節)
+- **注記**: 元は `docs/ai-failures.md` (2026-04-29) に記録、ADR-0018 (SSoT 境界規約) 確立に伴い本 ADR に統合 (2026-05-26、fragment 番号 000c)。
 
 ### FAIL-001: domain enum 値を view 層で再宣言 (2026-05-01)
 

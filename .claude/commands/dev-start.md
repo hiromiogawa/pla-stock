@@ -1,5 +1,5 @@
 ---
-description: Issue 着手前のコンテキスト準備（memory 検索 → github-flow でブランチ作成 → sdd で仕様確認）を統括する
+description: Issue 着手前のコンテキスト準備（memory 検索 → Issue 確認 → ブランチ作成 → 仕様確認）を統括する
 argument-hint: <issue-number>
 ---
 
@@ -43,15 +43,16 @@ master の場合は本コマンドの Step 1-2 を必ず経由して feature ブ
 
 1. Issue の内容を確認（`gh issue view $ARGUMENTS`）
 2. 関連 Issue があればリンクを確認
-3. ブランチを作成（命名規則: `[prefix]/#[issue]-[description]`）
+3. ブランチを作成（命名規則: `[prefix]/#[issue]-[description]`、詳細 `docs/rules/branch.md`）
 
-### Step 3: sdd（仕様確認）
+### Step 3: 仕様確認
 
-**REQUIRED SUB-SKILL:** sdd に従い:
+Issue 本文の受け入れ条件を仕様として整理し、影響範囲を把握する:
 
-1. 仕様ドキュメントがあれば読む
-2. なければ Issue の受け入れ条件を仕様として整理
-3. JSDoc で定義すべきインターフェースを特定
+1. Issue の受け入れ条件 / やること節を読む
+2. 既存 ADR (`docs/adr/`) に関連する設計判断がないか確認
+3. 既存 `docs/rules/` の該当 topic を読み、関連規約を把握
+4. 必要なら `docs/specs/` に関連仕様があるか確認
 
 ### 完了条件
 
@@ -60,7 +61,7 @@ master の場合は本コマンドの Step 1-2 を必ず経由して feature ブ
 - [ ] 関連する記憶（ファイル memory / ADR）を確認済み
 - [ ] Issue の内容と受け入れ条件を把握済み
 - [ ] **feature ブランチに切り替え済み**（master/main で作業していない）
-- [ ] 仕様（または Issue の受け入れ条件）を確認済み
+- [ ] 関連 docs/rules/ ・ ADR を確認済み
 
 ## よくある間違い
 

@@ -54,5 +54,10 @@ module.exports = {
 
     // 日本語 subject (例: "新規 view 追加") を許容するため case 検証を無効化。
     'subject-case': [0],
+
+    // header は 100 文字以内 (@commitlint/config-conventional のデフォルト値を
+    // 明示記載。docs/rules/commit.md / conventional-commits skill から参照される
+    // ため、extends chain 経由ではなく本 config 内で transparency を保つ)。
+    'header-max-length': [2, 'always', 100],
   },
 }
