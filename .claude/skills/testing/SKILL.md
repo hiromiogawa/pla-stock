@@ -1,9 +1,6 @@
 ---
 name: testing
 description: Testing Trophy (Vitest + jsdom + @testing-library/react + in-memory better-sqlite3) でテストを書く規約。co-location / factory / DB integration / coverage 不採用の 9 ルールを操作可能形式で定める. Use when 新規 test file (*.test.ts / *.test.tsx) を作成するとき、または既存 test を更新するとき
-metadata:
-  kind: atomic
-  trigger: 新規 test file (*.test.ts / *.test.tsx) を作成するとき、または既存 test を更新するとき
 ---
 
 # テスト規約

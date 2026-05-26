@@ -1,9 +1,5 @@
 ---
 description: レビュー指摘への対応（failure-record で失敗記録 → rule-cycle でルール改善）を統括する
-metadata:
-  kind: orchestrator
-  subskills: [dev-complete, failure-record]
-  trigger: ユーザーが /post-review で明示起動するとき (コードレビュー指摘受領直後)
 ---
 
 # レビュー後対応

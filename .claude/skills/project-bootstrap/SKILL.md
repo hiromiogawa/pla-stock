@@ -1,9 +1,6 @@
 ---
 name: project-bootstrap
 description: project-bootstrap subagent (.claude/agents/project-bootstrap.md) の dispatch reference。生成サイクル本体は subagent に集約。Use when 新規プロジェクトを dev-skills 標準でブートストラップするとき
-metadata:
-  kind: atomic
-  trigger: 新しいリポジトリを作成し dev-skills 標準でブートストラップするとき
 ---
 
 # project-bootstrap (dispatch reference)

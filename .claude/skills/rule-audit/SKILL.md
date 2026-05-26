@@ -1,9 +1,6 @@
 ---
 name: rule-audit
 description: rule-improve が起票した改善提案 Issue を精査し、承認かクローズかを判断する（改善サイクルの最終ステップ）。Use when rule-improve 直後、または `rule-improvement` ラベルの未精査 Issue があるとき
-metadata:
-  kind: atomic
-  trigger: rule-improve の直後、または rule-improvement ラベルの未精査 Issue があるとき
 ---
 
 # ルール検証
@@ -71,8 +68,6 @@ CLAUDE.md の記憶 (file memory) ルールに従い、ファイル memory の `
 ---
 name: rule-cycle-meta
 description: rule-cycle の前回実行記録（閾値判定の基準値）
-metadata:
-  type: reference
 ---
 
 - 前回サイクル実行日: <今日 YYYY-MM-DD>
