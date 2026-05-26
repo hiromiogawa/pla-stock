@@ -47,6 +47,7 @@ const URLS = ['/']
 const browser = await chromium.launch()
 const results = []
 
+/* oxlint-disable no-await-in-loop -- Playwright: 単一 context/page で goto → wait → screenshot は順序必須、Promise.all 化すると race condition (同一 page への並列 navigate / screenshot 不可) */
 for (const colorScheme of COLOR_SCHEMES) {
   for (const viewport of VIEWPORTS) {
     const context = await browser.newContext({
@@ -72,6 +73,7 @@ for (const colorScheme of COLOR_SCHEMES) {
     await context.close()
   }
 }
+/* oxlint-enable no-await-in-loop */
 
 await browser.close()
 
