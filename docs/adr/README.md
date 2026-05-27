@@ -26,3 +26,4 @@
 | [ADR-0019](./0019-view-container-hook-presenter.md) | View Container/Hook/Presenter 分離 (retroactive) | 承認 | 2026-04-29 |
 | [ADR-0020](./0020-emotion-isolation.md) | Emotion 隔離方針 (6 ルール、retroactive) | 承認 | 2026-04-28 |
 | [ADR-0021](./0021-linting-policy.md) | TypeScript / JS linting policy (retroactive) | 承認 | 2026-04-29 |
+| [ADR-0022](./0022-claude-handbooks-plugin.md) | claude-handbooks plugin による handbook 系 skill の切り出し | 承認 | — |
