@@ -1,0 +1,504 @@
+<mxfile host="app.diagrams.net" agent="claude-code" version="24.0.0">
+  <diagram name="overview" id="d-overview">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="&lt;b style=&quot;font-size:20px&quot;&gt;pla-stock AI 運用ハーネス俯瞰&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px;color:#666&quot;&gt;docs/harness-map.md SSoT の 5 層構造 × Claude Code 機構。詳細連鎖は &lt;b&gt;[orchestrator]&lt;/b&gt; タブ、凡例は &lt;b&gt;[legend]&lt;/b&gt; タブ&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="350" y="20" width="700" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane1-bg" value="&lt;b&gt;1. 統制層&lt;/b&gt; (Governance) — 規律記述 / 起動規律 / file memory" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fafafa;strokeColor=#999999;dashed=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="90" width="1320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="claude-md" value="&lt;b&gt;CLAUDE.md&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;規律 + skill/command 一覧 + 規約目次&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=12;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="130" width="300" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="file-memory" value="&lt;b&gt;file memory&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;memory/MEMORY.md + 型別エントリ (project / user / feedback / reference)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="420" y="130" width="380" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="rules-adr" value="&lt;b&gt;docs/rules/ + docs/adr/&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;規約 (現状形 SSoT) + 設計判断の歴史 (ADR-0018)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="840" y="130" width="480" height="55" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane2-bg" value="&lt;b&gt;2. skill + command 層&lt;/b&gt; (Working Layer) — orchestration only、規約本文は docs/rules/ 参照 (ADR-0018)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fafffe;strokeColor=#999999;dashed=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="210" width="1320" height="380" as="geometry" />
+        </mxCell>
+
+        <mxCell id="orch-label" value="&lt;b&gt;Orchestrator command&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;.claude/commands/ (5)&lt;br/&gt;本物 slash、user 入力のみ&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="240" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-devstart" value="/dev-start" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="290" width="200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-devcomplete" value="/dev-complete" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="330" width="200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-postreview" value="/post-review" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="370" width="200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-designdecision" value="/design-decision" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="410" width="200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="cmd-rulecycle" value="/rule-cycle" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="450" width="200" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="atomic-label" value="&lt;b&gt;Atomic skill&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;.claude/skills/ (12)&lt;br/&gt;AI auto-trigger or user /name&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="290" y="240" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-code-quality" value="code-quality" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="290" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-cc" value="conventional-commits" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="460" y="290" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-docs-fresh" value="docs-freshness" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="290" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-gh-flow" value="github-flow" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="330" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-testing" value="testing" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="460" y="330" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-writing-issues" value="writing-issues" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="330" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-rule-improve" value="rule-improve" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="290" y="370" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-rule-audit" value="rule-audit" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="460" y="370" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-self-review-ref" value="self-review &lt;i style=&quot;font-size:9px;color:#888&quot;&gt;(dispatch ref)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#e8f0fc;strokeColor=#6c8ebf;fontSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="370" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-rule-measure-ref" value="rule-measure &lt;i style=&quot;font-size:9px;color:#888&quot;&gt;(dispatch ref)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#e8f0fc;strokeColor=#6c8ebf;fontSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="410" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-rule-explore-ref" value="rule-explore &lt;i style=&quot;font-size:9px;color:#888&quot;&gt;(dispatch ref)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#e8f0fc;strokeColor=#6c8ebf;fontSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="460" y="410" width="160" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sk-bootstrap-ref" value="project-bootstrap &lt;i style=&quot;font-size:9px;color:#888&quot;&gt;(dispatch ref)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#e8f0fc;strokeColor=#6c8ebf;fontSize=10;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="410" width="160" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="subagent-label" value="&lt;b&gt;Subagent&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;.claude/agents/ (4)&lt;br/&gt;Agent tool で dispatch&lt;br/&gt;(独立 context)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="820" y="230" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="sa-self-review" value="self-review" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="290" width="200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sa-rule-measure" value="rule-measure" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="330" width="200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sa-rule-explore" value="rule-explore" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="370" width="200" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="sa-bootstrap" value="project-bootstrap &lt;i style=&quot;font-size:9px;color:#666&quot;&gt;(+Write)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="820" y="410" width="200" height="32" as="geometry" />
+        </mxCell>
+
+        <mxCell id="plugin-label" value="&lt;b&gt;Plugin skill&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;外部 plugin (frontmatter 管理外)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="240" width="280" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="plug-ch-adr" value="claude-handbooks:adr" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="290" width="280" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="plug-ch-fail" value="claude-handbooks:failure-record" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="324" width="280" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="plug-ch-ws" value="claude-handbooks:writing-skills" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="358" width="280" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="plug-sp" value="&lt;b&gt;superpowers:&lt;/b&gt; brainstorming / writing-plans / subagent-driven-development / systematic-debugging / requesting-code-review ..." style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#e1efd9;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="392" width="280" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="unused-note" value="&lt;b&gt;未使用 (参考)&lt;/b&gt;: output-styles / statusline (Claude Code 公式 6 機構のうち pla-stock では未活用)" style="text;html=1;strokeColor=#cccccc;fillColor=#f5f5f5;align=center;verticalAlign=middle;dashed=1;fontSize=10;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="490" width="1280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="lane2-foot" value="&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;atomic skill のうち &lt;b&gt;self-review / rule-measure / rule-explore / project-bootstrap&lt;/b&gt; (灰色) は dispatch reference、実体は &lt;b&gt;subagent&lt;/b&gt; に集約 (ADR-0018)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="530" width="1280" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane3-bg" value="&lt;b&gt;3. 静的検証層&lt;/b&gt; (Static Enforcement) — 決定的・安価な機械強制 / settings.json deny+ask (ADR-0011)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fffaf0;strokeColor=#999999;dashed=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="600" width="1320" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="hook-commit-msg" value="&lt;b&gt;.husky/commit-msg&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;commitlint&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="640" width="200" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="hook-pre-commit" value="&lt;b&gt;.husky/pre-commit&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;lint-staged + check-branch + check:parallel&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="280" y="640" width="260" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="hook-pre-push" value="&lt;b&gt;.husky/pre-push&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;build + verify:ui (UI 変更時)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="560" y="640" width="240" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="ci-workflow" value="&lt;b&gt;.github/workflows/&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;ci.yml + deploy.yml&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="820" y="640" width="240" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="settings-json" value="&lt;b&gt;.claude/settings.json&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;deny / ask 権限 (ADR-0011)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="640" width="260" height="48" as="geometry" />
+        </mxCell>
+        <mxCell id="lint-config" value="&lt;b&gt;lint-config/&lt;/b&gt; oxlint 3 / biome / commitlint" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="704" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="dep-cruiser" value="&lt;b&gt;dependency-cruiser&lt;/b&gt; (FSD 層 / no-seed-from-production)" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="704" width="320" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="knip" value="&lt;b&gt;knip&lt;/b&gt; (未使用 detect)" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="680" y="704" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="check-scripts" value="&lt;b&gt;scripts/check-*&lt;/b&gt; test-coverage / harness / workflow-pins" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="860" y="704" width="320" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="adr-index-gen" value="&lt;b&gt;gen:adr-index&lt;/b&gt; (docs-freshness)" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="704" width="140" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane4-bg" value="&lt;b&gt;4. 動的検証層&lt;/b&gt; (Dynamic Enforcement) — 振る舞いの正しさ (#109 で Clerk gate 内対応予定)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f5f5f5;strokeColor=#999999;dashed=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="770" width="1320" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="verify-ui" value="&lt;b&gt;playwright verify:ui&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;LandingView のみ (Clerk gate 未貫通、#109)、.playwright-snapshots/ 鮮度 check が pre-push hook で機械強制&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="800" width="600" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="manual-smoke" value="&lt;b&gt;controller 手動 smoke&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;UI 認証 gate 内 (CLAUDE.md UI 変更時規律) + DB mutation 制約境界 (FAIL-003)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#fafafa;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="680" y="800" width="660" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="lane5-bg" value="&lt;b&gt;5. 振り返り層&lt;/b&gt; (Retrospective) — rule-cycle、FAIL+3 / 手動発火 (発火自動化は #108)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8f5ff;strokeColor=#999999;dashed=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="870" width="1320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-cmd" value="/rule-cycle" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="910" width="200" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-measure" value="rule-measure&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;(subagent)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="320" y="910" width="200" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-explore" value="rule-explore&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;(subagent)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="580" y="910" width="200" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-improve" value="rule-improve&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;(skill, Issue 起票)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="840" y="910" width="200" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-audit" value="rule-audit&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;(skill, approved label gate)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="910" width="240" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-e1" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1" source="rc-cmd" target="rc-measure">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-e2" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1" source="rc-measure" target="rc-explore">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-e3" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1" source="rc-explore" target="rc-improve">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rc-e4" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1" source="rc-improve" target="rc-audit">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="footer-hint" value="&lt;b&gt;凡例&lt;/b&gt;: 黄=orchestrator command / 青=atomic skill / 赤=subagent / 緑=plugin / オレンジ=git hook / 黄系=CI / 灰=memory or 未使用 — 詳細は [legend] タブ" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="60" y="990" width="1280" height="40" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="orchestrator" id="d-orch">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="O0" />
+        <mxCell id="O1" parent="O0" />
+
+        <mxCell id="O-title" value="&lt;b style=&quot;font-size:20px&quot;&gt;Orchestrator 連鎖 詳細&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px;color:#666&quot;&gt;5 つの本物 slash command が呼び出す sub-skill / subagent / hook の連鎖。実体は各 .claude/commands/&amp;lt;name&amp;gt;.md が SSoT&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="O1">
+          <mxGeometry x="350" y="20" width="700" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-ds-cmd" value="/dev-start &lt;issue&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="40" y="110" width="260" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="O-ds-s1" value="Step 1: file memory 確認&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;CLAUDE.md 記憶ルール&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="40" y="180" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-ds-s2" value="Step 2: &lt;b&gt;github-flow&lt;/b&gt; skill&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;Issue view + branch 作成&lt;br/&gt;(docs/rules/branch.md)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="40" y="260" width="260" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="O-ds-s3" value="Step 3: 仕様確認&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;受け入れ条件 + 関連 ADR + docs/rules/&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="40" y="350" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-ds-e1" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-ds-cmd" target="O-ds-s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-ds-e2" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-ds-s1" target="O-ds-s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-ds-e3" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-ds-s2" target="O-ds-s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-dc-cmd" value="/dev-complete" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="320" y="110" width="260" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-s1" value="Step 1: &lt;b&gt;self-review&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;subagent dispatch (独立 context、新鮮な目)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="320" y="180" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-s2" value="Step 2: &lt;b&gt;docs-freshness&lt;/b&gt; skill&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;Why / What / How 分類、自動生成 drift&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="320" y="260" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-s3" value="Step 3: &lt;b&gt;conventional-commits&lt;/b&gt; skill&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;type(scope): 機械強制は commit-msg hook&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="320" y="340" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-s4" value="Step 4: &lt;b&gt;github-flow&lt;/b&gt; skill&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;PR 作成 (Closes #NNN)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="320" y="420" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-h1" value="&lt;font style=&quot;font-size:10px&quot;&gt;機械強制: .husky/commit-msg (commitlint) → .husky/pre-push (build + verify:ui)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=10;dashed=1;" vertex="1" parent="O1">
+          <mxGeometry x="320" y="500" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-e1" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;strokeWidth=2;" edge="1" parent="O1" source="O-dc-cmd" target="O-dc-s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-e2" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-dc-s1" target="O-dc-s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-e3" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-dc-s2" target="O-dc-s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-e4" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-dc-s3" target="O-dc-s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dc-e5" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;dashed=1;strokeColor=#d79b00;" edge="1" parent="O1" source="O-dc-s4" target="O-dc-h1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-pr-cmd" value="/post-review" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="600" y="110" width="260" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="O-pr-s1" value="Step 1: &lt;b&gt;claude-handbooks:failure-record&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;ADR-0007 に FAIL-NNN エントリ追記&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="600" y="180" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-pr-s2" value="Step 2: /rule-cycle (連鎖)&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;rule-cycle へバトン (詳細は右端 column)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="600" y="260" width="260" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-pr-note" value="&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;前段の /dev-complete を内部参照 (レビュー指摘修正 → 再 commit)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=10;" vertex="1" parent="O1">
+          <mxGeometry x="600" y="340" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="O-pr-e1" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-pr-cmd" target="O-pr-s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-pr-e2" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-pr-s1" target="O-pr-s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-dd-cmd" value="/design-decision" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="880" y="110" width="240" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dd-s1" value="Step 1: &lt;b&gt;claude-handbooks:adr&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;ADR 起票 / 既存 supersede / 採用却下の比較&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="880" y="180" width="240" height="66" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dd-s2" value="Step 2: docs/rules/ 更新&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;ADR→実装→rules 更新 workflow (ADR-0018)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="880" y="270" width="240" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dd-e1" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-dd-cmd" target="O-dd-s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-dd-e2" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-dd-s1" target="O-dd-s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-rc-cmd" value="/rule-cycle" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="1140" y="110" width="220" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-s1" value="Step 1: &lt;b&gt;rule-measure&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;subagent (FAIL +3 / 計測)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="1140" y="180" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-s2" value="Step 2: &lt;b&gt;rule-explore&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;subagent (パターン / 矛盾 探索)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontStyle=1;" vertex="1" parent="O1">
+          <mxGeometry x="1140" y="260" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-s3" value="Step 3: &lt;b&gt;rule-improve&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;skill (GitHub Issue 起票、改変提案)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="1140" y="340" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-s4" value="Step 4: &lt;b&gt;rule-audit&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:9px;color:#666&quot;&gt;skill (approved ラベル人間 gate)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="1140" y="420" width="220" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-e1" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;strokeWidth=2;" edge="1" parent="O1" source="O-rc-cmd" target="O-rc-s1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-e2" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;strokeWidth=2;" edge="1" parent="O1" source="O-rc-s1" target="O-rc-s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-e3" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-rc-s2" target="O-rc-s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="O-rc-e4" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;" edge="1" parent="O1" source="O-rc-s3" target="O-rc-s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-pr-cross" style="edgeStyle=none;rounded=0;html=1;startArrow=none;endArrow=classic;dashed=1;strokeColor=#999999;" edge="1" parent="O1" source="O-pr-s2" target="O-rc-cmd">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-legend" value="&lt;b&gt;凡例 (本ページ)&lt;/b&gt;: 黄=orchestrator command / 青=atomic skill / 赤=subagent (太線 dispatch) / 緑=plugin / オレンジ=git hook / 灰=その他 (memory / docs 等) / 点線=物理強制 or cross-orchestrator 連携" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="40" y="600" width="1320" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="O-note-chain" value="&lt;b&gt;連鎖 SSoT&lt;/b&gt;: 各 orchestrator の連鎖関係は &lt;code&gt;.claude/commands/&amp;lt;name&amp;gt;.md&lt;/code&gt; の body 中の言及が SSoT。本図は 2026-05-27 時点のスナップショット。&lt;br/&gt;&lt;b&gt;orchestrator → skill / subagent の起動規律&lt;/b&gt;: CLAUDE.md 「Skill / Command 起動の規律」(FAIL-002 / ADR-0007) で明示。/dev-complete 経由でないと self-review subagent dispatch + 連鎖が起きない (省略不可)。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fafafa;strokeColor=#666666;fontSize=11;" vertex="1" parent="O1">
+          <mxGeometry x="40" y="660" width="1320" height="80" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="legend" id="d-legend">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="L0" />
+        <mxCell id="L1" parent="L0" />
+
+        <mxCell id="L-title" value="&lt;b style=&quot;font-size:20px&quot;&gt;Legend &amp; 起動契機 &amp; 関連 ADR&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px;color:#666&quot;&gt;ハーネス俯瞰 [overview] / Orchestrator 連鎖 [orchestrator] タブの凡例集&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="L1">
+          <mxGeometry x="350" y="20" width="700" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-color-h" value="&lt;b&gt;Color Legend&lt;/b&gt; (機構タイプ別)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="100" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c1" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="140" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c1-l" value="&lt;b&gt;orchestrator command&lt;/b&gt; (黄、太字) — .claude/commands/ (5)。本物 slash、user 入力でのみ起動 (構造的に AI auto-trigger 不可)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="140" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="174" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c2-l" value="&lt;b&gt;atomic skill&lt;/b&gt; (青) — .claude/skills/ (12)。AI auto-trigger or user /name。orchestration only、規約本文は docs/rules/ 参照 (ADR-0018)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="174" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c2b" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e8f0fc;strokeColor=#6c8ebf;dashed=1;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="208" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c2b-l" value="atomic skill のうち薄青 + dashed = &lt;b&gt;dispatch reference&lt;/b&gt; (self-review / rule-measure / rule-explore / project-bootstrap)。実体は subagent" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="208" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="242" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c3-l" value="&lt;b&gt;subagent&lt;/b&gt; (赤) — .claude/agents/ (4)。Agent tool で dispatch、独立 context。新鮮な目 / 重い処理 / Write 許可 (project-bootstrap のみ)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="242" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="276" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c4-l" value="&lt;b&gt;plugin skill&lt;/b&gt; (緑) — 外部 plugin。claude-handbooks (汎用 handbook、v0.1.0+、ADR-0022) / superpowers (実作業の主役)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="276" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c5" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="310" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c5-l" value="&lt;b&gt;git hook&lt;/b&gt; (オレンジ) — .husky/ (3)。commit-msg (commitlint) / pre-commit (lint-staged + check) / pre-push (build + verify:ui)。&lt;b&gt;物理強制&lt;/b&gt; (--no-verify 禁止)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="310" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c6" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="344" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c6-l" value="&lt;b&gt;CI workflow&lt;/b&gt; (黄系) — .github/workflows/ (ci.yml + deploy.yml)。push / PR 時に再現実行、third-party action は SHA pin 必須" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="344" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c7" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="378" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c7-l" value="&lt;b&gt;memory / docs / その他&lt;/b&gt; (灰) — file memory (memory/MEMORY.md + 型別エントリ) / docs/rules/ / docs/adr/ 等の知識資源" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="378" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-c8" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;dashed=1;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="412" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-c8-l" value="&lt;b&gt;未使用 (参考)&lt;/b&gt; (灰薄、dashed) — output-styles / statusline (Claude Code 公式 6 機構のうち pla-stock では未活用)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=2;" vertex="1" parent="L1">
+          <mxGeometry x="90" y="412" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-edge-h" value="&lt;b&gt;Edge Legend&lt;/b&gt; (連鎖の種別)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="460" width="400" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-e1" value="" style="endArrow=classic;html=1;fontSize=11;" edge="1" parent="L1">
+          <mxGeometry width="50" height="50" as="geometry">
+            <mxPoint x="40" y="510" as="sourcePoint" />
+            <mxPoint x="90" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L-e1-l" value="&lt;b&gt;実線&lt;/b&gt; (細) — orchestrator → sub-skill (REQUIRED SUB-SKILL) の連鎖呼出" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="100" y="500" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-e2" value="" style="endArrow=classic;html=1;fontSize=11;strokeWidth=2;" edge="1" parent="L1">
+          <mxGeometry width="50" height="50" as="geometry">
+            <mxPoint x="40" y="540" as="sourcePoint" />
+            <mxPoint x="90" y="540" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L-e2-l" value="&lt;b&gt;太実線&lt;/b&gt; — orchestrator → subagent の dispatch (Agent tool、独立 context、新鮮な目)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="100" y="530" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-e3" value="" style="endArrow=classic;html=1;fontSize=11;dashed=1;strokeColor=#d79b00;" edge="1" parent="L1">
+          <mxGeometry width="50" height="50" as="geometry">
+            <mxPoint x="40" y="570" as="sourcePoint" />
+            <mxPoint x="90" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L-e3-l" value="&lt;b&gt;オレンジ点線&lt;/b&gt; — skill / commit 完了時に発火する git hook (commit-msg / pre-commit / pre-push) による物理強制" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="100" y="560" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-e4" value="" style="endArrow=classic;html=1;fontSize=11;dashed=1;strokeColor=#999999;" edge="1" parent="L1">
+          <mxGeometry width="50" height="50" as="geometry">
+            <mxPoint x="40" y="600" as="sourcePoint" />
+            <mxPoint x="90" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L-e4-l" value="&lt;b&gt;灰点線&lt;/b&gt; — cross-orchestrator 連携 (例: /post-review → /rule-cycle の後続 dispatch)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="100" y="590" width="800" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-trigger-h" value="&lt;b&gt;起動契機 (4 種)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="650" width="400" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="L-t1" value="&lt;b&gt;1. user 入力 (slash command)&lt;/b&gt; — /dev-start, /dev-complete, /post-review, /design-decision, /rule-cycle。&lt;b&gt;AI auto-trigger は構造的に不可&lt;/b&gt; (本物 slash の disable-model-invocation)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="690" width="1300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="L-t2" value="&lt;b&gt;2. AI auto-trigger (atomic skill / plugin skill の description マッチ)&lt;/b&gt; — session 開始時に system-reminder で全 skill description が context 注入、AI が状況判断" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="720" width="1300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="L-t3" value="&lt;b&gt;3. lifecycle event (Claude Code 内蔵)&lt;/b&gt; — session 開始時 system-reminder、settings.json の hooks セクション (PreToolUse / PostToolUse 等で外部 command 実行)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="750" width="1300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="L-t4" value="&lt;b&gt;4. git event (.husky/ + .github/workflows/)&lt;/b&gt; — commit-msg / pre-commit / pre-push hook、push 時 CI workflow。&lt;b&gt;物理強制&lt;/b&gt; (Claude Code 経路に依存しない)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="780" width="1300" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-adr-h" value="&lt;b&gt;関連 ADR (本図の origin)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="830" width="400" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="L-adr-list" value="&lt;b&gt;ADR-0001&lt;/b&gt; Tooling (lint / format / commitlint 採用) — &lt;b&gt;ADR-0007&lt;/b&gt; agent failure rules (FAIL-NNN live log) — &lt;b&gt;ADR-0009&lt;/b&gt; memory MCP decouple (file memory への一本化) — &lt;b&gt;ADR-0011&lt;/b&gt; settings.json 権限ポリシー (10 カテゴリ × deny/ask/allow) — &lt;b&gt;ADR-0018&lt;/b&gt; SSoT 境界 (docs/rules/ ground truth + skill orchestration only) — &lt;b&gt;ADR-0022&lt;/b&gt; claude-handbooks plugin 切出&lt;br/&gt;&lt;br/&gt;関連 Issue: &lt;b&gt;#158&lt;/b&gt; (Closed、skill 4 機構仕分け Epic) / &lt;b&gt;#170&lt;/b&gt; (Open、開発基盤・品質改善 Epic) / &lt;b&gt;#108&lt;/b&gt; (Open、振り返り発火自動化) / &lt;b&gt;#109&lt;/b&gt; (Open、verify:ui Clerk 認証貫通)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="870" width="1320" height="110" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-note-update" value="&lt;b&gt;更新ルール&lt;/b&gt; (docs-freshness の How カテゴリ): skill / command / subagent / hook の追加・削除時に手動更新が必要。SSoT は &lt;b&gt;docs/harness-map.md&lt;/b&gt; (本図と整合) と各 &lt;code&gt;.claude/&amp;lt;tier&amp;gt;/&amp;lt;name&amp;gt;.md&lt;/code&gt; の frontmatter。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fafafa;strokeColor=#666666;fontSize=11;" vertex="1" parent="L1">
+          <mxGeometry x="40" y="1000" width="1320" height="60" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
