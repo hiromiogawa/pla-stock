@@ -4,6 +4,11 @@ pla-stock の AI 運用ハーネスの全体像。skill / command 一覧は Clau
 session 開始時 system-reminder と CLAUDE.md `Skill / Command 一覧` を参照
 （各 SKILL.md / commands/*.md の frontmatter が SSoT、#227 でトリガー表生成は廃止）。
 
+俯瞰図 (drawio): [`docs/diagrams/harness-map.drawio`](./diagrams/harness-map.drawio) — 3 ページ構成
+(Page 1 = 5 層 × 機構マトリクス / Page 2 = orchestrator 連鎖 flowchart /
+Page 3 = Legend + 起動契機 + 関連 ADR)。本 markdown が SSoT、drawio は視覚化。
+drawio.com / VS Code 拡張で閲覧。
+
 ## 5 層構造
 
 | 層 | 役割 | 強制手段 | 既知負債 |
