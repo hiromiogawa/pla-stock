@@ -59,6 +59,12 @@ Issue テンプレートは `.github/ISSUE_TEMPLATE/` に配置:
 - 1 PR = 1 Issue
 - レビュー + QA 承認後にマージ
 
+## stacked PR
+
+**既定は避ける**。squash merge を既定とする本 repo では構造的に相性が悪い (親 `--delete-branch` で子が auto-close + reopen 不可 / squash で main 歴史変化により子が CONFLICTING)。依存後続作業は **親 PR マージ後にブランチを切る**。
+
+例外時の手順 (下から順マージ + `--delete-branch` 不使用 + base 付け替え + main merge): [docs/rules/branch.md#stacked-pr](../../../docs/rules/branch.md#stacked-pr) 参照。
+
 ## よくある間違い
 
 | 間違い | 正しい対応 |
