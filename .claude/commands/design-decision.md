@@ -1,5 +1,5 @@
 ---
-description: 設計判断を docs/adr/ の ADR に記録する (adr 一本)
+description: 設計判断を docs/adr/ の ADR に記録する (claude-handbooks:adr 一本)
 ---
 
 # 設計判断
@@ -14,9 +14,9 @@ description: 設計判断を docs/adr/ の ADR に記録する (adr 一本)
 
 ## 実行フロー
 
-### Step 1: adr（ADR作成）
+### Step 1: claude-handbooks:adr（ADR作成）
 
-**REQUIRED SUB-SKILL:** adr に従い:
+**REQUIRED SUB-SKILL:** claude-handbooks:adr に従い:
 
 1. `docs/adr/` に新規 ADR を作成
 2. コンテキスト、検討した選択肢、決定内容、理由を記録
@@ -24,7 +24,7 @@ description: 設計判断を docs/adr/ の ADR に記録する (adr 一本)
 
 ADR 番号は既存の最大番号 + 1。
 
-> memory への保存は行わない。設計判断の検索性は git + ADR 索引（連番ファイル名 + 各 ADR 冒頭のタイトル/関連）で担保する。ADR を Supersede する場合は adr skill の規約に従う。
+> memory への保存は行わない。設計判断の検索性は git + ADR 索引（連番ファイル名 + 各 ADR 冒頭のタイトル/関連）で担保する。ADR を Supersede する場合は claude-handbooks:adr skill の規約に従う。
 
 ### 完了条件
 

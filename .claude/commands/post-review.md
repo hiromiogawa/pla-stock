@@ -1,5 +1,5 @@
 ---
-description: レビュー指摘への対応（failure-record で失敗記録 → rule-cycle でルール改善）を統括する
+description: レビュー指摘への対応（claude-handbooks:failure-record で失敗記録 → rule-cycle でルール改善）を統括する
 ---
 
 # レビュー後対応
@@ -19,7 +19,7 @@ description: レビュー指摘への対応（failure-record で失敗記録 →
 
 - **修正必須**: バグ、セキュリティ、設計上の問題 → 即座に修正
 - **改善提案**: リファクタ、命名改善 → 判断して対応
-- **エージェントのミス**: ルール違反、コンテキスト不足による誤り → failure-record 対象
+- **エージェントのミス**: ルール違反、コンテキスト不足による誤り → claude-handbooks:failure-record 対象
 
 ### Step 2: 修正の実施
 
@@ -27,9 +27,9 @@ description: レビュー指摘への対応（failure-record で失敗記録 →
 
 > **注**: `dev-complete` は本物 slash command (`.claude/commands/dev-complete.md`)。post-review からの sub-command 呼出は、**ユーザーに `/dev-complete` 入力を依頼** してコマンド内容を context に展開させてから順次実行する。post-review 自体も本物 slash command のため、本コマンド全体が「ユーザー明示で起動した後、内部から更にユーザーに `/dev-complete` を依頼」する 2 段階フロー。
 
-### Step 3: failure-record（失敗記録）
+### Step 3: claude-handbooks:failure-record（失敗記録）
 
-エージェントのミスに該当する指摘があった場合、**REQUIRED SUB-SKILL:** failure-record を実行する:
+エージェントのミスに該当する指摘があった場合、**REQUIRED SUB-SKILL:** claude-handbooks:failure-record を実行する:
 
 1. ADR-0007 に FAIL エントリを追記
 2. 該当スキル/CLAUDE.md にルールを反映
@@ -37,10 +37,10 @@ description: レビュー指摘への対応（failure-record で失敗記録 →
 
 ### Step 4: rule-cycle（改善サイクル）
 
-**REQUIRED SUB-COMMAND:** failure-record が `/rule-cycle` を呼び出し、閾値に達していればサイクルが自動実行される。
+**REQUIRED SUB-COMMAND:** claude-handbooks:failure-record が `/rule-cycle` を呼び出し、閾値に達していればサイクルが自動実行される。
 
 ### 完了条件
 
 - [ ] レビュー指摘に全て対応済み
 - [ ] self-review subagent dispatch 再実行パス (Markdown 要約を確認、findings 修正済)
-- [ ] エージェントのミスがあれば failure-record 済み
+- [ ] エージェントのミスがあれば claude-handbooks:failure-record 済み
