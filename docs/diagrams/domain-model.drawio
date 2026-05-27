@@ -1,178 +1,205 @@
 <mxfile host="app.diagrams.net" agent="claude-code" version="24.0.0">
-  <diagram name="pla-stock-domain-model" id="domain-model">
-    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1200" math="0" shadow="0">
+  <diagram name="domain" id="d-domain">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
-        <mxCell id="title" value="&lt;b style=&quot;font-size:18px&quot;&gt;pla-stock domain model&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:11px;color:#666&quot;&gt;ADR-0008 (Drizzle schema SSoT) を origin。2026-05-27 時点の schema を表す&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="400" y="20" width="600" height="50" as="geometry" />
+        <mxCell id="title" value="&lt;b style=&quot;font-size:20px&quot;&gt;pla-stock domain model&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px;color:#666&quot;&gt;ADR-0008 (Drizzle schema SSoT) を origin。2026-05-27 時点の schema。詳細凡例 / 設計メモは &lt;b&gt;[legend]&lt;/b&gt; タブを参照&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="350" y="20" width="700" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="user" value="&lt;b&gt;User (Clerk)&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[external system]&lt;/font&gt;&lt;hr/&gt;userId : string&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;Clerk JWT.sub から取得。pla-stock DB にテーブル無し。&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="580" y="90" width="240" height="80" as="geometry" />
+        <mxCell id="clerk-note" value="&lt;b&gt;userId&lt;/b&gt; は全テーブルに登場するが、Clerk JWT.sub から取得 (external system、pla-stock DB にテーブル無し)" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;dashed=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="510" y="100" width="380" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="kits" value="&lt;b&gt;kits&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[master]&lt;/font&gt;&lt;hr/&gt;id : text [PK]&lt;br/&gt;name : text&lt;br/&gt;grade : enum (HG/RG/EG/MG/PG/other)&lt;br/&gt;scale : enum (1/144 | 1/100 | 1/60 | 1/48 | other)&lt;br/&gt;retailPriceYen : integer?&lt;br/&gt;boxArtUrl : text?" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="80" y="210" width="280" height="160" as="geometry" />
+        <mxCell id="kits" value="&lt;b style=&quot;font-size:15px&quot;&gt;kits&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[master]&lt;/font&gt;&lt;hr/&gt;&lt;b&gt;id&lt;/b&gt; text [PK]&lt;br/&gt;name text&lt;br/&gt;grade enum (HG/RG/EG/MG/PG/other)&lt;br/&gt;scale enum (1/144 | 1/100 | 1/60 | 1/48 | other)&lt;br/&gt;retailPriceYen integer?&lt;br/&gt;boxArtUrl text?" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="190" width="320" height="180" as="geometry" />
         </mxCell>
 
-        <mxCell id="kit_stocks" value="&lt;b&gt;kit_stocks&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[count cache]&lt;/font&gt;&lt;hr/&gt;userId : text [PK,1]&lt;br/&gt;kitId : text [PK,2] [FK→kits.id]&lt;br/&gt;count : integer (CHECK ≥ 0)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="80" y="410" width="280" height="100" as="geometry" />
+        <mxCell id="kit_stocks" value="&lt;b style=&quot;font-size:15px&quot;&gt;kit_stocks&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[count cache]&lt;/font&gt;&lt;hr/&gt;&lt;b&gt;userId&lt;/b&gt; text [PK,1]&lt;br/&gt;&lt;b&gt;kitId&lt;/b&gt; text [PK,2] [FK→kits.id]&lt;br/&gt;count integer (CHECK ≥ 0)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="400" width="320" height="120" as="geometry" />
         </mxCell>
 
-        <mxCell id="kit_events" value="&lt;b&gt;kit_events&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[event ledger]&lt;/font&gt;&lt;hr/&gt;id : text [PK]&lt;br/&gt;userId : text&lt;br/&gt;kitId : text [FK→kits.id]&lt;br/&gt;projectId : text? &lt;i&gt;(weak FK, nullable)&lt;/i&gt;&lt;br/&gt;delta : integer&lt;br/&gt;reason : enum (purchase/project/gift/sell/discard/other)&lt;br/&gt;purchasedAt : text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;&lt;br/&gt;priceYen : integer?&lt;br/&gt;purchaseLocation : text?&lt;br/&gt;note : text?&lt;br/&gt;&lt;b&gt;createdAt&lt;/b&gt; : Date &lt;i&gt;(timestamp_ms)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="80" y="550" width="280" height="260" as="geometry" />
+        <mxCell id="kit_events" value="&lt;b style=&quot;font-size:15px&quot;&gt;kit_events&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[event ledger]&lt;/font&gt;&lt;hr/&gt;&lt;b&gt;id&lt;/b&gt; text [PK]&lt;br/&gt;userId text&lt;br/&gt;kitId text [FK→kits.id]&lt;br/&gt;projectId text? &lt;i style=&quot;color:#999&quot;&gt;(weak FK)&lt;/i&gt;&lt;br/&gt;delta integer&lt;br/&gt;reason enum (purchase/project/gift/sell/discard/other)&lt;br/&gt;purchasedAt text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;&lt;br/&gt;priceYen integer?&lt;br/&gt;purchaseLocation text?&lt;br/&gt;note text?&lt;br/&gt;&lt;b&gt;createdAt&lt;/b&gt; Date &lt;i&gt;(timestamp_ms)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="550" width="320" height="290" as="geometry" />
         </mxCell>
 
-        <mxCell id="paints" value="&lt;b&gt;paints&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[master]&lt;/font&gt;&lt;hr/&gt;id : text [PK]&lt;br/&gt;brand : text&lt;br/&gt;code : text&lt;br/&gt;name : text&lt;br/&gt;colorFamily : enum? (赤/青/黄/緑/白/黒/銀/金/茶/蛍光/クリア/other)&lt;br/&gt;finishType : enum? (光沢/半光沢/つや消し/メタリック/パール/クリア/プライマー/ウェザリング)&lt;br/&gt;swatchUrl : text?" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="1040" y="210" width="280" height="160" as="geometry" />
+        <mxCell id="paints" value="&lt;b style=&quot;font-size:15px&quot;&gt;paints&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[master]&lt;/font&gt;&lt;hr/&gt;&lt;b&gt;id&lt;/b&gt; text [PK]&lt;br/&gt;brand text&lt;br/&gt;code text&lt;br/&gt;name text&lt;br/&gt;colorFamily enum? (赤/青/黄/緑/白/黒/銀/金/茶/蛍光/クリア/other)&lt;br/&gt;finishType enum? (光沢/半光沢/つや消し/メタリック/パール/クリア/プライマー/ウェザリング)&lt;br/&gt;swatchUrl text?" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="190" width="340" height="180" as="geometry" />
         </mxCell>
 
-        <mxCell id="paint_stocks" value="&lt;b&gt;paint_stocks&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[count cache]&lt;/font&gt;&lt;hr/&gt;userId : text [PK,1]&lt;br/&gt;paintId : text [PK,2] [FK→paints.id]&lt;br/&gt;count : integer (CHECK ≥ 0)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="1040" y="410" width="280" height="100" as="geometry" />
+        <mxCell id="paint_stocks" value="&lt;b style=&quot;font-size:15px&quot;&gt;paint_stocks&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[count cache]&lt;/font&gt;&lt;hr/&gt;&lt;b&gt;userId&lt;/b&gt; text [PK,1]&lt;br/&gt;&lt;b&gt;paintId&lt;/b&gt; text [PK,2] [FK→paints.id]&lt;br/&gt;count integer (CHECK ≥ 0)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="400" width="340" height="120" as="geometry" />
         </mxCell>
 
-        <mxCell id="paint_events" value="&lt;b&gt;paint_events&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[event ledger]&lt;/font&gt;&lt;hr/&gt;id : text [PK]&lt;br/&gt;userId : text&lt;br/&gt;paintId : text [FK→paints.id]&lt;br/&gt;delta : integer&lt;br/&gt;reason : enum (purchase/gift/sell/discard/lost/other)&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;※ 'project' は持たない (Project↔Paint は count 非影響)&lt;/font&gt;&lt;br/&gt;purchasedAt : text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;&lt;br/&gt;priceYen : integer?&lt;br/&gt;purchaseLocation : text?&lt;br/&gt;note : text?&lt;br/&gt;&lt;b&gt;createdAt&lt;/b&gt; : Date &lt;i&gt;(timestamp_ms)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="1040" y="550" width="280" height="270" as="geometry" />
+        <mxCell id="paint_events" value="&lt;b style=&quot;font-size:15px&quot;&gt;paint_events&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[event ledger]&lt;/font&gt;&lt;hr/&gt;&lt;b&gt;id&lt;/b&gt; text [PK]&lt;br/&gt;userId text&lt;br/&gt;paintId text [FK→paints.id]&lt;br/&gt;delta integer&lt;br/&gt;reason enum (purchase/gift/sell/discard/lost/other)&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;※ 'project' は持たない (Project↔Paint は count 非影響)&lt;/font&gt;&lt;br/&gt;purchasedAt text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;&lt;br/&gt;priceYen integer?&lt;br/&gt;purchaseLocation text?&lt;br/&gt;note text?&lt;br/&gt;&lt;b&gt;createdAt&lt;/b&gt; Date &lt;i&gt;(timestamp_ms)&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="550" width="340" height="290" as="geometry" />
         </mxCell>
 
-        <mxCell id="projects" value="&lt;b&gt;projects&lt;/b&gt;&lt;hr/&gt;id : text [PK]&lt;br/&gt;userId : text&lt;br/&gt;kitId : text &lt;i&gt;(weak FK)&lt;/i&gt;&lt;br/&gt;name : text&lt;br/&gt;description : text?&lt;br/&gt;status : enum (planning/building/completed/abandoned)&lt;br/&gt;startedAt : text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;&lt;br/&gt;completedAt : text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="540" y="210" width="320" height="180" as="geometry" />
+        <mxCell id="projects" value="&lt;b style=&quot;font-size:15px&quot;&gt;projects&lt;/b&gt;&lt;hr/&gt;&lt;b&gt;id&lt;/b&gt; text [PK]&lt;br/&gt;userId text&lt;br/&gt;kitId text &lt;i style=&quot;color:#999&quot;&gt;(weak FK)&lt;/i&gt;&lt;br/&gt;name text&lt;br/&gt;description text?&lt;br/&gt;status enum (planning/building/completed/abandoned)&lt;br/&gt;startedAt text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;&lt;br/&gt;completedAt text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="510" y="190" width="380" height="210" as="geometry" />
         </mxCell>
 
-        <mxCell id="project_photos" value="&lt;b&gt;project_photos&lt;/b&gt;&lt;hr/&gt;id : text [PK]&lt;br/&gt;projectId : text [FK→projects.id]&lt;br/&gt;url : text&lt;br/&gt;r2Key : text? &lt;i&gt;(R2 object key)&lt;/i&gt;&lt;br/&gt;caption : text?&lt;br/&gt;takenAt : text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="380" y="450" width="280" height="140" as="geometry" />
+        <mxCell id="project_photos" value="&lt;b style=&quot;font-size:15px&quot;&gt;project_photos&lt;/b&gt;&lt;hr/&gt;&lt;b&gt;id&lt;/b&gt; text [PK]&lt;br/&gt;projectId text [FK→projects.id]&lt;br/&gt;url text&lt;br/&gt;r2Key text? &lt;i&gt;(R2 object key)&lt;/i&gt;&lt;br/&gt;caption text?&lt;br/&gt;takenAt text? &lt;i&gt;'YYYY-MM-DD'&lt;/i&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="430" y="440" width="320" height="160" as="geometry" />
         </mxCell>
 
-        <mxCell id="project_paint_use" value="&lt;b&gt;project_paint_use&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[M:N junction]&lt;/font&gt;&lt;hr/&gt;projectId : text [PK,1] [FK→projects.id, CASCADE]&lt;br/&gt;paintId : text [PK,2] [FK→paints.id]&lt;br/&gt;&lt;b&gt;createdAt&lt;/b&gt; : Date &lt;i&gt;(timestamp_ms)&lt;/i&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;※ count 非影響 (paint stock と独立)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="720" y="450" width="320" height="140" as="geometry" />
+        <mxCell id="project_paint_use" value="&lt;b style=&quot;font-size:15px&quot;&gt;project_paint_use&lt;/b&gt; &lt;font style=&quot;font-size:10px;color:#666&quot;&gt;[M:N junction]&lt;/font&gt;&lt;hr/&gt;&lt;b&gt;projectId&lt;/b&gt; text [PK,1] [FK→projects.id, &lt;b&gt;CASCADE&lt;/b&gt;]&lt;br/&gt;&lt;b&gt;paintId&lt;/b&gt; text [PK,2] [FK→paints.id]&lt;br/&gt;&lt;b&gt;createdAt&lt;/b&gt; Date &lt;i&gt;(timestamp_ms)&lt;/i&gt;&lt;br/&gt;&lt;font style=&quot;font-size:10px;color:#666&quot;&gt;※ count 非影響 (paint stock と独立)&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="440" width="380" height="160" as="geometry" />
         </mxCell>
 
-        <mxCell id="rel-user-kitstocks" value="1:N (userId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#666666;fontSize=10;" edge="1" parent="1" source="user" target="kit_stocks">
+        <mxCell id="rel-kits-kitstocks" value="1:N FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kits" target="kit_stocks">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rel-user-kitevents" value="1:N (userId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#666666;fontSize=10;" edge="1" parent="1" source="user" target="kit_events">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-user-paintstocks" value="1:N (userId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#666666;fontSize=10;" edge="1" parent="1" source="user" target="paint_stocks">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-user-paintevents" value="1:N (userId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#666666;fontSize=10;" edge="1" parent="1" source="user" target="paint_events">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-user-projects" value="1:N (userId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#666666;fontSize=10;" edge="1" parent="1" source="user" target="projects">
+        <mxCell id="rel-kits-kitevents" value="1:N FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=11;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="kits" target="kit_events">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="rel-kits-kitstocks" value="1:N&#xa;FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=10;" edge="1" parent="1" source="kits" target="kit_stocks">
+        <mxCell id="rel-paints-paintstocks" value="1:N FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=11;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="paints" target="paint_stocks">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="rel-kits-kitevents" value="1:N&#xa;FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=10;" edge="1" parent="1" source="kits" target="kit_events">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="rel-paints-paintstocks" value="1:N&#xa;FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=10;" edge="1" parent="1" source="paints" target="paint_stocks">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-paints-paintevents" value="1:N&#xa;FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=10;" edge="1" parent="1" source="paints" target="paint_events">
+        <mxCell id="rel-paints-paintevents" value="1:N FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=11;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="paints" target="paint_events">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="rel-kits-projects" value="1:N&#xa;weak FK&#xa;(via kitId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#999999;fontSize=10;fontStyle=2;" edge="1" parent="1" source="kits" target="projects">
+        <mxCell id="rel-kits-projects" value="1:N&#xa;weak FK&#xa;(kitId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#999999;fontSize=11;fontStyle=2;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.3;entryDx=0;entryDy=0;" edge="1" parent="1" source="kits" target="projects">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="rel-projects-kitevents" value="0..1:N&#xa;weak FK&#xa;(via projectId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERzeroToOne;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#999999;fontSize=10;fontStyle=2;" edge="1" parent="1" source="projects" target="kit_events">
+        <mxCell id="rel-projects-kitevents" value="0..1:N&#xa;weak FK&#xa;(projectId)" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;dashed=1;startArrow=ERzeroToOne;endArrow=ERmany;startFill=0;endFill=0;strokeColor=#999999;fontSize=11;fontStyle=2;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.7;entryDx=0;entryDy=0;" edge="1" parent="1" source="projects" target="kit_events">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="rel-projects-photos" value="1:N&#xa;FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=10;" edge="1" parent="1" source="projects" target="project_photos">
+        <mxCell id="rel-projects-photos" value="1:N FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=11;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="projects" target="project_photos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel-projects-ppu" value="1:N&#xa;FK CASCADE" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=11;strokeWidth=2;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="projects" target="project_paint_use">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel-paints-ppu" value="1:N FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=11;exitX=0;exitY=0.7;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="paints" target="project_paint_use">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <mxCell id="rel-projects-ppu" value="1:N&#xa;FK CASCADE" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=10;strokeWidth=2;" edge="1" parent="1" source="projects" target="project_paint_use">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="rel-paints-ppu" value="1:N&#xa;FK" style="edgeStyle=entityRelationEdgeStyle;rounded=0;html=1;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;fontSize=10;" edge="1" parent="1" source="paints" target="project_paint_use">
-          <mxGeometry relative="1" as="geometry" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="legend" id="d-legend">
+    <mxGraphModel dx="1422" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="L0" />
+        <mxCell id="L1" parent="L0" />
+
+        <mxCell id="L-title" value="&lt;b style=&quot;font-size:20px&quot;&gt;Legend &amp; Design Notes&lt;/b&gt;&lt;br/&gt;&lt;font style=&quot;font-size:12px;color:#666&quot;&gt;ER 図本体は [domain] タブを参照&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="L1">
+          <mxGeometry x="350" y="20" width="700" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend" value="&lt;b&gt;凡例 (Legend)&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=top;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="1">
-          <mxGeometry x="80" y="860" width="600" height="320" as="geometry" />
+        <mxCell id="L-color-title" value="&lt;b&gt;Color Legend&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="100" width="200" height="30" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend-master" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="100" y="900" width="30" height="20" as="geometry" />
+        <mxCell id="L-master" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="140" width="40" height="24" as="geometry" />
         </mxCell>
-        <mxCell id="legend-master-label" value="master テーブル (kits / paints) — id + 不変属性 (name / grade / scale 等)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="900" width="520" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="legend-cache" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
-          <mxGeometry x="100" y="930" width="30" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="legend-cache-label" value="count cache (kit_stocks / paint_stocks) — (userId, masterId) composite PK + count, CHECK ≥ 0" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="930" width="520" height="20" as="geometry" />
+        <mxCell id="L-master-l" value="&lt;b&gt;master&lt;/b&gt; (kits / paints) — id + 不変属性 (name / grade / scale 等)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="140" width="540" height="24" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend-ledger" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
-          <mxGeometry x="100" y="960" width="30" height="20" as="geometry" />
+        <mxCell id="L-cache" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="174" width="40" height="24" as="geometry" />
         </mxCell>
-        <mxCell id="legend-ledger-label" value="event ledger (kit_events / paint_events) — append-only 変化記録、delta + reason、count cache の SoR" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="960" width="520" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="legend-project" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="100" y="990" width="30" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="legend-project-label" value="projects — 製作プロジェクト (kit に紐付く、status で lifecycle 表現)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="990" width="520" height="20" as="geometry" />
+        <mxCell id="L-cache-l" value="&lt;b&gt;count cache&lt;/b&gt; (kit_stocks / paint_stocks) — (userId, masterId) PK + count, CHECK ≥ 0" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="174" width="540" height="24" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend-photos" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="100" y="1020" width="30" height="20" as="geometry" />
+        <mxCell id="L-ledger" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="208" width="40" height="24" as="geometry" />
         </mxCell>
-        <mxCell id="legend-photos-label" value="project_photos — project に紐付く写真 (R2 object key)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="1020" width="520" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="legend-ppu" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
-          <mxGeometry x="100" y="1050" width="30" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="legend-ppu-label" value="M:N junction (project_paint_use) — projects ↔ paints の中間、count 非影響、CASCADE 削除" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="1050" width="520" height="20" as="geometry" />
+        <mxCell id="L-ledger-l" value="&lt;b&gt;event ledger&lt;/b&gt; (kit_events / paint_events) — append-only、delta + reason、count cache の SoR" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="208" width="540" height="24" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend-external" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="100" y="1080" width="30" height="20" as="geometry" />
+        <mxCell id="L-projects" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="242" width="40" height="24" as="geometry" />
         </mxCell>
-        <mxCell id="legend-external-label" value="external system (Clerk) — pla-stock DB にテーブルなし、userId のみ流入" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="1080" width="520" height="20" as="geometry" />
+        <mxCell id="L-projects-l" value="&lt;b&gt;projects&lt;/b&gt; — 製作プロジェクト (kit に紐付く、status で lifecycle 表現)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="242" width="540" height="24" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend-edge-solid" value="" style="endArrow=ERmany;html=1;startArrow=ERone;endFill=0;startFill=0;" edge="1" parent="1">
+        <mxCell id="L-photos" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="276" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-photos-l" value="&lt;b&gt;project_photos&lt;/b&gt; — project に紐付く写真 (R2 object key)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="276" width="540" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-ppu" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="310" width="40" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="L-ppu-l" value="&lt;b&gt;M:N junction&lt;/b&gt; (project_paint_use) — projects ↔ paints の中間、count 非影響、CASCADE 削除" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="310" width="540" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-edge-title" value="&lt;b&gt;Edge Legend&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="360" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-edge-solid" value="" style="endArrow=ERmany;html=1;startArrow=ERone;endFill=0;startFill=0;fontSize=11;" edge="1" parent="L1">
           <mxGeometry width="50" height="50" as="geometry">
-            <mxPoint x="100" y="1120" as="sourcePoint" />
-            <mxPoint x="130" y="1120" as="targetPoint" />
+            <mxPoint x="60" y="412" as="sourcePoint" />
+            <mxPoint x="100" y="412" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="legend-edge-solid-label" value="実線 = 強い参照 (FK with .references())、cardinality 1:N or 1:1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="1110" width="520" height="20" as="geometry" />
+        <mxCell id="L-edge-solid-l" value="&lt;b&gt;実線&lt;/b&gt; = 強い参照 (FK with .references())、cardinality 1:N or 1:1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="400" width="540" height="24" as="geometry" />
         </mxCell>
 
-        <mxCell id="legend-edge-dashed" value="" style="endArrow=ERmany;html=1;startArrow=ERone;endFill=0;startFill=0;dashed=1;strokeColor=#999999;" edge="1" parent="1">
+        <mxCell id="L-edge-bold" value="" style="endArrow=ERmany;html=1;startArrow=ERone;endFill=0;startFill=0;fontSize=11;strokeWidth=2;" edge="1" parent="L1">
           <mxGeometry width="50" height="50" as="geometry">
-            <mxPoint x="100" y="1145" as="sourcePoint" />
-            <mxPoint x="130" y="1145" as="targetPoint" />
+            <mxPoint x="60" y="442" as="sourcePoint" />
+            <mxPoint x="100" y="442" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="legend-edge-dashed-label" value="点線 = 弱い参照 (weak FK、.references() なし)。Clerk → tables も点線 (external)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="140" y="1135" width="520" height="20" as="geometry" />
+        <mxCell id="L-edge-bold-l" value="&lt;b&gt;太実線&lt;/b&gt; = FK CASCADE (project → project_paint_use のみ schema に onDelete: 'cascade' 明示)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="430" width="540" height="24" as="geometry" />
         </mxCell>
 
-        <mxCell id="notes" value="&lt;b&gt;設計メモ&lt;/b&gt;&#xa;&#xa;&lt;b&gt;count + event ledger pattern&lt;/b&gt;&#xa;在庫数は count (cache) + events (ledger) の 2 種類で表現。&#xa;events が SoR (source of record)、stocks は集計値の cache。&#xa;CHECK ≥ 0 + UPSERT batch で整合性確保 (ADR-0007 FAIL-003)。&#xa;&#xa;&lt;b&gt;weak FK (no .references())&lt;/b&gt;&#xa;FSD 同層 import 回避のため projects.kitId / kit_events.projectId は&#xa;.references() を付けない。論理的 1:N だが DB レベルの constraint なし。&#xa;&#xa;&lt;b&gt;timestamp の 2 種類&lt;/b&gt;&#xa;&lt;b&gt;Date&lt;/b&gt; (instant) = createdAt → integer(timestamp_ms) + boundary Date&#xa;&lt;i&gt;'YYYY-MM-DD'&lt;/i&gt; (calendar) = purchasedAt/startedAt → text + boundary string&#xa;native &amp;lt;input type=&quot;date&quot;&amp;gt; 整合のため calendar は string。&#xa;&#xa;&lt;b&gt;M:N junction&lt;/b&gt;&#xa;project_paint_use は専用 entity (entities/projectPaintUse/)。&#xa;唯一 cross-entity import (paint + project schema) が許される場所。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#ffffff;strokeColor=#000000;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="720" y="860" width="600" height="320" as="geometry" />
+        <mxCell id="L-edge-dashed" value="" style="endArrow=ERmany;html=1;startArrow=ERone;endFill=0;startFill=0;fontSize=11;dashed=1;strokeColor=#999999;" edge="1" parent="L1">
+          <mxGeometry width="50" height="50" as="geometry">
+            <mxPoint x="60" y="472" as="sourcePoint" />
+            <mxPoint x="100" y="472" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="L-edge-dashed-l" value="&lt;b&gt;点線 (灰色)&lt;/b&gt; = weak FK (.references() なし、FSD 同層 import 回避のため)。論理的 1:N だが DB constraint なし" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="110" y="460" width="700" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-notes-title" value="&lt;b&gt;設計メモ&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="510" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-note-ledger" value="&lt;b&gt;count + event ledger pattern&lt;/b&gt;&lt;br/&gt;在庫数は count (cache) + events (ledger) の 2 種類で表現。&lt;b&gt;events が SoR (source of record)&lt;/b&gt;、stocks は集計値の cache。&lt;br/&gt;CHECK ≥ 0 + UPSERT batch で整合性確保 (ADR-0007 FAIL-003)。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fff8e1;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="550" width="640" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-note-weak" value="&lt;b&gt;weak FK (no .references())&lt;/b&gt;&lt;br/&gt;FSD 同層 import 回避のため、&lt;code&gt;projects.kitId&lt;/code&gt; と &lt;code&gt;kit_events.projectId&lt;/code&gt; は &lt;code&gt;.references()&lt;/code&gt; を付けない。&lt;br/&gt;論理的 1:N だが DB レベルの constraint なし。Drizzle 型は手動 join で繋ぐ。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f5f5f5;strokeColor=#999999;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="640" width="640" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-note-timestamp" value="&lt;b&gt;timestamp の 2 種類区別 (ADR-0008)&lt;/b&gt;&lt;br/&gt;&lt;b&gt;Date (instant)&lt;/b&gt; — &lt;code&gt;createdAt&lt;/code&gt; → &lt;code&gt;integer({ mode: 'timestamp_ms' })&lt;/code&gt; + boundary &lt;code&gt;Date&lt;/code&gt;&lt;br/&gt;&lt;b&gt;'YYYY-MM-DD' (calendar)&lt;/b&gt; — &lt;code&gt;purchasedAt / startedAt / completedAt / takenAt&lt;/code&gt; → &lt;code&gt;text&lt;/code&gt; + boundary &lt;code&gt;string&lt;/code&gt;&lt;br/&gt;native &amp;lt;input type=&quot;date&quot;&amp;gt; の value 形式に合わせて calendar は string で扱う (instant のみ Date)。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fafafa;strokeColor=#666666;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="60" y="730" width="640" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-note-mn" value="&lt;b&gt;M:N junction (project_paint_use)&lt;/b&gt;&lt;br/&gt;projects ↔ paints の中間テーブル。専用 entity (&lt;code&gt;src/entities/projectPaintUse/&lt;/code&gt;) として独立。&lt;br/&gt;本 entity だけが cross-entity import (paint + project schema) を許される (ADR-0008)。count 非影響。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#fff3e0;strokeColor=#d79b00;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="720" y="550" width="620" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-note-userid" value="&lt;b&gt;userId (Clerk JWT)&lt;/b&gt;&lt;br/&gt;全テーブルの &lt;code&gt;userId&lt;/code&gt; カラムは Clerk JWT &lt;code&gt;.sub&lt;/code&gt; から取得。&lt;br/&gt;pla-stock DB にはユーザーテーブルが存在しない (Clerk が SSoT)。本図でも entity として表現せず、各テーブルのカラム注釈のみで示す。" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;dashed=1;" vertex="1" parent="L1">
+          <mxGeometry x="720" y="640" width="620" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="L-note-related" value="&lt;b&gt;関連 ADR / docs&lt;/b&gt;&lt;br/&gt;ADR-0008 (entity schema SSoT、本図の origin) / ADR-0006 (Drizzle + D1) / ADR-0010 (master data seeding) / ADR-0007 FAIL-003 (UPSERT CHECK 評価順)&lt;br/&gt;docs/rules/domain-modeling.md / docs/diagrams/README.md (閲覧 / export 手順)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;fillColor=#ffffff;strokeColor=#000000;fontSize=12;" vertex="1" parent="L1">
+          <mxGeometry x="720" y="730" width="620" height="100" as="geometry" />
         </mxCell>
 
       </root>
