@@ -50,7 +50,7 @@ export const KIT_EVENT_REASON_LABELS = {
 ## 強制方法 / convention
 
 - 機械強制はせず convention 運用 (ADR-0008)
-- AI エージェントが本規約に違反した場合は `failure-record` skill で ADR-0007 に FAIL エントリ追記 → user に `/rule-cycle` 依頼
+- AI エージェントが本規約に違反した場合は `claude-handbooks:failure-record` skill で ADR-0007 に FAIL エントリ追記 → user に `/rule-cycle` 依頼
 
 ## 関連
 

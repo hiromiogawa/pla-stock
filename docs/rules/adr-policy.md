@@ -82,12 +82,12 @@ docs/adr/
 - retro 挿入 (本 ADR 確立より前の失敗事例を後から追加) は **`FAIL-NNNx` (x = a/b/c)** で fragment 番号化、連番再割振りは禁止 (CLAUDE.md / docs / file memory からの参照を壊さないため)
 - 各 entry は: 事象 / 原因 / 対策 / 反映先
 
-新規 FAIL entry 追加は `failure-record` skill 経由 (本ファイルを読んで AI が追記)。
+新規 FAIL entry 追加は `claude-handbooks:failure-record` skill 経由 (本ファイルを読んで AI が追記)。
 
 ## 関連
 
-- skill: `adr` (新規 ADR 書き、本ファイルを読んで実行する orchestrator)
-- skill: `failure-record` (ADR-0007 への FAIL 追記)
+- skill: `claude-handbooks:adr` (新規 ADR 書き、本ファイルを読んで実行する orchestrator)
+- skill: `claude-handbooks:failure-record` (ADR-0007 への FAIL 追記)
 - command: `/design-decision` (ADR 起票 orchestrator)
 - 設定: `scripts/gen-adr-index.mjs`、`docs/adr/README.md` (自動生成)
 - 関連 ADR: ADR-0007 (FAIL log)、ADR-0009 (memory ルール)、ADR-0018 (SSoT 境界 = 本規約の根拠)
