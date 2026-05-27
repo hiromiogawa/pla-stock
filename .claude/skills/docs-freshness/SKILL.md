@@ -56,4 +56,4 @@ PR 作成前に以下を確認 (本リスト自体は dev-complete subagent disp
 
 - 「コードを見れば分かる」 → ならドキュメント化しない。JSDoc + 自動生成に任せる。
 - 「陳腐化するかも」 → 自動生成するか、書かない。
-- **「機械強制と謳って実体がない」** → paper tiger。新規 generator を追加する時は drift 検出 hook も同 PR で配線する (writing-project-skills の「機械強制併設原則」)。
+- **「機械強制と謳って実体がない」** → paper tiger。新規 generator を追加する時は drift 検出 hook も同 PR で配線する (`claude-handbooks:writing-skills` の「機械強制併設原則」)。
