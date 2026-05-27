@@ -67,7 +67,38 @@ PR 作成 → Issue 自動 In Progress、PR merge → Issue 自動 Done (Closes 
 
 ## stacked PR
 
-複数 PR を順序付きで積み上げる場合の運用は **Issue #146 で別途検討中** (squash merge 手順のルール化)。
+**既定: stacked PR を避ける**。squash merge を既定とする本 repo では stacked PR と相性が悪く、過去に手戻りが発生している (#146)。依存する後続作業は **親 PR がマージされてからブランチを切る** 運用を取る。
+
+### なぜ stacked PR が squash merge と相性が悪いか
+
+| 現象 | 原因 |
+|---|---|
+| 親 PR の `--delete-branch` で base ブランチ削除 → 子 PR が自動 CLOSED | GitHub 仕様上、base ブランチ削除済みの PR は **reopen 不可・base 変更不可** |
+| squash merge で main の歴史が変わる → 子ブランチが CONFLICTING | 子ブランチが parent ブランチ上の original commit を抱えているため |
+
+### やむを得ず stacked PR を採用する場合の手順
+
+並行作業を待てない等の例外時は以下を**全て**守る:
+
+1. **下から順にマージ** (親 → 子 → 孫)
+2. 親 PR マージ時に **`--delete-branch` を付けない** (`gh pr merge --squash` で止める、`--delete-branch` は子の merge 完了後にまとめて手動削除)
+3. 親マージ直後に、各子 PR の base を `main` に付け替える: `gh pr edit <child> --base main`
+4. 子ブランチに main を merge して整合させる (rebase ではなく **merge** にして force-push を回避):
+   ```sh
+   git switch <child-branch>
+   git merge main      # rebase ではなく merge
+   # コンフリクトは ours (子ブランチ側 = 上位互換) 採用
+   git push
+   ```
+5. 子 PR がマージ可能になってから次の子へ進む
+
+### NG 例 / 対処 (stacked PR 関連)
+
+| NG | 理由 | 対処 |
+|---|---|---|
+| 親マージ時に `--delete-branch` を付けた | 子 PR が auto-close + reopen 不可 | 新規 PR を base=main で作り直し (本来は最初から付けない) |
+| 親マージ後に子の base を main に付け替えず放置 | base が消えた / コンフリクト多発 | 即座に `gh pr edit <child> --base main` |
+| stacked PR を rebase で main 追従 | force-push が発生して review コメントの行紐付けが消える | merge で追従、コンフリクトは ours で解決 |
 
 ## NG 例 / 対処
 
