@@ -57,5 +57,16 @@
       "Bash(pnpm check:parallel)",
       "Bash(pnpm check:branch)"
     ]
+  },
+  "extraKnownMarketplaces": {
+    "claude-handbooks": {
+      "source": {
+        "source": "github",
+        "repo": "hiromiogawa/claude-handbooks"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "claude-handbooks@claude-handbooks": true
   }
 }
