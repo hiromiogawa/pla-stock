@@ -19,7 +19,7 @@
 | `dep-cruiser-fsd.cjs` | dependency-cruiser | FSD レイヤー単方向依存 + Container/Hook/Presenter (#43) + 共通 | 中 |
 | `commitlint-config.cjs` | commitlint | Conventional Commits + scope-enum | 小 |
 
-> View 純粋性 (#43 Container/Hook/Presenter) のうち `*View.tsx → ~/features/*` 禁止は `dep-cruiser-fsd.cjs` の `fsd-view-component-no-features-direct` rule で機械強制。`useState` 等 named import 禁止は **review 担保** (機械強制対象外、OSS 検討は Issue #217)。旧 `oxlint-view-purity.jsonc` は paths+importNames 形式が oxlint 1.61 で機能せず paper tiger だったため #155 で削除済 (FAIL-005 / ADR-0007)。
+> View 純粋性 (#43 Container/Hook/Presenter) のうち `*View.tsx → ~/features/*` 禁止は `dep-cruiser-fsd.cjs` の `fsd-view-component-no-features-direct` rule で機械強制。`useState` 等 named import 禁止は **review 担保** (機械強制対象外、ADR-0023 で OSS 採用見送り確定)。旧 `oxlint-view-purity.jsonc` は paths+importNames 形式が oxlint 1.61 で機能せず paper tiger だったため #155 で削除済 (FAIL-005 / ADR-0007)。
 
 ### knip だけ例外
 

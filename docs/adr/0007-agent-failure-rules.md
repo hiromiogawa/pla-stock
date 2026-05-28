@@ -169,6 +169,11 @@
   - **react の `useState` / `useEffect` / `useReducer` 等 named import 禁止**は **review 担保** に明示転換 (custom script 案は腐敗リスクから見送り)。OSS / 別ツール検討は Issue #217 に積み上げ
   - 古い paper tiger 設定 `lint-config/oxlint-view-purity.jsonc` を削除、`.oxlintrc.json` extends からも除外
   - CLAUDE.md `Container/Hook/Presenter` 節を更新 (depcruise 強制範囲 + review 担保範囲 + Issue #217 リンクを表で明示)
+- **2026-05-28 update (#217 close、ADR-0023 で OSS 採用見送り確定)**:
+  - Phase A 事前調査 7 候補 (dependency-cruiser 拡張 / ESLint dual lint / eslint-plugin-boundaries / Steiger / eslint-plugin-import / TS barrel / custom script) を比較
+  - 技術的に成立する選択肢は **ESLint dual lint** (`no-restricted-imports` + `importNames`) のみだったが、dual lint 設定保守コスト > paper tiger 継続リスクと user 判断で **見送り**
+  - **review 担保継続を意識的選択として明文化** (ADR-0023)、`docs/rules/architecture.md` の表記も「Issue #217 で検討中」→「ADR-0023 で見送り確定」に更新
+  - 将来再評価トリガー (ADR-0023 に記載): oxlint が paths+importNames を正式 support / Steiger GA / review で見落とし複数発生 / eslint 採用判断変化、のいずれか
 
 ### FAIL-006: testing skill ルール 2/3 を機械強制せず paper tiger を再発 (2026-05-23)
 

@@ -33,3 +33,19 @@ mutation や 3 個以上の useState、async handler を持つ view を **Contai
 
 - (a) `scripts/check-view-purity.mjs` の custom regex script: 腐敗リスク (regex 場当たり / IDE squiggle なし / oxlint 外で進化享受できない) から却下 (#155 で議論済)
 - (b) eslint plugin 自作: メンテ負荷、却下
+
+## 追補 (2026-05-28、ADR-0023 で named import OSS 検討結論)
+
+本 ADR-0019 起票時 (2026-04-29、retro 記録) は「将来 OSS で named import 禁止が確立したら本 ADR を supersede する」予定だったが、Issue #217 で Phase A 事前調査 7 候補 (dependency-cruiser 拡張 / ESLint dual lint / eslint-plugin-boundaries / Steiger / eslint-plugin-import / TS barrel / custom script) を比較した結果、**OSS 採用を見送り、review 担保継続を意識的選択として明文化** する判断に至った (詳細は **ADR-0023**)。
+
+主な要因:
+- 技術的に成立する選択肢は ESLint dual lint (`no-restricted-imports` + `importNames`) のみだったが、dual lint 設定保守コスト > paper tiger 継続リスクと user 判断
+- Steiger (FSD purpose-built) は 0.6.0 milestone = beta、API breaking 可能性で時期尚早
+- 既存 depcruise rule `fsd-view-component-no-features-direct` で View → features 直 import は機械強制されており、named import の review 担保は補助的位置付け
+
+これに伴い:
+- 本 ADR-0019「強制方法」表 L24 の「Issue #217 で OSS 検討中」の検討は **ADR-0023 で見送り確定**
+- 本 ADR-0019「結果」 L30 の「将来 OSS で named import 禁止が確立したら supersede」は、当面実現しない見込み (ADR-0023 の将来再評価トリガーが満たされた場合のみ)
+- **本 ADR-0019 自体は supersede しない** (Container/Hook/Presenter 規約と enforcement 範囲 (depcruise + review 担保) は変わらないため。ADR-0023 は ADR-0019 の補完で、OSS 採用見送り判断を独立 ADR として記録)
+
+将来 ADR-0023 の再評価トリガー (oxlint paths+importNames support / Steiger GA / 複数見落とし発生 / eslint 採用判断変化) が満たされた場合は、ADR-0023 を supersede する新 ADR を立てる (本 ADR-0019 はそのまま継続)。
