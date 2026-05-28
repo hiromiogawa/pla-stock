@@ -79,10 +79,10 @@ export function KitDetailView({ kit, isPurchaseDialogOpen, ... }: Props) {
 |---|---|---|
 | View 本体 (`*View.tsx`) → `~/features/*` 直 import 禁止 | depcruise rule `fsd-view-component-no-features-direct` | ✅ 機械強制 (CI / pre-commit) |
 | ライブラリ仕様の自然誘導 (TanStack Router の `useLoaderData` は route 階層 = Container のみ) | フレームワーク仕様 | ✅ 構造的 |
-| Presenter 内の react named import (`useState` 等) 禁止 | review 担保 | ⚠️ 意識的選択 (Issue #217 で OSS 検討中) |
+| Presenter 内の react named import (`useState` 等) 禁止 | review 担保 | ⚠️ 意識的選択 (ADR-0023 で OSS 採用見送り確定、dual lint コスト > paper tiger リスクと判断) |
 
 ## 関連
 
 - 設計経緯: ADR-0019 (Container/Hook/Presenter 規約)
 - 機械強制実装: `.dependency-cruiser.cjs` (FSD レイヤールール)
-- 関連 issue: #43 (規約導入)、#155 (paper tiger 解消)、#218 (depcruise rule 機械強制化)、#217 (named import OSS 検討)
+- 関連 issue: #43 (規約導入)、#155 (paper tiger 解消)、#218 (depcruise rule 機械強制化)、#217 (named import OSS 検討、ADR-0023 で見送り確定)
