@@ -28,3 +28,4 @@
 | [ADR-0021](./0021-linting-policy.md) | TypeScript / JS linting policy (retroactive) | 承認 | 2026-04-29 |
 | [ADR-0022](./0022-claude-handbooks-plugin.md) | claude-handbooks plugin による handbook 系 skill の切り出し | 承認 | — |
 | [ADR-0023](./0023-view-purity-named-import-restriction-deferred.md) | View 純粋性 named import 禁止 — OSS 採用見送り、review 担保継続 | 承認 | — |
+| [ADR-0024](./0024-harness-mechanism-audit.md) | harness 機構再点検 — `.claude/rules/` 採用 + commands→skills 統一 + stakes 別 user-only 判定 | 承認 | — |
