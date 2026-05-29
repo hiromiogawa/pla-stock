@@ -57,3 +57,4 @@ export const KIT_EVENT_REASON_LABELS = {
 - 設計経緯: ADR-0008 (entity schema SSoT、ADR-0005 を Supersede)、ADR-0006 (Drizzle + D1 採用)、ADR-0007 (failure log)
 - 関連 entity: `src/entities/kit/`、`src/entities/paint/`、`src/entities/project/`、`src/entities/projectPaintUse/`
 - 機械強制: `.dependency-cruiser.cjs` (no-seed-from-production)
+- 俯瞰図: [`docs/diagrams/domain-model.drawio`](../diagrams/domain-model.drawio) (9 テーブル + Clerk user の関係、cardinality、timestamp 種別を視覚化、#226)

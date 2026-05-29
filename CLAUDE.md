@@ -68,6 +68,7 @@ orchestrator の連鎖関係 (各 `.claude/commands/<name>.md` body 中の言及
 - 設計判断の歴史: [docs/adr/README.md](./docs/adr/README.md) (索引、自動生成)
 - 失敗事例 live log: [docs/adr/0007-agent-failure-rules.md](./docs/adr/0007-agent-failure-rules.md)
 - ハーネス俯瞰: [docs/harness-map.md](./docs/harness-map.md)
+- ドメインモデル俯瞰: [docs/diagrams/domain-model.drawio](./docs/diagrams/domain-model.drawio) (drawio.com / VS Code 拡張で閲覧、PNG/SVG は手動 export)
 - デザイン方向性: [docs/specs/2026-04-29-design-direction.md](./docs/specs/2026-04-29-design-direction.md)
 - 開発環境セットアップ / 本番 deploy: [README.md](./README.md)
 
